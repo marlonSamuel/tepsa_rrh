@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Exceptions;
+
 use Exception;
 use App\Traits\ApiResponser;
 use Asm89\Stack\CorsService;
@@ -63,7 +65,7 @@ class Handler extends ExceptionHandler
 
     public function handleException($request, Exception $exception)
     {
-        if($exception->getCode() === 401){
+        if ($exception->getCode() === 401) {
             return $this->errorResponse("Usuario o contraseña incorrectos", 401);
         }
 
@@ -79,7 +81,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof AuthenticationException) {
             return $this->unauthenticated($request, $exception);
         }
-        
+
         if ($exception instanceof AuthorizationException) {
             return $this->errorResponse('No posee permisos para ejecutar esta acción', 403);
         }
@@ -89,11 +91,11 @@ class Handler extends ExceptionHandler
         if ($exception instanceof MethodNotAllowedHttpException) {
             return $this->errorResponse('El método especificado en la petición no es válido', 405);
         }
-        
+
         if ($exception instanceof HttpException) {
             return $this->errorResponse($exception->getMessage(), $exception->getStatusCode());
         }
-        
+
         if ($exception instanceof QueryException) {
             $codigo = $exception->errorInfo[1];
             if ($codigo == 1451) {
@@ -104,8 +106,8 @@ class Handler extends ExceptionHandler
         if ($exception instanceof TokenMismatchException) {
             return redirect()->back()->withInput($request->input());
         }
-        
-        dd($exception);
+
+        //dd($exception);
 
         return $this->errorResponse($exception, 500);
     }
@@ -118,7 +120,7 @@ class Handler extends ExceptionHandler
         if ($this->isFrontend($request)) {
             return redirect()->guest('login');
         }
-        return $this->errorResponse('No autenticado.', 401);        
+        return $this->errorResponse('No autenticado.', 401);
     }
 
     /**
@@ -134,7 +136,7 @@ class Handler extends ExceptionHandler
         }
         return $this->errorResponse($errors, 422);
     }
-    
+
     private function isFrontend($request)
     {
         return $request->acceptsHtml() && collect($request->route()->middleware())->contains('web');
