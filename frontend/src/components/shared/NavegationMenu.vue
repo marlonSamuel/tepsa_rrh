@@ -148,6 +148,7 @@ export default {
             path: '',
             children: [
                 { name: 'turno', icon: 'add', text: 'Turnos', path: '/turno' },
+                { name: 'carnet', icon: 'add', text: 'Carnets', path: '/carnet' },
             ]
         },
 

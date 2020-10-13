@@ -9,6 +9,7 @@ import exampleService from '../services/ExampleService'
 import LoginService from '../services/LoginService'
 import UsuarioService from '../services/UsuarioService'
 import TurnoService from '../services/TurnoService'
+import CarnetService from '../services/CarnetService'
 
 
 let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
@@ -66,4 +67,5 @@ export default {
     loginService: new LoginService(Axios, baseUrl),
     usuarioService: new UsuarioService(Axios, baseUrl),
     turnoService: new TurnoService(Axios, baseUrl),
+    carnetService: new CarnetService(Axios, baseUrl),
 }

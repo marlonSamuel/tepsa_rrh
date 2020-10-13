@@ -95,6 +95,9 @@ VueCookies.config('7d')
 Vue.config.productionTip = false
 window.events = new Vue();
 
+import VueHtmlToPaper from 'vue-html-to-paper';
+Vue.use(VueHtmlToPaper);
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

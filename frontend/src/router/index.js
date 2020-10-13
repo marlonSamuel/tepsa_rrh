@@ -8,6 +8,7 @@ import ExampleIndex from '@/components/example/Index'
 import Login from '@/components/login/Index'
 import CambiarContrasenia from '@/components/accesos/CambiarContrasenia'
 import Turno from '@/components/configuracion/Turno'
+import Carnet from '@/components/configuracion/Carnet'
 
 Vue.use(Router)
 
@@ -27,6 +28,7 @@ const routes = [
     { path: '/login', name: 'Login', component: Login, beforeEnter: multiguard([isLoggedOut]) },
     { path: '/change_password', name: 'CambiarContrasenia', component: CambiarContrasenia, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/turno', name: 'Turno', component: Turno, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/carnet', name: 'Carnet', component: Carnet, beforeEnter: multiguard([isLoggedIn]) },
 ]
 
 

@@ -16,7 +16,7 @@ class TurnoController extends ApiController
 
     public function index()
     {
-        $turnos = turno::all();
+        $turnos = Turno::all();
         return $this->showAll($turnos);
     }
 
