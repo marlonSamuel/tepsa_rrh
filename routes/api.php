@@ -32,3 +32,6 @@ Route::resource('cargos', 'Cargo\CargoController', ['except' => ['create', 'edit
 
 #=======================TURNOS=========================================================#
 Route::resource('turnos', 'Turno\TurnoController', ['except' => ['create', 'edit']]);
+
+#=======================CARNETS=========================================================#
+Route::resource('carnets', 'Carnet\CarnetController', ['except' => ['create', 'edit']]);

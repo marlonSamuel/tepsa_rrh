@@ -2,7 +2,7 @@
   <v-layout align-start v-loading="loading">
     <v-flex>
       <v-toolbar flat color="white">
-        <v-toolbar-title>TURNOS </v-toolbar-title>
+        <v-toolbar-title>CARNETS </v-toolbar-title>
         <v-divider
           class="mx-2"
           inset
@@ -16,6 +16,41 @@
             hide-details
           ></v-text-field>
         <v-spacer></v-spacer>
+
+        <v-dialog v-model="showCarnet" max-width="500px">
+            
+            <v-card>
+                
+                <v-card-actions>
+                    <v-btn flat color="info" @click="print"><v-icon>print</v-icon></v-btn>
+                </v-card-actions>
+
+                <v-card-text>
+                   <div class="card-row" id="print" ref="print">
+                          <div class="columnCard">
+                              <article class="card">
+                                <img :src="this.$store.state.global.getLogo()"/>
+                                <qrcode-vue :size="70" v-if="form.codigo !== null" :value="form.codigo"></qrcode-vue>
+                                <br />
+                                <h5>codigo: {{form.codigo}}</h5>
+                            </article> 
+                          </div>
+                          <div class="column">
+                              <article class="card">
+                                <img :src="this.$store.state.global.getLogo()"/>
+                                <qrcode-vue :size="70" v-if="form.codigo !== null" :value="form.codigo"></qrcode-vue>
+                                <br />
+                                <h5>codigo: {{form.codigo}}</h5>
+                            </article> 
+                          </div>
+                       
+                    </div>
+                </v-card-text>
+                
+            </v-card>
+            
+        </v-dialog>
+
         <v-dialog v-model="dialog" max-width="800px" persistent>
           <template v-slot:activator="{ on }">
             <v-btn color="primary" small dark class="mb-2" v-on="on"><v-icon>add</v-icon> Nuevo</v-btn>
@@ -29,26 +64,18 @@
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs6 sm6 md6>
-                    <v-text-field v-model="form.hora_inicio" 
-                        label="Hora inicio"
+                    <v-text-field v-model="form.codigo" 
+                        label="Codigo"
                         v-validate="'required'"
-                        type="time"
-                        data-vv-name="hora_inicio"
-                        data-vv-as="hora inicio"
-                        :error-messages="errors.collect('hora_inicio')">
+                        type="text"
+                        data-vv-name="codigo"
+                        :error-messages="errors.collect('codigo')">
                     </v-text-field>
                   </v-flex>
-
-                  <v-flex xs6 sm6 md6>
-                    <v-text-field v-model="form.hora_fin" 
-                        label="Hora fin"
-                        v-validate="'required'"
-                        type="time"
-                        data-vv-name="hora_fin"
-                        data-vv-as="hora fin"
-                        :error-messages="errors.collect('hora_fin')">
-                    </v-text-field>
+                  <v-flex xs6 sm3 md3 v-if="form.codigo !== null">
+                      <qrcode-vue :value="form.codigo"></qrcode-vue>
                   </v-flex>
+                  
                 </v-layout>
               </v-container>
             </v-card-text>
@@ -68,9 +95,18 @@
         class="elevation-1"
       >
         <template v-slot:items="props">
-          <td class="text-xs-left">{{'2020-04-05 '+ props.item.hora_inicio | moment('h:mm a')}}</td>
-          <td class="text-xs-left">{{'2020-04-05 '+ props.item.hora_fin | moment('h:mm a')}}</td>
+          <td class="text-xs-left">{{props.item.codigo}}</td>
           <td class="text-xs-left">
+              <v-chip small :color="props.item.asignado?'primary':'green'">{{props.item.asignado ? 'Asignado':'Disponible'}}</v-chip>
+              
+            </td>
+          <td class="text-xs-left">
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                    <v-icon v-on="on"  color="info" fab dark @click="showInfo(props.item)"> remove_red_eye</v-icon>
+                </template>
+                <span>Mostrar carnet</span>
+            </v-tooltip>
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
                     <v-icon v-on="on"  color="warning" fab dark @click="edit(props.item)"> edit</v-icon>
@@ -93,27 +129,73 @@
   </v-layout>
 </template>
 
+<style>
+
+    .columnCard {
+        float: right;
+        width: 60%;
+        padding: 0 10px;
+    }
+
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .content {
+        text-align: center;
+    }
+
+    .card {
+      margin: auto;
+      width: 150px;
+      height: 200px;
+      padding: 10px;
+      border: 1px solid gray;
+      border-left: 6px solid #130877;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    .card > img:first-child {
+      border-radius: 7px 7px 0 0;
+      width: 150px;
+      text-align: right;
+      padding-right: 40px;
+    }
+</style>
+
 <script>
+import QrcodeVue from 'qrcode.vue'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
+import moment from 'moment'
+var pdfMake = require('pdfmake/build/pdfmake.js')
+
 export default {
-  name: "turno",
+  name: "carnet",
+  components: {
+      QrcodeVue
+  },
   props: {
       source: String
     },
   data() {
     return {
       dialog: false,
+      showCarnet: false,
       search: '',
       loading: false,
       items: [],
       headers: [
-        { text: 'Hora inicio', value: 'hora_inicio' },
-        { text: 'Hora fin', value: 'hora_fin' },
+        { text: 'Codigo', value: 'codigo' },
+        { text: 'Estado', value: 'asignado' },
         { text: 'Acciones', value: '', sortable: false }
       ],
       form: {
         id: null,
-        hora_inicio: null,
-        hora_fin: null
+        codigo: null
       },
     };
   },
@@ -127,7 +209,7 @@ export default {
      getAll() {
       let self = this
       self.loading = true
-      self.$store.state.services.turnoService
+      self.$store.state.services.carnetService
         .getAll()
         .then(r => {
           self.loading = false
@@ -144,7 +226,7 @@ export default {
       let self = this
       let data = self.form
       self.loading = true
-      self.$store.state.services.turnoService
+      self.$store.state.services.carnetService
         .create(data)
         .then(r => {
           self.loading = false
@@ -164,7 +246,7 @@ export default {
       self.loading = true
       let data = self.form
        
-      self.$store.state.services.turnoService
+      self.$store.state.services.carnetService
         .update(data)
         .then(r => {
           self.loading = false
@@ -183,7 +265,7 @@ export default {
       let self = this
       self.$confirm('Seguro que desea eliminar turno?').then(res => {
         self.loading = true
-            self.$store.state.services.turnoService
+            self.$store.state.services.carnetService
             .destroy(data)
             .then(r => {
                 self.loading = false
@@ -218,12 +300,17 @@ export default {
         self.mapData(data)   
     },
 
+    showInfo(data){
+        let self = this
+        self.mapData(data)
+        self.showCarnet = true
+    },
+
     //mapear datos a formulario
     mapData(data){
         let self = this
         self.form.id = data.id
-        self.form.hora_inicio = data.hora_inicio
-        self.form.hora_fin = data.hora_fin
+        self.form.codigo = data.codigo
     },
 
     //funcion, validar si se guarda o actualiza
@@ -247,14 +334,37 @@ export default {
     close () {
         let self = this
         self.dialog = false
+        self.showCarnet = false
         self.clearData()
     },
+
+    print () {
+      let self = this
+      self.loading = true
+
+      // capturamos el div con html2canvas para despues descargarlo con pdfmake
+      html2canvas(self.$refs.print,{scale:5}).then(canvas => {
+          self.loading = true
+          var data = canvas.toDataURL("image/png");
+                var docDefinition = {
+                    content: [{
+                        image: data,
+                        width: 500,
+                    }],
+                    pageSize: 'LETTER',
+                };
+                pdfMake.createPdf(docDefinition).download('carnet_'+self.form.codigo);
+           self.loading = false
+      }).catch((error) => {
+          self.loading =false
+      });
+    }
   },
 
   computed: {
     setTitle(){
       let self = this
-      return self.form.id !== null ? 'actualizar' : 'Nuevo Registro'
+      return self.form.id !== null ? 'actualizar codigo '+self.form.codigo : 'Nuevo Registro'
     }
   },
 };
