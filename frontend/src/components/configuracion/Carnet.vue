@@ -35,7 +35,7 @@
                                 <h5>codigo: {{form.codigo}}</h5>
                             </article> 
                           </div>
-                          <div class="column">
+                          <div class="columnCard">
                               <article class="card">
                                 <img :src="this.$store.state.global.getLogo()"/>
                                 <qrcode-vue :size="70" v-if="form.codigo !== null" :value="form.codigo"></qrcode-vue>
@@ -132,7 +132,7 @@
 <style>
 
     .columnCard {
-        float: right;
+        float: left;
         width: 60%;
         padding: 0 10px;
     }
