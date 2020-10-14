@@ -28,7 +28,17 @@
             <v-card-text>
               <v-container grid-list-md>
                 <v-layout wrap>
-                  <v-flex xs6 sm6 md6>
+                  <v-flex xs6 sm2 md2>
+                    <v-text-field v-model="form.numero" 
+                        label="Hora inicio"
+                        v-validate="'required|numeric'"
+                        type="time"
+                        data-vv-name="hora_inicio"
+                        data-vv-as="hora inicio"
+                        :error-messages="errors.collect('hora_inicio')">
+                    </v-text-field>
+                  </v-flex>
+                <v-flex xs6 sm5 md5>
                     <v-text-field v-model="form.hora_inicio" 
                         label="Hora inicio"
                         v-validate="'required'"
@@ -39,7 +49,7 @@
                     </v-text-field>
                   </v-flex>
 
-                  <v-flex xs6 sm6 md6>
+                  <v-flex xs6 sm5 md5>
                     <v-text-field v-model="form.hora_fin" 
                         label="Hora fin"
                         v-validate="'required'"
@@ -68,6 +78,7 @@
         class="elevation-1"
       >
         <template v-slot:items="props">
+          <td class="text-xs-left">{{props.item.numero}}</td>
           <td class="text-xs-left">{{'2020-04-05 '+ props.item.hora_inicio | moment('h:mm a')}}</td>
           <td class="text-xs-left">{{'2020-04-05 '+ props.item.hora_fin | moment('h:mm a')}}</td>
           <td class="text-xs-left">
@@ -106,12 +117,14 @@ export default {
       loading: false,
       items: [],
       headers: [
+        { text: '#', value: 'numero' },
         { text: 'Hora inicio', value: 'hora_inicio' },
         { text: 'Hora fin', value: 'hora_fin' },
         { text: 'Acciones', value: '', sortable: false }
       ],
       form: {
         id: null,
+        numero: null,
         hora_inicio: null,
         hora_fin: null
       },
@@ -224,6 +237,7 @@ export default {
         self.form.id = data.id
         self.form.hora_inicio = data.hora_inicio
         self.form.hora_fin = data.hora_fin
+        self.form.numero = data.numero
     },
 
     //funcion, validar si se guarda o actualiza

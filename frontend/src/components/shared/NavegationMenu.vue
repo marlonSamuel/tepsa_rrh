@@ -149,8 +149,20 @@ export default {
             children: [
                 { name: 'turno', icon: 'add', text: 'Turnos', path: '/turno' },
                 { name: 'carnet', icon: 'add', text: 'Carnets', path: '/carnet' },
+                { name: 'asignacion', icon: 'add', text: 'Asignaciones', path: '/asignacion' },
             ]
         },
+
+        {
+            icon: 'file_copy',
+            text: 'Administracion',
+            name: 'Administracion',
+            model: true,
+            path: '',
+            children: [
+                { name: 'asignacion', icon: 'add', text: 'Asignaciones', path: '/asignacion' },
+            ]
+        }
 
     ],
     }

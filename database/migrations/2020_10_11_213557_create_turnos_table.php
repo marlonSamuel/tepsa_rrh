@@ -15,6 +15,7 @@ class CreateTurnosTable extends Migration
     {
         Schema::connection('rrh')->create('turnos', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('numero')->unique();
             $table->time('hora_inicio');
             $table->time('hora_fin');
             $table->timestamps();

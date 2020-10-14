@@ -24,7 +24,7 @@ class CreateDetalleAsignacionEmpleadosTable extends Migration
 
             $table->foreign('turno_id')->references('id')->on('turnos');
 
-            $table->foreign('asignacion_empleado_id')->references('id')->on('asignacion_empleados');
+            $table->foreign('asignacion_empleado_id')->references('id')->on('asignacion_empleados')->onDelete('cascade');
 
             $table->foreign('carnet_id')->references('id')->on('carnets');
         });

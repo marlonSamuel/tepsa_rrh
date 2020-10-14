@@ -10,6 +10,8 @@ import CambiarContrasenia from '@/components/accesos/CambiarContrasenia'
 import Turno from '@/components/configuracion/Turno'
 import Carnet from '@/components/configuracion/Carnet'
 
+import Asignacion from '@/components/administracion/Asignacion'
+
 Vue.use(Router)
 
 //validar authenticacion
@@ -29,6 +31,7 @@ const routes = [
     { path: '/change_password', name: 'CambiarContrasenia', component: CambiarContrasenia, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/turno', name: 'Turno', component: Turno, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/carnet', name: 'Carnet', component: Carnet, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/asignacion', name: 'Asignacion', component: Asignacion, beforeEnter: multiguard([isLoggedIn]) },
 ]
 
 
