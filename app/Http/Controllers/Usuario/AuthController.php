@@ -12,12 +12,12 @@ use App\User;
 
 class AuthController extends Controller
 {
-	public function __construct()
+    public function __construct()
     {
         $this->middleware('auth:api')->except(['login']);
     }
 
-	//iniciar session
+    //iniciar session
     public function login(Request $request)
     {
         $request->validate([
@@ -29,7 +29,7 @@ class AuthController extends Controller
 
         $http = new Client();
 
-        $response = $http->post(config('services.passport.base_url').'oauth/token', [
+        $response = $http->post(config('services.passport.base_url') . 'oauth/token', [
             'form_params' => [
                 'grant_type' => 'password',
                 'client_id' => config('services.passport.client_id'),
@@ -48,8 +48,8 @@ class AuthController extends Controller
     {
         $request->user()->token()->revoke();
 
-        return response()->json(['message' => 
-            'saliendo...']);
+        return response()->json(['message' =>
+        'saliendo...']);
     }
 
     //obtener usuario logueado
