@@ -17,7 +17,7 @@ const state = {
     token_expired: null,
     client_id: 2,
     base_url: 'http://www.tepsa-rrh.com/',
-    client_secret: 'kOSODWQInBGXOJNGeBKBb6xNVhlSCNt8uzknzogk'
+    client_secret: 'of8M6z8VvMcyyVoVOYjVwvM3fgkc1PUxgprIgHkY'
 }
 
 const mutations = {

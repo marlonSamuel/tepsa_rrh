@@ -35,3 +35,6 @@ Route::resource('turnos', 'Turno\TurnoController', ['except' => ['create', 'edit
 
 #=======================CARNETS=========================================================#
 Route::resource('carnets', 'Carnet\CarnetController', ['except' => ['create', 'edit']]);
+
+#=======================PRESTACIONES=========================================================#
+Route::resource('prestacions', 'Prestacion\PrestacionController', ['except' => ['create', 'edit']]);
