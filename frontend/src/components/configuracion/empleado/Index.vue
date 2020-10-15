@@ -284,7 +284,8 @@ export default {
         idCargo: 0,
         cuenta: "",
         tipo_empleado: 0,
-        foto: ""
+        foto: "",
+        estado: "A"
       },
       image: null,
       image_default: this.$store.state.base_url + "img/user_empty.png",

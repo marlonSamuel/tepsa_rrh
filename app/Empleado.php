@@ -11,7 +11,7 @@ class Empleado extends Model
     protected $connection = 'planificacion';
     
     protected $table = 'empleado';
-
+    public $timestamps = false;
     protected $fillable = [
     	'idEmpleado',
     	'nit',
@@ -25,7 +25,8 @@ class Empleado extends Model
     	'idCargo',
         'foto',
         'cuenta',
-        'tipo_empleado'
+        'tipo_empleado',
+        'estado'
     ];
 
     public function Cargo(){
