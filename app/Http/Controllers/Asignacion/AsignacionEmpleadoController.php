@@ -14,7 +14,7 @@ class AsignacionEmpleadoController extends ApiController
 {
     public function __construct()
     {
-        #parent::__construct(); //validacion de autenticacion
+        //parent::__construct(); //validacion de autenticacion
     }
 
     public function index()
@@ -30,32 +30,33 @@ class AsignacionEmpleadoController extends ApiController
     {
         $rules = [
             'planificacion_id' => 'required|integer',
-            'detalle_asignacion'=>'required'
+            'turno_id'=>'required',
+            'carnet_id'=>'required',
+            'empleado_id'=>'required',
+            'fecha'=>'required'
         ];
 
         $db = DB::connection('rrh');
 
         $db->beginTransaction();
             $this->validate($request,$rules);
+
             $data = $request->all();
 
             $asignacion = AsignacionEmpleado::create($data);
 
-            foreach ($request->detalle_asignacion as $d) {
-                $data_d = new DetalleAsignacionEmpleado;
-                $data_d->turno_id = $d['turno_id'];
-                $data_d->asignacion_empleado_id = $asignacion->id;
-                $data_d->carnet_id = $d['carnet_id'];
-                $data_d->empleado_id = $d['empleado_id'];
-                $data_d->fecha = $d['fecha'];
+            $data_d = new DetalleAsignacionEmpleado;
+            $data_d->turno_id = $request->turno_id;
+            $data_d->asignacion_empleado_id = $asignacion->id;
+            $data_d->carnet_id = $request->carnet_id;
+            $data_d->empleado_id = $request->empleado_id;
+            $data_d->fecha = $request->fecha;
 
-                $data_d->save();
+            $data_d->save();
 
-                $carnet = Carnet::find($d['carnet_id']);
-                $carnet->asignado = true;
-                $carnet->save();
-            }
-
+            $carnet = Carnet::find($request->carnet_id);
+            $carnet->asignado = true;
+            $carnet->save();
         $db->commit();
 
         return $this->showOne($asignacion,201,'insert');
@@ -68,24 +69,44 @@ class AsignacionEmpleadoController extends ApiController
         return $this->showOne($asignacion_empleado,200,'select');
     }
 
+    //obtener asignacion por turno e id en detalle asignacion empleado
+    public function getDataTurn($id,$turno_id){
+        $detalle = DetalleAsignacionEmpleado::where([['asignacion_empleado_id',$id],['turno_id',$turno_id]])->with('empleado','turno','carnet','asignacion.planificacion')->first();
+
+        return $this->showOne($detalle);
+    }
+
     /**
      */
     public function update(Request $request, AsignacionEmpleado $asignacion_empleado)
     {
         $rules = [
             'planificacion_id' => 'required|integer',
+            'turno_id'=>'required',
+            'carnet_id'=>'required',
+            'empleado_id'=>'required',
+            'fecha'=>'required'
         ];
 
-        $this->validate($request,$rules);
+        $db = DB::connection('rrh');
 
-        $asignacion_empleado->planificacion_id = $request->planificacion_id;
+        $db->beginTransaction();
+            $this->validate($request,$rules);
 
-        if(!$asignacion_empleado->isDirty())
-        {
-            return $this->errorResponse('se debe especificar al menos un valor para actualizar',422);
-        }
+            $data_d = new DetalleAsignacionEmpleado;
+            $data_d->turno_id = $request->turno_id;
+            $data_d->asignacion_empleado_id = $asignacion_empleado->id;
+            $data_d->carnet_id = $request->carnet_id;
+            $data_d->empleado_id = $request->empleado_id;
+            $data_d->fecha = $request->fecha;
 
-        $asignacion_empleado->save();
+            $data_d->save();
+
+            $carnet = Carnet::find($request->carnet_id);
+            $carnet->asignado = true;
+            $carnet->save();
+
+        $db->commit();
 
         return $this->showOne($asignacion_empleado,201,'update');
 

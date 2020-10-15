@@ -60,7 +60,6 @@ instance.interceptors.response.use(response => {
     if (error.response.status === 401) {
         auth.noAcceso()
     }
-
     return error
 });
 

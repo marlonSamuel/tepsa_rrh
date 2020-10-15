@@ -30,12 +30,12 @@
                 <v-layout wrap>
                   <v-flex xs6 sm2 md2>
                     <v-text-field v-model="form.numero" 
-                        label="Hora inicio"
+                        label="Numero turno"
                         v-validate="'required|numeric'"
-                        type="time"
-                        data-vv-name="hora_inicio"
-                        data-vv-as="hora inicio"
-                        :error-messages="errors.collect('hora_inicio')">
+                        type="number"
+                        data-vv-name="numero"
+                        data-vv-as="numero"
+                        :error-messages="errors.collect('numero')">
                     </v-text-field>
                   </v-flex>
                 <v-flex xs6 sm5 md5>

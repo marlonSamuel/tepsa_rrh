@@ -26,7 +26,7 @@ class DetalleAsignacionEmpleado extends Model
     }
 
     public function asignacion(){
-    	return $this->belongsTo(AsignacionEmpleado::class);
+    	return $this->belongsTo(AsignacionEmpleado::class,'asignacion_empleado_id');
     }
 
     public function empleado(){
