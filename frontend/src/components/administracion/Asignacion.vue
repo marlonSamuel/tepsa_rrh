@@ -435,9 +435,20 @@ export default {
     //funcion para actualizar registro
     update(){
       let self = this
-      self.loading = true
       let data = self.form
-       
+
+      if(self.detalle_asignacion.some(x=>x.carnet_id == data.carnet_id)){
+        self.$toastr.error("numero de carnet ya fue asignado","error");
+        return
+      }
+
+       if(self.detalle_asignacion.some(x=>x.empleado_id == data.empleado_id)){
+        self.$toastr.error("empleado ya fue asignado","error");
+        return
+      }
+      
+      return
+      self.loading = true
       self.$store.state.services.asignacionService
         .update(data)
         .then(r => {
