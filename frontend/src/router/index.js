@@ -13,6 +13,7 @@ import Prestacion from '@/components/configuracion/Prestacion'
 import EmpleadoIndex from '@/components/configuracion/empleado/Index'
 
 import Asignacion from '@/components/administracion/Asignacion'
+import AsistenciaTurno from '@/components/asistencia/Turno'
 
 Vue.use(Router)
 
@@ -36,6 +37,7 @@ const routes = [
     { path: '/prestacion', name: 'Prestacion', component: Prestacion, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/empleado_index', name: 'EmpleadoIndex', component: EmpleadoIndex, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/asignacion', name: 'Asignacion', component: Asignacion, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/asistencia_turno', name: 'AsistenciaTurno', component: AsistenciaTurno, beforeEnter: multiguard([isLoggedIn]) },
 ]
 
 

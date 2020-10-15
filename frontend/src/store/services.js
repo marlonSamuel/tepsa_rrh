@@ -19,7 +19,10 @@ import PlanificacionService from '../services/PlanificacionService'
 import DetalleAsignacionService from '../services/DetalleAsignacionService'
 
 
-let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
+//let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
+
+let baseUrl = 'http://167.172.158.187/tepsa-rrh/' //url production
+
 let token_data = $cookies.get('token_data')
 
 // Axios Configuration

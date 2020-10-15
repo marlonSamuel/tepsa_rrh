@@ -95,8 +95,8 @@ VueCookies.config('7d')
 Vue.config.productionTip = false
 window.events = new Vue();
 
-import VueHtmlToPaper from 'vue-html-to-paper';
-Vue.use(VueHtmlToPaper);
+import VueQrcodeReader from "vue-qrcode-reader";
+Vue.use(VueQrcodeReader);
 
 /* eslint-disable no-new */
 new Vue({
