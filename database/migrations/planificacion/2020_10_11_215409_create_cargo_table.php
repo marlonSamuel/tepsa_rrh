@@ -17,7 +17,7 @@ class CreateCargoTable extends Migration
             $table->bigIncrements('idCargo')->autoIncrement();
             $table->string('nombre');
             $table->string('descripcion');
-            $table->timestamps();
+            
         });
     }
 

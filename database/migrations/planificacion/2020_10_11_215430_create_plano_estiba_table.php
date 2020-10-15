@@ -20,7 +20,7 @@ class CreatePlanoEstibaTable extends Migration
             $table->char('estado',1);
             $table->unsignedBigInteger('idBuque');
 
-            $table->timestamps();
+            
         });
     }
 

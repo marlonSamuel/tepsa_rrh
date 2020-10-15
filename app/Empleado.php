@@ -9,7 +9,7 @@ class Empleado extends Model
 {
 
     protected $connection = 'planificacion';
-    //dd($connection);
+    
     protected $table = 'empleado';
 
     protected $fillable = [
@@ -23,9 +23,9 @@ class Empleado extends Model
     	'direccion',
     	'telefono',
     	'idCargo',
+        'foto',
         'cuenta',
-        //'tipo_empleado',
-        'foto'
+        'tipo_empleado'
     ];
 
     public function Cargo(){

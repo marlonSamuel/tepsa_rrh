@@ -17,7 +17,7 @@ class CreateBuqueTable extends Migration
             $table->bigIncrements('idBuque');
             $table->string('nombre');
             $table->integer('no_bodegas');
-            $table->timestamps();
+            
         });
     }
 

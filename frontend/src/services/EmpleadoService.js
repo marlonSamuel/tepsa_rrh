@@ -18,6 +18,7 @@ class EmpleadoService {
     }
 
     create(data) {
+        console.log(data);
         let self = this
         return self.axios.post(`${self.baseUrl}`, data)
     }

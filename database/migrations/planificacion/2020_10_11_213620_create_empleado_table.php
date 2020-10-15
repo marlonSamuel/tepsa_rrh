@@ -25,7 +25,8 @@ class CreateEmpleadoTable extends Migration
             $table->string('telefono');
             $table->unsignedBigInteger('idCargo');
             $table->string('foto')->nullable();
-            $table->timestamps();
+            $table->string('cuenta');
+            $table->boolean('tipo_empleado')->default(0);
 
             $table->foreign('idCargo')->references('idCargo')->on('cargos');
         });
