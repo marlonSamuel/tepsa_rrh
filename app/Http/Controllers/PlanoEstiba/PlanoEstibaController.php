@@ -22,9 +22,11 @@ class PlanoEstibaController extends ApiController
 
     public function search($date,$buque_id)
     {
-    	$planificacion = PlanoEstiba::where([['fecha_atraque',$date],['idBuque',$buque_id]])->with('buque')->first();
+    	$planificacion = PlanoEstiba::where([['fecha_atraque',$date],['idBuque',$buque_id]])->with('buque','asignacion')->first();
 
-    	if(is_null($planificacion)) return $this->errorResponse('no se encontro ninguan importación con los datos especificados',404);
+    	if(is_null($planificacion)) return $this->errorResponse('no se encontró ningun importación con los datos especificados',404);
+
+        if(!is_null($planificacion->asignacion)) return $this->errorResponse('importación con los datos especificados ya fue asignada',421);
     	
     	return $this->showOne($planificacion);
     }

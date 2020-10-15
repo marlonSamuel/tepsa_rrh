@@ -70,10 +70,10 @@ class AsignacionEmpleadoController extends ApiController
     }
 
     //obtener asignacion por turno e id en detalle asignacion empleado
-    public function getDataTurn($id,$turno_id){
-        $detalle = DetalleAsignacionEmpleado::where([['asignacion_empleado_id',$id],['turno_id',$turno_id]])->with('empleado','turno','carnet','asignacion.planificacion')->first();
+    public function getDataTurn($id,$turno_id,$fecha){
+        $detalle = DetalleAsignacionEmpleado::where([['asignacion_empleado_id',$id],['turno_id',$turno_id],['fecha',$fecha]])->with('empleado','turno','carnet','asignacion.planificacion')->get();
 
-        return $this->showOne($detalle);
+        return $this->showall($detalle);
     }
 
     /**

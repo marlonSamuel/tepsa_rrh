@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Buque;
+use App\AsignacionEmpleado;
 use Illuminate\Database\Eloquent\Model;
 
 class PlanoEstiba extends Model
@@ -21,5 +22,9 @@ class PlanoEstiba extends Model
 
     public function buque(){
     	return $this->belongsTo(Buque::class,'idBuque','idBuque');
+    }
+
+    public function asignacion(){
+        return $this->hasOne(AsignacionEmpleado::class,'planificacion_id','idPlano_Estiba');
     }
 }

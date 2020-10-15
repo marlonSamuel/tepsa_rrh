@@ -30,7 +30,7 @@ class DetalleAsignacionEmpleado extends Model
     }
 
     public function empleado(){
-    	return $this->belongsTo(Empleado::class,'idEmpleado','empleado_id');
+    	return $this->belongsTo(Empleado::class,'empleado_id','idEmpleado');
     }
 
     public function carnet(){

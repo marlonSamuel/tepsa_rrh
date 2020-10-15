@@ -46,6 +46,7 @@
                                     type="date"
                                     data-vv-name="fecha_atraque"
                                     data-vv-as="fecha de atraque"
+                                    :readonly="form.id !== null ? true: false"
                                     :error-messages="errors.collect('form_a.fecha_atraque')">
                                 </v-text-field>
                             </v-flex>
@@ -60,6 +61,7 @@
                                     v-validate="'required'"
                                     data-vv-name="buque_id"
                                     data-vv-as="buque"
+                                    :readonly="form.id !== null ? true: false"
                                     :error-messages="errors.collect('form_a.buque_id')">
                                     >
                                 </v-autocomplete>
@@ -69,11 +71,11 @@
                        
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="green darken-1" flat @click="validateForm('form_a')"><v-icon>search</v-icon> buscar</v-btn>
+                            <v-btn :disabled="form.id !== null ? true: false" color="green darken-1" flat @click="validateForm('form_a')"><v-icon>search</v-icon> buscar</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-flex>
-                <v-flex xs8>
+                <v-flex xs8 v-if="planificacion !== null">
                     <v-card>
                         <v-card-title>
                             <div>
@@ -83,52 +85,13 @@
                         </v-card-title>
                         <v-card-text class="px-0"> 
 
-                            <v-form data-vv-scope="form_d">
+                            <v-form data-vv-scope="form">
                              <v-card-text class="px-0"> 
                                  <v-container grid-list-md>
                                     <v-layout wrap>
-                                        <v-flex xs12 sm4 md4>
-                                            <v-text-field v-model="form_d.fecha" 
-                                                label="Fecha"
-                                                v-validate="'required'"
-                                                type="date"
-                                                data-vv-name="fecha"
-                                                :error-messages="errors.collect('form_d.fecha_atraque')">
-                                            </v-text-field>
-                                        </v-flex>
-                                        <v-flex xs12 sm4 md4>
+                                       <v-flex xs12 sm4 md4>
                                             <v-autocomplete
-                                                v-model="form_d.empleado_id"
-                                                label="Empleado"
-                                                placeholder="seleccione empleado"
-                                                :items="empleados"
-                                                item-text="nombre"
-                                                item-value="idEmpleado"
-                                                v-validate="'required'"
-                                                data-vv-name="empleado"
-                                                :error-messages="errors.collect('form_d.empleado')">
-                                                >
-                                            </v-autocomplete>
-                                        </v-flex>
-
-                                        <v-flex xs12 sm4 md4>
-                                            <v-autocomplete
-                                                v-model="form_d.carnet_id"
-                                                label="Carnet"
-                                                placeholder="seleccione carnet"
-                                                :items="carnets"
-                                                item-text="codigo"
-                                                item-value="id"
-                                                v-validate="'required'"
-                                                data-vv-name="carnet"
-                                                :error-messages="errors.collect('form_d.carnet')">
-                                                >
-                                            </v-autocomplete>
-                                        </v-flex>
-
-                                        <v-flex xs12 sm4 md4>
-                                            <v-autocomplete
-                                                v-model="form_d.turno_id"
+                                                v-model="form.turno_id"
                                                 label="Turno"
                                                 placeholder="seleccione turno"
                                                 :items="turnos"
@@ -136,12 +99,54 @@
                                                 item-value="id"
                                                 v-validate="'required'"
                                                 data-vv-name="turno"
-                                                :error-messages="errors.collect('form_d.turno')">
+                                                :error-messages="errors.collect('form.turno')"
+                                                @change="detailChange">
                                                 >
                                             </v-autocomplete>
                                         </v-flex>
+                                        <v-flex xs12 sm4 md4>
+                                            <v-text-field v-model="form.fecha" 
+                                                label="Fecha"
+                                                v-validate="'required'"
+                                                type="date"
+                                                data-vv-name="fecha"
+                                                :error-messages="errors.collect('form.fecha')"
+                                                @input="detailChange">
+                                            </v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 sm4 md4>
+                                            <v-autocomplete
+                                                v-model="form.empleado_id"
+                                                label="Empleado"
+                                                placeholder="seleccione empleado"
+                                                :items="empleados"
+                                                item-text="empleado"
+                                                item-value="idEmpleado"
+                                                v-validate="'required'"
+                                                data-vv-name="empleado"
+                                                :error-messages="errors.collect('form.empleado')"
+                                                >
+                                                >
+                                            </v-autocomplete>
+                                        </v-flex>
+
+                                        <v-flex xs12 sm4 md4>
+                                            <v-autocomplete
+                                                v-model="form.carnet_id"
+                                                label="Carnet"
+                                                placeholder="seleccione carnet"
+                                                :items="carnets"
+                                                item-text="codigo"
+                                                item-value="id"
+                                                v-validate="'required'"
+                                                data-vv-name="carnet"
+                                                :error-messages="errors.collect('form.carnet')">
+                                                >
+                                            </v-autocomplete>
+                                        </v-flex>
+
                                         <v-flex xs6 sm2 md2>
-                                            <v-btn block dark color="green darken-1" @click="validateForm('form_d')"><v-icon>add</v-icon> agregar</v-btn>
+                                            <v-btn :disabled="planificacion!==null ? false:true" block dark color="green darken-1" @click="validateForm('form')"><v-icon>add</v-icon> agregar</v-btn>
                                         </v-flex>
 
                                     </v-layout>
@@ -152,15 +157,31 @@
 
                             <v-data-table
                                     :headers="headers_details"
-                                    :items="form.detalle"
+                                    :items="detalle_asignacion"
                                     :search="search"
                                     :expand="false"
                                     class="elevation-1"
                                     disable-initial-sort
+                                    hide-actions
                             >
                                 <template v-slot:items="props">
-                                    <td class="text-xs-left">{{props.item.empleado}}</td>
-                                    <td class="text-xs-left">{{props.item.carnet}}</td>
+                                    <td class="text-xs-left">
+                                      #{{props.item.turno.numero}}-
+                                      {{'2020-04-05 '+ props.item.turno.hora_inicio | moment('h:mm a')}}-
+                                      {{'2020-04-05 '+ props.item.turno.hora_fin | moment('h:mm a')}}
+                                    </td>
+                                    <td class="text-xs-left">{{props.item.fecha | moment('DD/MM/YYYY')}}</td>
+                                    <td class="text-xs-left">
+                                      {{props.item.empleado.primer_nombre}} {{props.item.empleado.segundo_nombre}}
+                                      {{props.item.empleado.primer_apellido}} {{props.item.empleado.segundo_apellido}}
+                                    </td>
+                                    <td class="text-xs-left">{{props.item.carnet.codigo}}</td>
+                                    <v-tooltip top>
+                                      <template v-slot:activator="{ on }">
+                                          <v-icon v-on="on" color="error" fab dark @click="removeDetail(props.item)"> remove_circle</v-icon>
+                                      </template>
+                                      <span>Remover</span>
+                                  </v-tooltip>
                                 </template>
                             </v-data-table>
                         </v-card-text>
@@ -230,6 +251,7 @@ export default {
       turnos: [],
       carnets: [],
       empleados: [],
+      detalle_asignacion: [],
       planificacion: null,
       headers: [
         { text: 'Buque', value: 'buque' },
@@ -238,24 +260,25 @@ export default {
         { text: 'Acciones', value: '', sortable: false }
       ],
       headers_details: [
-          {text: 'Empleado', value: 'empleado'},
-          {text: 'Carnet', value: 'carnet'},
-          {text: 'fecha', value: 'fecha'}
+        {text: 'turno', value: 'turno'},
+        {text: 'fecha', value: 'fecha'},
+        {text: 'Empleado', value: 'empleado'},
+        {text: 'Carnet', value: 'carnet'},
+        { text: 'Accion', value: '', sortable: false }
+          
       ],
       form:{
           id: null,
           planificacion_id: null,
-          detalle_asignacion: []
-      },
-      form_a: {
-        fecha_atraque: null,
-        buque_id: null
-      },
-      form_d: {
+          detalle_id: null,
           fecha: null,
           empleado_id: null,
           turno_id: null,
           carnet_id: null
+      },
+      form_a: {
+        fecha_atraque: null,
+        buque_id: null
       }
     };
   },
@@ -266,6 +289,7 @@ export default {
     self.getBuques()
     self.getCarnets()
     self.getTurnos()
+    self.getEmpleados()
   },
 
   methods: {
@@ -301,6 +325,23 @@ export default {
     },
 
     //obtener buques
+    getEmpleados() {
+      let self = this
+      self.loading = true
+      self.$store.state.services.empleadoService
+        .getAll()
+        .then(r => {
+          self.loading = false
+          if(self.$store.state.global.captureError(r)){
+            return
+          }
+          r.data.map(obj=> ({ ...obj.empleado = obj.primer_nombre+' '+obj.segundo_nombre+' '+obj.primer_apellido+' '+obj.segundo_apellido}))
+          self.empleados = r.data
+        })
+        .catch(r => {});
+    },
+
+    //obtener buques
     getTurnos() {
       let self = this
       self.loading = true
@@ -329,7 +370,7 @@ export default {
           if(self.$store.state.global.captureError(r)){
             return
           }
-          self.carnes = r.data
+          self.carnets = r.data
         })
         .catch(r => {});
     },
@@ -344,10 +385,29 @@ export default {
           self.loading = false
           if(self.$store.state.global.captureError(r)){
             self.planificacion = null
+            self.form.planificacion_id = null
+            self.detalle_asignacion = []
             return
           }
-
           self.planificacion = r.data
+          self.form.planificacion_id = self.planificacion.idPlano_Estiba
+          console.log(self.form)
+        })
+        .catch(r => {});
+    },
+
+    //obtener detalles
+    getDetailData(id,turno_id,fecha){
+      let self = this
+      self.loading = true
+      self.$store.state.services.asignacionService
+        .getDetail(id,turno_id,fecha)
+        .then(r => {
+          self.loading = false
+          if(self.$store.state.global.captureError(r)){
+            return
+          }
+          self.detalle_asignacion = r.data
         })
         .catch(r => {});
     },
@@ -365,8 +425,9 @@ export default {
             return
           }
           this.$toastr.success('registro agregado con éxito', 'éxito')
+          self.form.id = r.data.id
           self.getAll()
-          self.clearData()
+          self.getDetailData(r.data.id, data.turno_id, data.fecha)
         })
         .catch(r => {});
     },
@@ -384,9 +445,8 @@ export default {
           if(self.$store.state.global.captureError(r)){
             return
           }
-          self.getAll()
-          this.$toastr.success('registro actualizado con éxito', 'éxito')
-          self.clearData()
+          self.getDetailData(data.id, data.turno_id, data.fecha)
+          //this.$toastr.success('registro actualizado con éxito', 'éxito')
         })
         .catch(r => {});
     },
@@ -411,6 +471,27 @@ export default {
       }).catch(cancel =>{
       })
     },
+
+    //remover detail
+    removeDetail(data){
+      let self = this
+      self.$confirm('Seguro que desea remover asignacion?').then(res => {
+        self.loading = true
+            self.$store.state.services.detalleAsignacionService
+            .destroy(data)
+            .then(r => {
+                self.loading = false
+                if(self.$store.state.global.captureError(r)){
+                    return
+                }
+                this.$toastr.success('empleado removido con éxito', 'éxito')
+                self.getDetailData(data.asignacion_empleado_id, data.turno_id, data.fecha)  
+            })
+            .catch(r => {});
+      }).catch(cancel =>{
+      })
+    },
+
     //limpiar data de formulario
     clearData(){
         let self = this
@@ -428,6 +509,8 @@ export default {
     edit(data){
         let self = this
         this.dialog = true
+        self.detalle_asignacion = []
+        self.clearData()
         self.mapData(data)   
     },
 
@@ -436,6 +519,9 @@ export default {
         let self = this
         self.form.id = data.id
         self.form.planificacion_id = data.planificacion_id
+        self.planificacion = data.planificacion
+        self.form_a.buque_id = data.planificacion.idBuque
+        self.form_a.fecha_atraque = data.planificacion.fecha_atraque
     },
 
     //validar formulario
@@ -443,32 +529,15 @@ export default {
       let self = this
       this.$validator.validateAll(scope).then((result) => {
           if (result) {
-             scope == 'form_a' ? self.searchPlanification() : scope == 'form' ? self.createOrEdit() : self.addDetail()
+             scope == 'form_a' ? self.searchPlanification() : self.createOrEdit()
             }
       });
-    },
-
-    //agregar detalle
-    addDetail(){
-        let self = this
-        let data = self.form_d
-        let carnet = self.carnets.find(x=>x.id == data.carnet_id)
-        let turno = self.turnos.find(x=>x.id == data.turno_id)
-        let empleado = self.empleados.find(x=>x.idEmpleado == data.empleado_id)
-        self.form.detalle_asignacion.push([{
-            'empleado_id':data.empleado_id,
-            'carnet_id':data.carnet_id,
-            'turno_id':data.turno_id,
-            'fecha':data.fecha,
-            'carnet':carnet.carnet,
-            'turno':turno.turno,
-            'empleado':empleado.nombre
-        }])
     },
 
     //funcion, validar si se guarda o actualiza
     createOrEdit(){
         let self = this
+        console.log(self.form)
         if(self.form.id > 0 && self.form.id !== null){
             self.update()
         }else{
@@ -485,6 +554,14 @@ export default {
         self.dialog = false
         self.clearData()
     },
+
+    detailChange(){
+      let  self = this
+      let data = self.form
+      if(data.id !== null && data.turno_id !== null && data.fecha !== null){
+        self.getDetailData(data.id, data.turno_id, data.fecha)
+      }
+    }
   },
 
   computed: {

@@ -16,6 +16,7 @@ import CargoService from '../services/CargoService'
 import AsignacionService from '../services/AsignacionService'
 import BuqueService from '../services/BuqueService'
 import PlanificacionService from '../services/PlanificacionService'
+import DetalleAsignacionService from '../services/DetalleAsignacionService'
 
 
 let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
@@ -79,4 +80,5 @@ export default {
     asignacionService: new AsignacionService(Axios, baseUrl),
     buqueService: new BuqueService(Axios, baseUrl),
     planificacionService: new PlanificacionService(Axios, baseUrl),
+    detalleAsignacionService: new DetalleAsignacionService(Axios, baseUrl),
 }
