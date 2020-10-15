@@ -36,5 +36,16 @@ Route::resource('turnos', 'Turno\TurnoController', ['except' => ['create', 'edit
 #=======================CARNETS=========================================================#
 Route::resource('carnets', 'Carnet\CarnetController', ['except' => ['create', 'edit']]);
 
+
 #=======================PRESTACIONES=========================================================#
 Route::resource('prestacions', 'Prestacion\PrestacionController', ['except' => ['create', 'edit']]);
+
+#=======================PLANO ESTIBAS=========================================================#
+Route::resource('planificaciones', 'PlanoEstiba\PlanoEstibaController', ['except' => ['create', 'edit']]);
+Route::name('search_planificacion')->get('planificaciones_search/{date}/{buque_id}', 'PlanoEstiba\PlanoEstibaController@search');
+
+#=======================BUQUES=========================================================#
+Route::resource('buques', 'Buque\BuqueController', ['except' => ['create', 'edit']]);
+
+#=======================ASIGNACIONES=========================================================#
+Route::resource('asignacion_empleados', 'Asignacion\AsignacionEmpleadoController', ['except' => ['create', 'edit']]);

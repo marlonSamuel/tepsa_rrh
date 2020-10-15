@@ -26,6 +26,7 @@ class TurnoController extends ApiController
     public function store(Request $request)
     {
         $rules = [
+            'numero'=>'required|string|unique:rrh.turnos',
             'hora_inicio' => 'required',
             'hora_fin' => 'required'
         ];
@@ -50,6 +51,7 @@ class TurnoController extends ApiController
     public function update(Request $request, Turno $turno)
     {
         $rules = [
+            'numero' => 'required|string|unique:rrh.turnos,numero,' . $turno->id,
             'hora_inicio' => 'required',
             'hora_fin' => 'required'
         ];
@@ -57,6 +59,7 @@ class TurnoController extends ApiController
 
         $this->validate($request,$rules);
 
+        $turno->numero = $request->numero;
         $turno->hora_inicio = $request->hora_inicio;
         $turno->hora_fin = $request->hora_fin;
 

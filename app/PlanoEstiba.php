@@ -9,7 +9,7 @@ class PlanoEstiba extends Model
 {
     protected $connection = 'planificacion';
 
-    protected $table = 'PlanoEstiba';
+    protected $table = 'plano_estiba';
 
     protected $fillable = [
     	'idPlano_Estiba',
@@ -20,6 +20,6 @@ class PlanoEstiba extends Model
     ];
 
     public function buque(){
-    	return $this->belongsTo(Buque::class,'idBuque');
+    	return $this->belongsTo(Buque::class,'idBuque','idBuque');
     }
 }

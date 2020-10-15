@@ -12,6 +12,8 @@ import Carnet from '@/components/configuracion/Carnet'
 import Prestacion from '@/components/configuracion/Prestacion'
 import EmpleadoIndex from '@/components/configuracion/empleado/Index'
 
+import Asignacion from '@/components/administracion/Asignacion'
+
 Vue.use(Router)
 
 //validar authenticacion
@@ -33,6 +35,7 @@ const routes = [
     { path: '/carnet', name: 'Carnet', component: Carnet, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/prestacion', name: 'Prestacion', component: Prestacion, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/empleado_index', name: 'EmpleadoIndex', component: EmpleadoIndex, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/asignacion', name: 'Asignacion', component: Asignacion, beforeEnter: multiguard([isLoggedIn]) },
 ]
 
 

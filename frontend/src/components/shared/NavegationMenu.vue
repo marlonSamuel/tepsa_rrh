@@ -163,6 +163,21 @@ export default {
               path: "/empleado_index"
             }
           ]
+        },
+        {
+          icon: "file_copy",
+          text: "Administracion",
+          name: "Administracion",
+          model: true,
+          path: "",
+          children: [
+            {
+              name: "asignacion",
+              icon: "add",
+              text: "Asignaciones",
+              path: "/asignacion"
+            }
+          ]
         }
       ]
     };
