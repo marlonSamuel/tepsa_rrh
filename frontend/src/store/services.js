@@ -10,6 +10,9 @@ import LoginService from '../services/LoginService'
 import UsuarioService from '../services/UsuarioService'
 import TurnoService from '../services/TurnoService'
 import CarnetService from '../services/CarnetService'
+import PrestacionService from '../services/PrestacionService'
+import EmpleadoService from '../services/EmpleadoService'
+import CargoService from '../services/CargoService'
 import AsignacionService from '../services/AsignacionService'
 import BuqueService from '../services/BuqueService'
 import PlanificacionService from '../services/PlanificacionService'
@@ -44,7 +47,7 @@ Axios.interceptors.response.use(response => {
 
 function refreshToken() {
     var data = auth.getRefreshToken()
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         instance.post(baseUrl + 'oauth/token', data)
             .then(r => {
                 resolve(r)
@@ -70,6 +73,9 @@ export default {
     usuarioService: new UsuarioService(Axios, baseUrl),
     turnoService: new TurnoService(Axios, baseUrl),
     carnetService: new CarnetService(Axios, baseUrl),
+    prestacionService: new PrestacionService(Axios, baseUrl),
+    empleadoService: new EmpleadoService(Axios, baseUrl),
+    cargoService: new CargoService(Axios, baseUrl),
     asignacionService: new AsignacionService(Axios, baseUrl),
     buqueService: new BuqueService(Axios, baseUrl),
     planificacionService: new PlanificacionService(Axios, baseUrl),
