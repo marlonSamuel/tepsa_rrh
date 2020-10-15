@@ -12,6 +12,8 @@ class Empleado extends Model
     
     protected $table = 'empleado';
 
+    public $timestamps = false;
+
     protected $fillable = [
     	'idEmpleado',
     	'nit',

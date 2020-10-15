@@ -28,28 +28,14 @@ class EmpleadoController extends ApiController
     public function store(Request $request)
     {
         $rules = [
-            'dpi' => 'required|string|unique:planificacion.empleado',
+            'dpi' => 'required|string',
             'nit' => 'required',
             'primer_nombre' => 'required|string',
             'primer_apellido' => 'required|string'
         ];
 
         $this->validate($request, $rules);
-        $data = new Empleado();
-        $data->idEmpleado = $request->idEmpleado;
-        $data->primer_nombre = $request->primer_nombre;
-        $data->segundo_nombre = $request->segundo_nombre;
-        $data->primer_apellido = $request->primer_apellido;
-        $data->segundo_apellido = $request->segundo_apellido;
-        $data->dpi = $request->dpi;
-        $data->nit = $request->nit;
-        $data->direccion = $request->direccion;
-        $data->telefono = $request->telefono;
-        $data->idCargo = $request->idCargo;
-        $data->foto = $request->foto;
-        $data->cuenta = $request->cuenta;
-        $data->tipo_empleado = $request->tipo_empleado;
-        
+        $data = $request->all();
         
         $imagePath = '';
             if($request->foto != null || $request->foto != ''){
