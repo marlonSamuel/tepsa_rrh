@@ -9,14 +9,14 @@ use App\Http\Controllers\ApiController;
 
 class EmpleadoController extends ApiController
 {
-   public function __construct()
+    public function __construct()
     {
         //parent::__construct(); //validacion de autenticacion
     }
 
     public function index()
     {
-    	
+
         $empleados = Empleado::with('cargo')->get();
 
         return $this->showAll($empleados);
@@ -24,7 +24,7 @@ class EmpleadoController extends ApiController
 
     /**
      */
-    
+
     public function store(Request $request)
     {
         $rules = [
@@ -36,21 +36,22 @@ class EmpleadoController extends ApiController
 
         $this->validate($request, $rules);
         $data = $request->all();
-        
-        $imagePath = '';
-            if($request->foto != null || $request->foto != ''){
-                if (preg_match('/^data:image\/(\w+);base64,/', $request->foto)) {
-                    $data_img = substr($request->foto, strpos($request->foto, ',') + 1);
-                    $data_img = base64_decode($data_img);
-                    $imagePath = $request->codigo.'_'.time().'.png';
-                    Storage::disk('images')->put($imagePath, $data_img);
-                }
 
-                $data['foto'] = 'img/fotos/'.$imagePath;
+
+        $imagePath = '';
+        if ($request->foto != null || $request->foto != '') {
+            if (preg_match('/^data:image\/(\w+);base64,/', $request->foto)) {
+                $data_img = substr($request->foto, strpos($request->foto, ',') + 1);
+                $data_img = base64_decode($data_img);
+                $imagePath = $request->idEmpleado . '_' . time() . '.png';
+                Storage::disk('images')->put($imagePath, $data_img);
             }
 
+            $data['foto'] = 'img/fotos/' . $imagePath;
+        }
+
         $empleado = Empleado::create($data);
-            
+
 
         return $this->showOne($empleado, 201, 'insert');
     }

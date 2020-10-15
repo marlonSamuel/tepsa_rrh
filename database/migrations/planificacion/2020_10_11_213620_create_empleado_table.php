@@ -39,6 +39,6 @@ class CreateEmpleadoTable extends Migration
      */
     public function down()
     {
-        Schema::connection('rrh')->dropIfExists('empleados');
+        Schema::connection('planificacion')->dropIfExists('empleados');
     }
 }
