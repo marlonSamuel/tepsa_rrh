@@ -29,9 +29,11 @@ Route::resource('empleados', 'Empleado\EmpleadoController', ['except' => ['creat
 
 #=======================CARGOS=========================================================#
 Route::resource('cargos', 'Cargo\CargoController', ['except' => ['create', 'edit']]);
+Route::resource('cargos.turnos', 'Cargo\CargoTurnoController', ['except' => ['create', 'edit']]);
 
 #=======================TURNOS=========================================================#
 Route::resource('turnos', 'Turno\TurnoController', ['except' => ['create', 'edit']]);
+Route::resource('turnos.cargos', 'Turno\TurnoCargoController', ['except' => ['create', 'edit']]);
 
 #=======================CARNETS=========================================================#
 Route::resource('carnets', 'Carnet\CarnetController', ['except' => ['create', 'edit']]);
@@ -49,7 +51,11 @@ Route::resource('buques', 'Buque\BuqueController', ['except' => ['create', 'edit
 
 #=======================ASIGNACIONES=========================================================#
 Route::resource('asignacion_empleados', 'Asignacion\AsignacionEmpleadoController', ['except' => ['create', 'edit']]);
-
 Route::name('dataTurn')->get('asignacion_empleados/{id}/{turno_id}/{fecha}', 'Asignacion\AsignacionEmpleadoController@getDataTurn');
-
 Route::resource('detalle_asignacion_empleados', 'Asignacion\DetalleAsignacionEmpleadoController', ['except' => ['create', 'edit']]);
+Route::name('showAsign')->get('detalle_asignacion_empleados/{codigo}/{fecha}/{turno_id}', 'Asignacion\DetalleAsignacionEmpleadoController@showAsign');
+
+Route::name('print_asignacion')->get('asignacion_empleados_print/{id}/{turno_id}/{fecha}/{empleado_id?}', 'Asignacion\AsignacionEmpleadoController@print');
+
+#=======================ASISTENCIAS=========================================================#
+Route::resource('asistencia_turno_bodegas', 'Asistencia\AsistenciaTurnoBodegaController', ['except' => ['create', 'edit']]);

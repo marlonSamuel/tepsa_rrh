@@ -5,6 +5,7 @@ namespace App;
 use App\Turno;
 use App\Carnet;
 use App\Empleado;
+use Carbon\Carbon;
 use App\AsignacionEmpleado;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,7 +19,8 @@ class DetalleAsignacionEmpleado extends Model
     	'turno_id',
     	'asignacion_empleado_id',
     	'empleado_id',
-    	'carnet_id'
+    	'carnet_id',
+        'fecha'
     ];
 
     public function turno(){
@@ -35,5 +37,12 @@ class DetalleAsignacionEmpleado extends Model
 
     public function carnet(){
     	return $this->belongsTo(Carnet::class);
+    }
+
+    //verificar asistencia turno, fecha actual
+    public function asistencia_turno(){
+        //$today = Carbon::now('America/Guatemala');
+        //$today = Carbon::now()->format('Y-m-d');
+        return $this->hasOne(AsistenciaTurnoBodega::class);
     }
 }

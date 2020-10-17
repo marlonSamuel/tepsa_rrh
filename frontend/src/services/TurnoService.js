@@ -17,6 +17,11 @@ class TurnoService{
         return self.axios.get(`${self.baseUrl}/${id}`)
     }
 
+    getCargos(id){
+        let self = this
+        return self.axios.get(`${self.baseUrl}/${id}/cargos`)
+    }
+
     create(data){
         let self = this
         return self.axios.post(`${self.baseUrl}`,data)
