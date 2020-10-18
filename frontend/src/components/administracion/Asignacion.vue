@@ -253,7 +253,7 @@
         class="elevation-1"
       >
         <template v-slot:items="props">
-          <td class="text-xs-left">{{props.item.planificacion.buque.nombre}}</td>
+          <td class="text-xs-left">{{props.item.planificacion.buque.nombre | uppercase}}</td>
           <td class="text-xs-left">{{props.item.planificacion.fecha_atraque | moment('DD/MM/YYYY')}}</td>
           <td class="text-xs-left">{{props.item.planificacion.fecha_zarpe | moment('DD/MM/YYYY')}}</td>
           

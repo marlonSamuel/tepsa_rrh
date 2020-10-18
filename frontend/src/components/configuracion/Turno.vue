@@ -242,6 +242,7 @@ export default {
 
     //funcion, validar si se guarda o actualiza
     createOrEdit(){
+      let self = this
       this.$validator.validateAll().then((result) => {
           if (result) {
               if(self.form.id > 0 && self.form.id !== null){
@@ -251,7 +252,7 @@ export default {
               }
            }
       });
-      let self = this
+      
     },
     
     cancelar(){

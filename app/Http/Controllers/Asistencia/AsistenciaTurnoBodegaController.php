@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Asistencia;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\AsistenciaTurnoBodega;
 use App\Http\Controllers\Controller;
@@ -28,12 +29,13 @@ class AsistenciaTurnoBodegaController extends ApiController
         $rules = [
             'detalle_asignacion_empleado_id'=>'required|integer',
             'cargo_turno_id'=>'required|integer',
-            'hora_entrada'=>'required',
             'bodega'=>'required'
         ];
 
         $this->validate($request,$rules);
+        $today = Carbon::now('America/Guatemala');
         $data = $request->all();
+        $data['hora_entrada'] = $today;
 
         $asistenciaTurnoBodega = AsistenciaTurnoBodega::create($data);
 
@@ -54,17 +56,21 @@ class AsistenciaTurnoBodegaController extends ApiController
         $rules = [
             'detalle_asignacion_empleado_id'=>'required|integer',
             'cargo_turno_id'=>'required|integer',
-            'hora_entrada'=>'required',
-            'bodega'=>'required',
-            'hora_salida' => 'required'
+            'bodega'=>'required'
         ];
 
 
         $this->validate($request,$rules);
 
-        $asistencia_turno_bodega->hora_salida = $request->hora_salida;
+        if($request->salida)
+        {
+            $today = Carbon::now('America/Guatemala');
+            $asistencia_turno_bodega->hora_salida = $today;
+        }
+        
         $asistencia_turno_bodega->bodega = $request->bodega;
         $asistencia_turno_bodega->cargo_turno_id = $request->cargo_turno_id;
+        $asistencia_turno_bodega->observaciones = $request->observaciones;
 
         if(!$asistencia_turno_bodega->isDirty())
         {

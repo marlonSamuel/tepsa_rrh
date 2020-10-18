@@ -27,7 +27,7 @@ class DetalleAsignacionEmpleadoController extends ApiController
 
         $carnet = Carnet::where('codigo',$codigo)->firstOrFail();
 
-        $asignacion = DetalleAsignacionEmpleado::where([['carnet_id',$carnet->id],['fecha',$fecha],['turno_id',$turno_id]])->with('empleado','asistencia_turno','asignacion.planificacion.buque','turno')->first();
+        $asignacion = DetalleAsignacionEmpleado::where([['carnet_id',$carnet->id],['fecha',$fecha],['turno_id',$turno_id]])->with('empleado','asistencia_turno.cargo_turno.cargo','asignacion.planificacion.buque','turno')->first();
         
         if(is_null($asignacion)){
             return $this->errorResponse('no se encontró asignación de este empleado con el codigo '.$codigo.' fecha y turno correspondiente', 421);

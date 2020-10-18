@@ -19,6 +19,7 @@ class CreateAsistenciaTurnoBodegasTable extends Migration
             $table->unsignedBigInteger('cargo_turno_id');
             $table->datetime('hora_entrada');
             $table->datetime('hora_salida')->nullable();
+            $table->string('observaciones',255)->nullable();
             $table->integer('bodega');
 
             $table->timestamps();

@@ -17,14 +17,15 @@ class AsistenciaTurnoBodega extends Model
     	'cargo_turno_id',
     	'hora_entrada',
     	'hora_salida',
-    	'bodega'
+    	'bodega',
+        'observaciones'
     ];
 
     public function detalle_asignacion(){
-    	$this->belongsTo(DetalleAsignacionEmpleado::class);
+    	return $this->belongsTo(DetalleAsignacionEmpleado::class);
     }
 
     public function cargo_turno(){
-    	$this->belongsTo(CargoTurno::class);
+    	return $this->belongsTo(CargoTurno::class,'cargo_turno_id');
     }
 }
