@@ -7,6 +7,7 @@ use App\Carnet;
 use App\Empleado;
 use Carbon\Carbon;
 use App\AsignacionEmpleado;
+use App\AsistenciaAlmuerzo;
 use Illuminate\Database\Eloquent\Model;
 
 class DetalleAsignacionEmpleado extends Model
@@ -44,5 +45,9 @@ class DetalleAsignacionEmpleado extends Model
         //$today = Carbon::now('America/Guatemala');
         //$today = Carbon::now()->format('Y-m-d');
         return $this->hasOne(AsistenciaTurnoBodega::class);
+    }
+
+    public function asistencia_almuerzo(){
+        return $this->hasMany(AsistenciaAlmuerzo::class);
     }
 }

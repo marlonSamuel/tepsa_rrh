@@ -20,7 +20,7 @@ class AsignacionEmpleadoController extends ApiController
 
     public function index()
     {
-        $asignaciones = AsignacionEmpleado::with('planificacion.buque')->get();
+        $asignaciones = AsignacionEmpleado::with('planificacion.buque','detalle_asignacion.asistencia_turno.cargo_turno.cargo','detalle_asignacion.turno','detalle_asignacion.empleado')->get();
         return $this->showAll($asignaciones);
     }
 

@@ -6,7 +6,7 @@
               <v-flex>
                 <v-tooltip top>
                     <template v-slot:activator="{ on }">
-                        <v-icon v-on="on" color="info" fab dark> file_copy</v-icon>
+                        <v-icon v-on="on" color="info" fab dark @click="$router.push(`asistencia_turno_index`)"> file_copy</v-icon>
                     </template>
                     <span>ir a historial de asistencias</span>
                 </v-tooltip>
