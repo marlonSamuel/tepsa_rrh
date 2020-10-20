@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Asignacion;
 
 use App\Carnet;
+use Barryvdh\DomPDF\PDF;
 use App\AsignacionEmpleado;
 use Illuminate\Http\Request;
 use App\DetalleAsignacionEmpleado;
@@ -66,7 +67,10 @@ class AsignacionEmpleadoController extends ApiController
      */
     public function show(AsignacionEmpleado $asignacion_empleado)
     {
-        return $this->showOne($asignacion_empleado,200,'select');
+        $asignacion_empleado = AsignacionEmpleado::where('id',$asignacion_empleado->id)
+                                                    ->with('detalle_asignacion.turno')->get()->pluck('detalle_asignacion')->collapse();
+
+        return $this->showAll($asignacion_empleado,200,'select');
     }
 
     //obtener asignacion por turno e id en detalle asignacion empleado
@@ -119,5 +123,28 @@ class AsignacionEmpleadoController extends ApiController
         $asignacion_empleado->delete();
 
         return $this->showOne($asignacion_empleado,201,'delete');
+    }
+
+    //imprimir pdf
+    public function print($id,$turno_id,$fecha,$empleado_id=0)
+    {
+        $asignacion = AsignacionEmpleado::where('id',$id)
+                                         ->with('planificacion.buque')
+                                         ->firstOrFail();
+
+        $detalle = DetalleAsignacionEmpleado::where([['asignacion_empleado_id',$id],['turno_id',$turno_id],['fecha',$fecha]])->with('empleado','turno','carnet')->get();
+
+        if($empleado_id > 0){
+            $detalle = $detalle->where('empleado_id',$empleado_id);
+        }
+
+        $pdf = \PDF::loadView('pdfs.print_asignacion',['asignacion'=>$asignacion,'detalle'=>$detalle])->setPaper('a4', 'landscape');
+
+
+        
+        #$pdf->setPaper('legal', 'portrait');
+
+        return $pdf->download('ejemplo.pdf');
+        
     }
 }

@@ -36,6 +36,14 @@ class AsignacionService{
         let self = this
         return self.axios.delete(`${self.baseUrl}/${data.id}`)
     }
+
+    //imprimir contrato
+    print(id,turno_id,fecha,empleado_id) {
+        let self = this
+        if (empleado_id == undefined)
+            empleado_id = 0
+        return self.axios.get(`${self.baseUrl}_print/${id}/${turno_id}/${fecha}/${empleado_id}`, { responseType: 'blob' });
+    }
 }
 
 export default AsignacionService

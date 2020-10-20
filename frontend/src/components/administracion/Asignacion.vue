@@ -16,6 +16,38 @@
             hide-details
           ></v-text-field>
         <v-spacer></v-spacer>
+        <v-dialog v-model="dialog_turn" max-width="1000px">
+          <v-card>
+            <v-card-title v-if="planificacion !== null">
+              <div>
+              <span class="headline">TURNOS CONTROL DE INGRESO/EGRESO DE VISITA AL BUQUE</span><br />
+              
+                <strong>BUQUE: </strong>{{planificacion.buque.nombre | uppercase}}<br />
+                <strong v-if="planificacion !== null">FECHA ZARPE: {{planificacion.fecha_zarpe}}</strong>
+              </div>
+            </v-card-title>
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout row wrap>
+                  <v-flex sm3 md3 v-for="(value, key, index) in turnos_print" :key="index">
+                    <v-card>
+                        <v-card-title>
+                          {{value.fecha | moment('DD/MM/YYYY')}}
+                        </v-card-title>
+                        <v-card-text>
+                            <v-btn v-for="t in value.turnos" :key="t.id" color="info" small dark class="mb-2" @click="print(t)">
+                              <v-icon>print</v-icon> turno {{t.numero}}
+                            </v-btn>
+                        </v-card-text>
+                      </v-card>
+                      
+                  </v-flex>
+                </v-layout>
+              </v-container>
+              
+            </v-card-text>
+          </v-card>
+        </v-dialog>
         <v-dialog v-model="dialog" full-width persistent>
           <template v-slot:activator="{ on }">
             <v-btn color="primary" small dark class="mb-2" v-on="on"><v-icon>add</v-icon> Nuevo</v-btn>
@@ -80,7 +112,8 @@
                         <v-card-title>
                             <div>
                               <span class="headline">Detalle asignación</span><br />
-                              <strong v-if="planificacion !== null">Fecha de zarpe: {{planificacion.fecha_zarpe | moment('DD/MM/YYYY')}}</strong>
+                              <strong v-if="planificacion !== null">Fecha de zarpe:</strong> {{planificacion.buque.nombre}}<br />
+                              <strong v-if="planificacion !== null">Fecha de zarpe:</strong> {{planificacion.fecha_zarpe | moment('DD/MM/YYYY')}}
                             </div>
                         </v-card-title>
                         <v-card-text class="px-0"> 
@@ -154,7 +187,14 @@
 
                         </v-card-text>
                         </v-form>
-
+                            <v-flex v-if="detalle_asignacion.length > 0">
+                                <v-tooltip top>
+                                    <template v-slot:activator="{ on }">
+                                        <v-icon v-on="on" color="info" fab dark @click="printAll"> print</v-icon>
+                                    </template>
+                                    <span>Imprimir asignacion</span>
+                                </v-tooltip>
+                            </v-flex>
                             <v-data-table
                                     :headers="headers_details"
                                     :items="detalle_asignacion"
@@ -176,6 +216,12 @@
                                       {{props.item.empleado.primer_apellido}} {{props.item.empleado.segundo_apellido}}
                                     </td>
                                     <td class="text-xs-left">{{props.item.carnet.codigo}}</td>
+                                    <v-tooltip top>
+                                      <template v-slot:activator="{ on }">
+                                          <v-icon v-on="on" color="info" fab dark @click="singlePrint(props.item)"> print</v-icon>
+                                      </template>
+                                      <span>Imprimir asignacion empleado</span>
+                                  </v-tooltip>
                                     <v-tooltip top>
                                       <template v-slot:activator="{ on }">
                                           <v-icon v-on="on" color="error" fab dark @click="removeDetail(props.item)"> remove_circle</v-icon>
@@ -207,11 +253,17 @@
         class="elevation-1"
       >
         <template v-slot:items="props">
-          <td class="text-xs-left">{{props.item.planificacion.buque.nombre}}</td>
+          <td class="text-xs-left">{{props.item.planificacion.buque.nombre | uppercase}}</td>
           <td class="text-xs-left">{{props.item.planificacion.fecha_atraque | moment('DD/MM/YYYY')}}</td>
           <td class="text-xs-left">{{props.item.planificacion.fecha_zarpe | moment('DD/MM/YYYY')}}</td>
           
           <td class="text-xs-left">
+            <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                    <v-icon v-on="on"  color="info" fab dark @click="get(props.item)"> print</v-icon>
+                </template>
+                <span>imprimir</span>
+            </v-tooltip>
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
                     <v-icon v-on="on"  color="warning" fab dark @click="edit(props.item)"> edit</v-icon>
@@ -244,6 +296,7 @@ export default {
   data() {
     return {
       dialog: false,
+      dialog_turn: false,
       search: '',
       loading: false,
       items: [],
@@ -252,6 +305,7 @@ export default {
       carnets: [],
       empleados: [],
       detalle_asignacion: [],
+      turnos_print: [],
       planificacion: null,
       headers: [
         { text: 'Buque', value: 'buque' },
@@ -447,7 +501,6 @@ export default {
         return
       }
       
-      return
       self.loading = true
       self.$store.state.services.asignacionService
         .update(data)
@@ -572,6 +625,80 @@ export default {
       if(data.id !== null && data.turno_id !== null && data.fecha !== null){
         self.getDetailData(data.id, data.turno_id, data.fecha)
       }
+    },
+
+    singlePrint(data){
+      let self = this
+      self.print({
+        empleado_id: data.empleado_id,
+        fecha: data.fecha,
+        turno_id: data.turno_id
+      })
+    },
+
+    printAll(){
+      let self = this
+      self.print({
+        fecha: self.form.fecha,
+        turno_id: self.form.turno_id
+      })
+    },  
+
+    //obtener turnos
+    get(data){
+      let self = this
+      self.mapData(data)
+      self.loading = true
+      self.dialog_turn = true
+      self.$store.state.services.asignacionService
+        .get(data.id)
+        .then(r => {
+          self.loading = false
+          if(self.$store.state.global.captureError(r)){
+            return
+          }
+          
+          self.turnos_print = _(r.data)
+              .groupBy('fecha')
+              .map(function(items, fecha) {
+              return {
+                  fecha: fecha,
+                  turnos: _(items).groupBy('turno_id')
+                                 .map(function(items2,turno_id){
+                                   return {
+                                     fecha: fecha,
+                                     turno_id: parseInt(turno_id),
+                                     numero: items2[0].turno.numero
+                                   }
+                                 }).value()
+              }
+          }).value()
+          
+        })
+        .catch(r => {});
+    },
+
+  //imprimir hora entrada
+    print(data){
+      let self = this
+      self.loading = true
+      self.$store.state.services.asignacionService
+        .print(self.form.id,data.turno_id,data.fecha,data.empleado_id)
+        .then(r => {
+          self.loading = false
+          if(r.response){
+            this.$toastr.error(r.response.data.error, 'error')
+            return
+          }
+          const url = window.URL.createObjectURL(new Blob([r.data], { type: 'application/pdf' }));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'asignacion_fecha_'+data.fecha+'_turno_'+data.turno_id); 
+          //link.target = '_blank'
+          link.click();
+        })
+        .catch(r => {});
+
     }
   },
 

@@ -17,11 +17,12 @@ import AsignacionService from '../services/AsignacionService'
 import BuqueService from '../services/BuqueService'
 import PlanificacionService from '../services/PlanificacionService'
 import DetalleAsignacionService from '../services/DetalleAsignacionService'
+import AsistenciaTurnoService from '../services/AsistenciaTurnoService'
 
 
-//let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
+let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
 
-let baseUrl = 'http://167.172.158.187/tepsa-rrh/' //url production
+//let baseUrl = 'http://167.172.158.187/tepsa-rrh/' //url production
 
 let token_data = $cookies.get('token_data')
 
@@ -84,4 +85,5 @@ export default {
     buqueService: new BuqueService(Axios, baseUrl),
     planificacionService: new PlanificacionService(Axios, baseUrl),
     detalleAsignacionService: new DetalleAsignacionService(Axios, baseUrl),
+    asistenciaTurnoService: new AsistenciaTurnoService(Axios, baseUrl),
 }
