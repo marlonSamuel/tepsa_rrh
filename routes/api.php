@@ -54,8 +54,12 @@ Route::resource('asignacion_empleados', 'Asignacion\AsignacionEmpleadoController
 Route::name('dataTurn')->get('asignacion_empleados/{id}/{turno_id}/{fecha}', 'Asignacion\AsignacionEmpleadoController@getDataTurn');
 Route::resource('detalle_asignacion_empleados', 'Asignacion\DetalleAsignacionEmpleadoController', ['except' => ['create', 'edit']]);
 Route::name('showAsign')->get('detalle_asignacion_empleados/{codigo}/{fecha}/{turno_id}', 'Asignacion\DetalleAsignacionEmpleadoController@showAsign');
+Route::name('showTurnDate')->get('detalle_asignacion_empleados/{fecha}/{turno_id}', 'Asignacion\DetalleAsignacionEmpleadoController@showTurnDate');
 
 Route::name('print_asignacion')->get('asignacion_empleados_print/{id}/{turno_id}/{fecha}/{empleado_id?}', 'Asignacion\AsignacionEmpleadoController@print');
 
+Route::name('print_detalle_asignacion')->get('detalle_asignacion_empleados_print/{asignacion_id}/{turno_id}/{fecha}/{bodega?}', 'Asignacion\DetalleAsignacionEmpleadoController@print');
+
 #=======================ASISTENCIAS=========================================================#
 Route::resource('asistencia_turno_bodegas', 'Asistencia\AsistenciaTurnoBodegaController', ['except' => ['create', 'edit']]);
+Route::resource('asistencia_almuerzos', 'Asistencia\AsistenciaAlmuerzoController', ['except' => ['create', 'edit']]);
