@@ -110,8 +110,8 @@
         <img class="logo" src="{{asset('img/logo.jpg')}}" width="200px" height="100px" />
         <b>EMPRESA PORTUARIA QUETZAL, DEPARTAMENTO DE PROTECCIÓN <br />
             CONTROL DE INGRESO/EGRESO DE VISITA AL BUQUE</b>
-        <img class="logo_left" src="{{asset('img/portuaria.jpg')}}" width="100px" height="90px" />
-        <img style="padding-left: 100px;" class="logo_left" src="{{asset('img/cap.jpg')}}" width="100px" height="90px" />
+        <img class="logo_left" src="{{asset('img/portuaria.JPG')}}" width="100px" height="90px" />
+        <img style="padding-left: 100px;" class="logo_left" src="{{asset('img/cap.JPG')}}" width="100px" height="90px" />
     </header>
 
     <!-- Wrap the content of your PDF inside a main tag -->
