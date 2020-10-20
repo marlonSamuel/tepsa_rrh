@@ -14,7 +14,7 @@ import EmpleadoIndex from '@/components/configuracion/empleado/Index'
 
 import Asignacion from '@/components/administracion/Asignacion'
 import AsistenciaTurno from '@/components/asistencia/Turno'
-import AsistenciaTurnoIndex from '@/components/asistencia/TurnoIndex2'
+import AsistenciaTurnoIndex from '@/components/asistencia/TurnoIndex'
 
 Vue.use(Router)
 

@@ -11,12 +11,6 @@
         </div>
       </v-layout>
       <v-toolbar flat color="white">
-        <v-tooltip top v-if="items.length > 0">
-            <template v-slot:activator="{ on }">
-              <v-btn small v-on="on"><v-icon>print</v-icon></v-btn>
-            </template>
-            <span>Imprimir</span>
-        </v-tooltip>
         <v-toolbar-title>HISTORIAL ASISTENCIA </v-toolbar-title>
           <v-divider
           class="mx-2"
@@ -37,12 +31,15 @@
          
         <v-container grid-list-md>
           <v-layout wrap>
-              <v-flex xs12 sm3 md3>
-                <v-text-field v-model="form.fecha" 
-                    label="Fecha"
-                    type="date"
-                    @input="changeReq">
-                </v-text-field>
+            <v-flex xs12 sm6 md6>
+                <v-autocomplete
+                    v-model="form.fecha_buque"
+                    label="Fecha / Buque"
+                    placeholder="seleccione fecha y buque"
+                    :items="asignaciones"
+                    item-text="fecha_buque"
+                    @input="change">
+                </v-autocomplete>
             </v-flex>
             <v-flex xs12 sm3 md3>
                 <v-autocomplete
@@ -50,40 +47,32 @@
                     label="Turno"
                     placeholder="seleccione turno"
                     :items="turnos"
-                    item-text="numero"
-                    item-value="id"
-                    @change="changeReq">
+                    item-text="turno.numero"
+                    item-value="turno_id"
+                    @input="changeTurn">
                 </v-autocomplete>
             </v-flex>
-            <v-flex xs12 sm3 md3>
-                <v-autocomplete
-                    v-model="form.buque_id"
-                    label="Buque"
-                    placeholder="seleccione buque"
-                    :items="buques"
-                    item-text="nombre"
-                    item-value="idBuque"
-                    @input="changeBuq">
-                </v-autocomplete>
-            </v-flex>
-            <v-flex xs12 sm3 md3>
-                <v-autocomplete
-                    v-model="form.bodega"
-                    label="Bodega"
-                    placeholder="seleccione bodega"
-                    :items="bodegas"
-                    @input="changeBod">
-                </v-autocomplete>
+
+             <v-flex xs12 sm3 md3>
+              <v-tooltip top v-if="items.length > 0">
+              <template v-slot:activator="{ on }">
+                <v-btn small v-on="on" @click="print"><v-icon>print</v-icon></v-btn>
+              </template>
+              <span>Imprimir</span>
+          </v-tooltip>
             </v-flex>
           </v-layout>
         </v-container>
       </v-toolbar>
+
 
       
       <v-data-table
         :headers="headers"
         :items="items"
         :search="search"
+        :rows-per-page-items="rowsPerPageItems"
+        :pagination.sync="pagination"
         class="elevation-1"
       >
         <template v-slot:items="props">
@@ -92,16 +81,40 @@
                                     {{props.item.empleado.primer_apellido}}
                                     {{props.item.empleado.segundo_apellido}}
           </td>
-          <td class="text-xs-left">{{props.item.asistencia_turno.cargo_turno.cargo.nombre}}</td>
-          <td class="text-xs-left">{{props.item.asistencia_turno.bodega}}</td>
-          <td class="text-xs-left">{{props.item.asistencia_turno.hora_entrada | moment('hh:mm')}}</td>
           <td class="text-xs-left">
-              <span v-if="props.item.asistencia_turno.hora_salida !==null">
+              <span v-if="props.item.asistencia_turno !== null">
+                  {{props.item.asistencia_turno.cargo_turno.cargo.nombre}}
+              </span>
+              <span v-else class="red--text">
+                  sin asistencia
+              </span>
+              
+              </td>
+          <td class="text-xs-left">
+              <span v-if="props.item.asistencia_turno !== null">
+                  {{props.item.asistencia_turno.bodega}}
+              </span>
+              <span v-else class="red--text">
+                  sin asistencia
+              </span>
+          </td>
+          <td class="text-xs-left">
+              <span v-if="props.item.asistencia_turno !== null">
+                  {{props.item.asistencia_turno.hora_entrada | moment('hh:mm')}}
+              </span>
+              <span v-else class="red--text">
+                  sin asistencia
+              </span>
+          </td>
+          <td class="text-xs-left">
+              <span v-if="props.item.asistencia_turno !== null">
+                  <span v-if="props.item.asistencia_turno.hora_salida !==null">
                   {{props.item.asistencia_turno.hora_salida | moment('hh:mm')}}
               </span>
-              <span v-else class="text--red">
-                  No marcó salida
-              </span>
+            </span>
+            <span v-else class="red--text">
+                sin asistencia
+            </span>
           </td>
         </template>
         <template v-slot:no-data>
@@ -114,7 +127,7 @@
 
 
 <script>
-
+import moment from 'moment'
 export default {
   name: "TurnoIndex",
   components: {
@@ -128,11 +141,10 @@ export default {
       dialog: false,
       search: '',
       loading: false,
+      asignaciones: [],
       all_items: [],
       items: [],
       turnos: [],
-      buques: [],
-      bodegas: [],
       headers: [
         { text: 'empleado', value: 'empleado' },
         { text: 'rol', value: 'rol' },
@@ -140,6 +152,10 @@ export default {
         { text: 'Hora entrada', value: 'hora_entrada' },
         { text: 'Hora salida', value: 'hora_salida' },
       ],
+      rowsPerPageItems: [10, 20, 30, 40],
+      pagination: {
+          rowsPerPage: 20
+      },
 
       itemsB: [
         {
@@ -155,89 +171,100 @@ export default {
       ],
 
       form: {
-        fecha: null,
+        asignacion_id: null,
+        fecha_buque: "",
         turno_id: null,
-        buque_id: null,
-        bodega: null
       },
     };
   },
 
   created() {
     let self = this
-    self.getTurns()
+    self.getAll()
   },
 
   methods: {
       //obtener asistencias
-    getAll(fecha,turno) {
+    getAll() {
         let self = this
         self.loading = true
 
-        self.$store.state.services.detalleAsignacionService
-        .getTurnDate(fecha,turno)
+        self.$store.state.services.asignacionService
+        .getAll()
         .then(r=>{
             self.loading = false
             if(self.$store.state.global.captureError(r)){
                 return
             }
-            
-            self.bodegas = []
-            self.buques = []
-            self.all_items = r.data
-            r.data.forEach((e,i)=>{
-                self.buques.push(e.asignacion.planificacion.buque)
+            let data = []
+            self.asignaciones = []
+            r.data.forEach((x,i)=>{
+                x.detalle_asignacion.forEach((d,j)=>{
+                    self.asignaciones.push({
+                        asignacion_id: d.asignacion_empleado_id,
+                        fecha_buque: moment(d.fecha).format('DD/MM/YYYY')+' - '+x.planificacion.buque.nombre,
+                        fecha: d.fecha
+                    })
+
+                    let asistencia_turno = null
+                    if(d.asistencia_turno !== null){
+                        asistencia_turno = d.asistencia_turno
+                    }
+                    self.all_items.push({
+                        asignacion_id: d.asignacion_empleado_id,
+                        fecha_buque: moment(d.fecha).format('DD/MM/YYYY')+' - '+x.planificacion.buque.nombre,
+                        fecha: d.fecha,
+                        turno: d.turno,
+                        turno_id: d.turno_id,
+                        empleado: d.empleado,
+                        asistencia_turno: asistencia_turno
+                    })
+                })
             })
-            //self.items = r.data
         }).catch(e=>{})
     },
 
-    //obtener turnos
-    getTurns(){
+    change(){
         let self = this
-        self.loading = true
-        self.$store.state.services.turnoService
-        .getAll()
-        .then(r=>{
-            self.loading = false
-            if(self.$store.state.global.captureError(r)){
-            return
-            }
-            self.turnos = r.data
-        }).catch(e=>{})
-    },
-
-    //capturar onChange para el request
-    changeReq(){
-      let  self = this
-      let data = self.form
-      if(data.turno_id !== null && data.fecha !== null){
-        self.getAll(data.fecha,data.turno_id)
-      }
-    },
-
-    //change buque
-    changeBuq(){
-        let self = this
-        self.bodegas = []
-        let buque = self.buques.find(x=>x.idBuque == self.form.buque_id)
-        for(var i=1; i<=buque.no_bodegas; i++){
-            self.bodegas.push({text:i,value:i})
+        self.turnos = self.all_items.filter(x=>x.fecha_buque == self.form.fecha_buque)
+        if(self.form.turno_id !== null){
+          self.changeTurn()
         }
     },
 
-    //change bodegas
-    changeBod(){
+    changeTurn(){
         let self = this
-        self.items = self.all_items.filter(x=>x.asistencia_turno.bodega == self.form.bodega)
+        self.items = self.all_items.filter(x=>x.turno_id == self.form.turno_id && x.fecha_buque == self.form.fecha_buque)
+    },
+
+    print(){
+      let self = this
+      let asignacion = self.asignaciones.find(x=>x.fecha_buque == self.form.fecha_buque)
+      let data = self.form
+      data.asignacion_id = asignacion.asignacion_id
+      data.fecha = asignacion.fecha
+      self.loading = true
+      self.$store.state.services.detalleAsignacionService
+        .print(data.asignacion_id,data.turno_id,data.fecha)
+        .then(r => {
+          self.loading = false
+          if(r.response){
+            this.$toastr.error(r.response.data.error, 'error')
+            return
+          }
+          const url = window.URL.createObjectURL(new Blob([r.data], { type: 'application/pdf' }));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'asistencia_fecha_'+data.fecha+'_turno_'+data.turno_id); 
+          //link.target = '_blank'
+          link.click();
+        })
+        .catch(r => {});
     }
+
   },
 
   computed: {
-    setTitle(){
-      let self = this
-      return self.form.id !== null ? 'actualizar codigo '+self.form.codigo : 'Nuevo Registro'
-    }
   },
 };
 </script>
