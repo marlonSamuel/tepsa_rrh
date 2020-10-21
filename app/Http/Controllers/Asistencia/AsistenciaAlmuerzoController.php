@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ApiController;
 
-class AsisenciaAlmuerzoController extends ApiController
+class AsistenciaAlmuerzoController extends ApiController
 {
      public function __construct()
     {
@@ -16,7 +16,7 @@ class AsisenciaAlmuerzoController extends ApiController
 
     public function index()
     {
-        $asistenciaAlmuerzos = asistenciaAlmuerzo::all();
+        $asistenciaAlmuerzos = AsistenciaAlmuerzo::all();
         return $this->showAll($asistenciaAlmuerzos);
     }
 
@@ -32,31 +32,15 @@ class AsisenciaAlmuerzoController extends ApiController
         $this->validate($request,$rules);
         $data = $request->all();
 
-        $asistenciaAlmuerzo = asistenciaAlmuerzo::create($data);
+        $asistenciaAlmuerzo = AsistenciaAlmuerzo::create($data);
 
         return $this->showOne($asistenciaAlmuerzo,201,'insert');
     }
 
     /**
      */
-    public function show(asistenciaAlmuerzo $asistencia_almuerzo)
+    public function show(AsistenciaAlmuerzo $asistencia_almuerzo)
     {
         return $this->showOne($asistencia_almuerzo,200,'select');
-    }
-
-    /**
-     */
-    public function update(Request $request, AsistenciaAlmuerzo $asistencia_almuerzo)
-    {
-       
-    }
-
-    /**
-     */
-    public function destroy(AsistenciaAlmuerzo $asistencia_almuerzo)
-    {
-        $asistencia_almuerzo->delete();
-
-        return $this->showOne($asistencia_almuerzo,201,'delete');
     }
 }
