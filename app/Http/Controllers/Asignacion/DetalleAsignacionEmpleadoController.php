@@ -61,14 +61,34 @@ class DetalleAsignacionEmpleadoController extends ApiController
     }
 
     //imprimir pdf
-    public function print($asignacion_id,$turno_id,$fecha,$bodega = 0){
+    public function print($asignacion_id,$turno_id,$fecha,$a,$bodega = 0){
         $asignacion = AsignacionEmpleado::where('id',$asignacion_id)
                                          ->with('planificacion.buque')
                                          ->firstOrFail();
 
         $detalle = DetalleAsignacionEmpleado::where([['asignacion_empleado_id',$asignacion_id],['turno_id',$turno_id],['fecha',$fecha]])->with('empleado','turno','carnet','asistencia_turno.cargo_turno.cargo')->get();
 
-        $pdf = \PDF::loadView('pdfs.print_asistencia_turno',['asignacion'=>$asignacion,'detalle'=>$detalle])->setPaper('a4', 'landscape');
+        $pdf_file = 'pdfs.print_asistencia_turno';
+
+        if($a=="true")
+            $pdf_file = 'pdfs.print_asistencia_almuerzo';
+
+        $pdf = \PDF::loadView($pdf_file,['asignacion'=>$asignacion,'detalle'=>$detalle])->setPaper('a4', 'landscape');
+        
+        #$pdf->setPaper('legal', 'portrait');
+
+        return $pdf->download('ejemplo.pdf'); 
+    }
+
+    //imprimir pdf
+    public function printAlmuerzo($asignacion_id,$turno_id,$fecha){
+        $asignacion = AsignacionEmpleado::where('id',$asignacion_id)
+                                         ->with('planificacion.buque')
+                                         ->firstOrFail();
+
+        $detalle = DetalleAsignacionEmpleado::where([['asignacion_empleado_id',$asignacion_id],['turno_id',$turno_id],['fecha',$fecha]])->with('empleado','turno','carnet','asistencia_turno.cargo_turno.cargo','asistencia_almuerzo')->get();
+
+        $pdf = \PDF::loadView('pdfs.print_asistencia_almuerzo',['asignacion'=>$asignacion,'detalle'=>$detalle])->setPaper('a4', 'landscape');
         
         #$pdf->setPaper('legal', 'portrait');
 

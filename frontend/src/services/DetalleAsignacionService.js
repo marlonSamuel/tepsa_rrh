@@ -23,10 +23,10 @@ class DetalleAsignacionService{
         return self.axios.delete(`${self.baseUrl}/${data.id}`)
     }
 
-    //imprimir contrato
-    print(id,turno_id,fecha) {
+    //imprimir asistencia
+    print(id,turno_id,fecha,a=false) {
         let self = this
-        return self.axios.get(`${self.baseUrl}_print/${id}/${turno_id}/${fecha}`, { responseType: 'blob' });
+        return self.axios.get(`${self.baseUrl}_print/${id}/${turno_id}/${fecha}/${a}`, { responseType: 'blob' });
     }
 }
 
