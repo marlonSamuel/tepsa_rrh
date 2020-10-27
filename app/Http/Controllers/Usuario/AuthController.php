@@ -27,7 +27,11 @@ class AuthController extends Controller
 
         $credentials = request(['email', 'password']);
 
-        $http = new Client();
+        $http = new Client(
+            [
+                'verify' => false
+            ]
+        );
 
         $response = $http->post(config('services.passport.base_url') . 'oauth/token', [
             'form_params' => [
