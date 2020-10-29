@@ -14,6 +14,14 @@
               
           </v-toolbar>
           <v-card>
+            <v-flex>
+                  <v-btn :color="!active_qr?'success':'error'" @click="activeQR" small dark class="mb-2">
+                    <v-icon>videocam</v-icon> {{!active_qr?'activar':'detener'}}
+                  </v-btn>
+              </v-flex>
+              <v-flex v-if="active_qr">
+                  <qrcode-stream size="40" @decode="onDecode" @init="onInit" />
+              </v-flex>
                <v-flex v-if="error !== null">
                       <v-alert
                         v-model="alert"
@@ -24,7 +32,6 @@
                     </v-alert>
                   </v-flex>
               <v-card-text>
-                  <!--<qrcode-stream size="40" @decode="onDecode" @init="onInit" />-->
                   <v-container>
                     <v-layout>
                       <v-flex sm3 md3 xs6>
@@ -39,7 +46,7 @@
                   </v-container>
 
                   
-                  <v-container grid-list-md v-if="asignacion !== null">
+                  <v-container grid-list-md v-if="asignacion !== null && !active_qr">
                     <v-flex v-if="asignacion.asistencia_turno.hora_salida !== null">
                       <v-alert
                         v-model="alert"
@@ -160,6 +167,7 @@ export default {
       asignacion: null,
       bodegas: [],
       cargos: [],
+      active_qr: false,
       form: {
           id: null,
           hora_entrada: "",
@@ -245,6 +253,7 @@ export default {
           }
           this.$toastr.success('asistencia entrada registrada con éxito', 'éxito')
           self.clearData()
+          self.active_qr = true
         })
         .catch(r => {});
     },
@@ -265,6 +274,7 @@ export default {
           }
           this.$toastr.success('asistencia salida registrada con éxito', 'éxito')
           self.clearData()
+          self.active_qr = false
         })
         .catch(r => {});
     },
@@ -344,11 +354,21 @@ export default {
         self.bodegas.push({text: i, value: i})
       }
     },
+
+    //active qr
+    activeQR(){
+      let self = this
+      self.active_qr = !self.active_qr
+    },
+
     //decode
     onDecode (result) {
         console.log(result)
         let self = this
+        navigator.vibrate([500])
         self.codigo = result
+        self.active_qr = false
+        self.search()
     },
 
     //erorroa sicncronos

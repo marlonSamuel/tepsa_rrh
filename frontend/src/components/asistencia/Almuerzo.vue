@@ -14,6 +14,14 @@
               
           </v-toolbar>
           <v-card>
+              <v-flex>
+                  <v-btn :color="!active_qr?'success':'error'" @click="activeQR" small dark class="mb-2">
+                    <v-icon>videocam</v-icon> {{!active_qr?'activar':'detener'}}
+                  </v-btn>
+              </v-flex>
+              <v-flex>
+                  <qrcode-stream v-if="active_qr" size="40" @decode="onDecode" @init="onInit" />
+              </v-flex>
                <v-flex v-if="error !== null">
                       <v-alert
                         v-model="alert"
@@ -24,7 +32,11 @@
                     </v-alert>
                   </v-flex>
               <v-card-text>
-                  <!--<qrcode-stream size="40" @decode="onDecode" @init="onInit" />-->
+
+                <v-container grid-list-md>
+                 
+                </v-container>
+                  
                   <v-container>
                     <v-layout>
                       <v-flex sm3 md3 xs6>
@@ -89,6 +101,7 @@ export default {
     return {
       loading: false,
       alert: true,
+      active_qr: false,
       code: '',
       error: null,
       turno: null,
@@ -135,6 +148,7 @@ export default {
       .getAsign(self.codigo,'2020-10-14',1)
       .then(r=>{
         self.loading = false
+        self.active_qr = true
         if(self.$store.state.global.captureError(r)){
           self.clearData()
           return
@@ -162,7 +176,6 @@ export default {
                 self.fecha = moment().subtract(1,'d').format('YYYY-MM-DD')
             }
               
-            
             if(moment(currentTime).isBetween(start_time, end_time)){
                 self.turno = t
             }
@@ -197,11 +210,19 @@ export default {
         self.asignacion = null
     },
 
+    activeQR(){
+      let self = this
+      self.active_qr = !self.active_qr
+    },
+
     //decode
     onDecode (result) {
         console.log(result)
         let self = this
+        navigator.vibrate([500])
         self.codigo = result
+        self.active_qr = false
+        self.search()
     },
 
     //erorroa sicncronos

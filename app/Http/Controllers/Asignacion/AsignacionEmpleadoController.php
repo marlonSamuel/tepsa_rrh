@@ -134,6 +134,7 @@ class AsignacionEmpleadoController extends ApiController
 
         $detalle = DetalleAsignacionEmpleado::where([['asignacion_empleado_id',$id],['turno_id',$turno_id],['fecha',$fecha]])->with('empleado','turno','carnet')->get();
 
+
         if($empleado_id > 0){
             $detalle = $detalle->where('empleado_id',$empleado_id);
         }
