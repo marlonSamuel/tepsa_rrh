@@ -11,17 +11,24 @@
                     <span>ir a historial de asistencias</span>
                 </v-tooltip>
               </v-flex>
-              
           </v-toolbar>
           <v-card>
             <v-flex>
-                  <v-btn :color="!active_qr?'success':'error'" @click="activeQR" small dark class="mb-2">
-                    <v-icon>videocam</v-icon> {{!active_qr?'activar':'detener'}}
-                  </v-btn>
+                <v-btn :color="!active_qr?'success':'error'" @click="activeQR" small dark class="mb-2">
+                  <v-icon>videocam</v-icon> {{!active_qr?'activar':'detener'}}
+                </v-btn>
               </v-flex>
-              <v-flex v-if="active_qr">
-                  <qrcode-stream size="40" @decode="onDecode" @init="onInit" />
-              </v-flex>
+                <div v-if="active_qr">
+                  <br />
+                  <br />
+                  <br />
+                    <qrcode-stream size="40" :torch="torchActive" @decode="onDecode" @init="onInit" >
+                      <button @click="torchActive = !torchActive" :disabled="torchNotSupported">
+                        <v-icon color="white" v-if="!torchActive">flash_on</v-icon>
+                        <v-icon color="white" v-else>flash_off</v-icon>
+                      </button>
+                    </qrcode-stream>
+                </div>
                <v-flex v-if="error !== null">
                       <v-alert
                         v-model="alert"
@@ -157,6 +164,8 @@ export default {
     return {
       loading: false,
       alert: true,
+      torchActive: false,
+      torchNotSupported: false,
       code: '',
       error: null,
       turnos: [],
@@ -373,31 +382,55 @@ export default {
 
     //erorroa sicncronos
     async onInit (promise) {
-    try {
-        await promise
-    } catch (error) {
-        console.log(error.name)
-        if (error.name === 'NotAllowedError') {
-        this.error = "ERROR: necesitas permiso para utilizar la camara"
-        } else if (error.name === 'NotFoundError') {
-        this.error = "ERROR: camara inexistente en este dispositivo"
-        } else if (error.name === 'NotSupportedError') {
-        this.error = "ERROR: necesitas cerficiado de seguridad (HTTPS, localhost)"
-        } else if (error.name === 'NotReadableError') {
-        this.error = "ERROR: la camara esta en uso?"
-        } else if (error.name === 'OverconstrainedError') {
-        this.error = "ERROR: las camaras no son compatibles"
-        } else if (error.name === 'StreamApiNotSupportedError') {
-        this.error = "ERROR: Stream API no es soportada por el navegador, de preferencia utilize google chrome"
-        } else if (error.name == 'InsecureContextError') {
-            this.error = "ERROR: se necesita certificado de seguridad (HTTS,loclhos)"
-        }
-    }
+      let self = this
+      try {
+          await promise
+          const { capabilities } = await promise
+          self.torchNotSupported = !capabilities.torch
+          if(self.torchNotSupported){
+            self.$toastr.warning("flash no soportado en este dispositivo","advertencia");
+          }
+      } catch (error) {
+          console.log(error.name)
+          if (error.name === 'NotAllowedError') {
+          this.error = "ERROR: necesitas permiso para utilizar la camara"
+          } else if (error.name === 'NotFoundError') {
+          this.error = "ERROR: camara inexistente en este dispositivo"
+          } else if (error.name === 'NotSupportedError') {
+          this.error = "ERROR: necesitas cerficiado de seguridad (HTTPS, localhost)"
+          } else if (error.name === 'NotReadableError') {
+          this.error = "ERROR: la camara esta en uso?"
+          } else if (error.name === 'OverconstrainedError') {
+          this.error = "ERROR: las camaras no son compatibles"
+          } else if (error.name === 'StreamApiNotSupportedError') {
+          this.error = "ERROR: Stream API no es soportada por el navegador, de preferencia utilize google chrome"
+          } else if (error.name == 'InsecureContextError') {
+              this.error = "ERROR: se necesita certificado de seguridad (HTTS,loclhos)"
+          }
+      }
     }
   },
 
   computed: {
+    icon() {
+      if (this.torchActive)
+        return '/flash-off.svg'
+      else
+        return '/flash-on.svg'
+    }
       
   },
 };
 </script>
+
+<style scoped>
+button {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+.error {
+  color: red;
+  font-weight: bold;
+}
+</style>
