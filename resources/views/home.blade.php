@@ -8,11 +8,11 @@
     <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
     <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-<link href="bundle/css/app.c587156fe6779b6c0a31b2ee3a789782.css" rel="stylesheet"></head>
+<link href="bundle/css/app.55f085a5a178786979294c4296d82c90.css" rel="stylesheet"></head>
 
 <body class="hold-transition skin-blue sidebar-mini">
     <div style="height: 100%" id="app"></div>
     <!-- built files will be auto injected -->
-<script type="text/javascript" src="bundle/js/manifest.6aa67b56925988dfee92.js"></script><script type="text/javascript" src="bundle/js/app.83f5665b9578afcf820f.js"></script></body>
+<script type="text/javascript" src="bundle/js/manifest.6aa67b56925988dfee92.js"></script><script type="text/javascript" src="bundle/js/app.8885aa15c3978e9f24d9.js"></script></body>
 
 </html>
