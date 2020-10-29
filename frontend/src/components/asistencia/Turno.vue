@@ -42,6 +42,8 @@
                   <v-container>
                     <v-layout>
                       <v-flex sm3 md3 xs6>
+                        <br />
+                        <br />
                         <v-text-field v-model="codigo" 
                           label="Codigo de carnet"
                           type="text"
