@@ -379,6 +379,7 @@ export default {
       turns.forEach((t, i) => {
         var start_time = moment(extra + t.hora_inicio);
         var end_time = moment(extra + t.hora_fin);
+        debugger;
         if ((t.hora_fin < t.hora_inicio) & (self.turno == null)) {
           var extra_e =
             moment()
