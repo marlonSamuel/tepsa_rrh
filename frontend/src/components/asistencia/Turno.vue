@@ -241,7 +241,7 @@ export default {
         self.form.detalle_asignacion_empleado_id = self.asignacion.id
         if(self.asignacion.asistencia_turno !== null){
           self.mapData(self.asignacion.asistencia_turno)
-          self.asignacion.asistencia_turno.hora_salida !== nul ? self.check_salida = true : self.check_salida = false
+          self.asignacion.asistencia_turno.hora_salida !== null ? self.check_salida = true : self.check_salida = false
         }
         self.setBodegas(r.data.asignacion.planificacion.buque.no_bodegas)
       }).catch(e=>{})
