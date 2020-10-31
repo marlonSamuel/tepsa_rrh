@@ -389,6 +389,7 @@ export default {
           if(self.$store.state.global.captureError(r)){
             return
           }
+          r.data = r.data.filter(x=>x.estado = 'A');
           r.data.map(obj=> ({ ...obj.empleado = obj.primer_nombre+' '+obj.segundo_nombre+' '+obj.primer_apellido+' '+obj.segundo_apellido}))
           self.empleados = r.data
         })
