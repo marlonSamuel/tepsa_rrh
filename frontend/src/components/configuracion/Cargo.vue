@@ -2,7 +2,7 @@
   <v-layout align-start v-loading="loading">
     <v-flex>
       <v-toolbar flat color="white">
-        <v-toolbar-title>CARNETS </v-toolbar-title>
+        <v-toolbar-title>Cargos </v-toolbar-title>
         <v-divider class="mx-2" inset vertical></v-divider><v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -12,61 +12,6 @@
           hide-details
         ></v-text-field>
         <v-spacer></v-spacer>
-
-        <v-dialog v-model="showCarnet" max-width="500px">
-          <v-card>
-            <v-card-actions>
-              <v-btn flat color="info" @click="print"
-                ><v-icon>print</v-icon></v-btn
-              >
-            </v-card-actions>
-
-            <v-card-text>
-              <div class="card-row" id="print" ref="print">
-                <div class="columnCard">
-                  <article class="card">
-                    <img :src="this.$store.state.global.getLogo()" />
-                    <img
-                      v-if="fotoVisible"
-                      height="40"
-                      width="40"
-                      style="margin-top:-20;"
-                      :src="image !== null ? image : image_default"
-                    />
-                    <qrcode-vue
-                      :size="70"
-                      v-if="form.codigo !== null"
-                      :value="form.codigo"
-                    ></qrcode-vue>
-                    <br />
-                    <h5>codigo: {{ form.codigo }}</h5>
-                  </article>
-                </div>
-                <div class="columnCard">
-                  <article class="card">
-                    <img :src="this.$store.state.global.getLogo()" />
-
-                    <img
-                      v-if="fotoVisible"
-                      height="40"
-                      width="40"
-                      style="margin-top:-20;"
-                      :src="image !== null ? image : image_default"
-                    />
-                    <qrcode-vue
-                      :size="70"
-                      v-if="form.codigo !== null"
-                      :value="form.codigo"
-                    ></qrcode-vue>
-                    <br />
-                    <h5>codigo: {{ form.codigo }}</h5>
-                  </article>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-dialog>
-
         <v-dialog v-model="dialog" max-width="800px" persistent>
           <template v-slot:activator="{ on }">
             <v-btn color="primary" small dark class="mb-2" v-on="on"
@@ -81,19 +26,38 @@
             <v-card-text>
               <v-container grid-list-md>
                 <v-layout wrap>
-                  <v-flex xs6 sm6 md6>
+                  <v-flex xs12 sm6 md6>
                     <v-text-field
-                      v-model="form.codigo"
-                      label="Codigo"
+                      v-model="form.nombre"
+                      label="Nombre"
                       v-validate="'required'"
                       type="text"
-                      data-vv-name="codigo"
-                      :error-messages="errors.collect('codigo')"
+                      data-vv-name="nombre"
+                      :error-messages="errors.collect('nombre')"
                     >
                     </v-text-field>
                   </v-flex>
-                  <v-flex xs6 sm3 md3 v-if="form.codigo !== null">
-                    <qrcode-vue :value="form.codigo"></qrcode-vue>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field
+                      v-model="form.descripcion"
+                      label="Descripcion"
+                      v-validate="'required'"
+                      type="text"
+                      data-vv-name="descripcion"
+                      :error-messages="errors.collect('descripcion')"
+                    >
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex xs6 sm6 md6>
+                    <v-text-field
+                      v-model="form.salario"
+                      label="Salario"
+                      v-validate="'required'"
+                      type="number"
+                      data-vv-name="salario"
+                      :error-messages="errors.collect('salario')"
+                    >
+                    </v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -116,26 +80,30 @@
         class="elevation-1"
       >
         <template v-slot:items="props">
-          <td class="text-xs-left">{{ props.item.codigo }}</td>
+          <td class="text-xs-left">{{ props.item.nombre }}</td>
+          <td class="text-xs-left">{{ props.item.descripcion }}</td>
+          <td class="text-xs-left">{{ props.item.salario }}</td>
           <td class="text-xs-left">
-            <v-chip small :color="props.item.asignado ? 'primary' : 'green'">{{
-              props.item.asignado ? "Asignado" : "Disponible"
-            }}</v-chip>
+            <v-chip
+              small
+              :color="props.item.estado == 'A' ? 'primary' : 'error'"
+              >{{ props.item.estado == "A" ? "Activo" : "Inactivo" }}</v-chip
+            >
           </td>
           <td class="text-xs-left">
             <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <v-icon
                   v-on="on"
-                  color="info"
+                  :color="color(props.item.estado)"
                   fab
                   dark
-                  @click="showInfo(props.item)"
+                  @click="disabledCargo(props.item)"
                 >
-                  remove_red_eye</v-icon
+                  {{ setEstado(props.item.estado) }}</v-icon
                 >
               </template>
-              <span>Mostrar carnet</span>
+              <span>{{ setSpan(props.item.estado) }}</span>
             </v-tooltip>
             <v-tooltip top>
               <template v-slot:activator="{ on }">
@@ -174,80 +142,37 @@
     </v-flex>
   </v-layout>
 </template>
-
-<style>
-.columnCard {
-  float: left;
-  width: 60%;
-  padding: 0 10px;
-}
-
-.card-row {
-  display: flex;
-  justify-content: space-between;
-}
-
-.content {
-  text-align: center;
-}
-
-.card {
-  margin: auto;
-  width: 150px;
-  height: 200px;
-  padding: 10px;
-  border: 1px solid gray;
-  border-left: 6px solid #130877;
-  text-align: center;
-  border-radius: 10px;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-.card > img:first-child {
-  border-radius: 7px 7px 0 0;
-  width: 150px;
-  text-align: right;
-  padding-right: 40px;
-}
-</style>
-
 <script>
-import QrcodeVue from "qrcode.vue";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import moment from "moment";
-var pdfMake = require("pdfmake/build/pdfmake.js");
-
 export default {
-  name: "carnet",
-  components: {
-    QrcodeVue
-  },
+  name: "prestacions",
   props: {
     source: String
   },
   data() {
     return {
-      dialog: false,
-      showCarnet: false,
-      search: "",
       loading: false,
+      search: "",
+      dialog: false,
+      form: {
+        idCargo: null,
+        nombre: "",
+        descripcion: "",
+        salario: 0,
+        estado: "A"
+      },
       items: [],
       headers: [
-        { text: "Codigo", value: "codigo" },
-        { text: "Estado", value: "asignado" },
+        { text: "Nombre", value: "nombre" },
+        { text: "Descripcion", value: "descripcion" },
+        { text: "Salario", value: "salario" },
+        {
+          text: "Estado",
+          value: "estado"
+        },
         { text: "Acciones", value: "", sortable: false }
-      ],
-      form: {
-        id: null,
-        codigo: null
-      },
-      image: null,
-      image_default: this.$store.state.base_url + "img/user_empty.png",
-      fotoVisible: false
+      ]
     };
   },
-
   created() {
     let self = this;
     self.getAll();
@@ -257,7 +182,7 @@ export default {
     getAll() {
       let self = this;
       self.loading = true;
-      self.$store.state.services.carnetService
+      self.$store.state.services.cargoService
         .getAll()
         .then(r => {
           self.loading = false;
@@ -268,13 +193,12 @@ export default {
         })
         .catch(r => {});
     },
-
-    //funcion para guardar registro
     create() {
       let self = this;
       let data = self.form;
       self.loading = true;
-      self.$store.state.services.carnetService
+      console.log(data);
+      self.$store.state.services.cargoService
         .create(data)
         .then(r => {
           self.loading = false;
@@ -288,13 +212,11 @@ export default {
         .catch(r => {});
     },
 
-    //funcion para actualizar registro
     update() {
       let self = this;
       self.loading = true;
       let data = self.form;
-
-      self.$store.state.services.carnetService
+      self.$store.state.services.cargoService
         .update(data)
         .then(r => {
           self.loading = false;
@@ -307,15 +229,13 @@ export default {
         })
         .catch(r => {});
     },
-
-    //funcion para eliminar registro
     destroy(data) {
       let self = this;
       self
-        .$confirm("Seguro que desea eliminar turno?")
+        .$confirm("Seguro que desea eliminar Prestación?")
         .then(res => {
           self.loading = true;
-          self.$store.state.services.carnetService
+          self.$store.state.services.cargoService
             .destroy(data)
             .then(r => {
               self.loading = false;
@@ -330,7 +250,23 @@ export default {
         })
         .catch(cancel => {});
     },
-    //limpiar data de formulario
+    disabledCargo(data) {
+      let self = this;
+      self.loading = true;
+      self.$store.state.services.cargoService
+        .disabled(data)
+        .then(r => {
+          self.loading = false;
+          if (self.$store.state.global.captureError(r)) {
+            return;
+          }
+          self.getAll();
+          this.$toastr.success("Cambio de Estado exitoso", "exito");
+          self.clearData();
+          self.close();
+        })
+        .catch(r => {});
+    },
     clearData() {
       let self = this;
       Object.keys(self.form).forEach(function(key, index) {
@@ -340,49 +276,23 @@ export default {
       });
       self.$validator.reset();
     },
-    //editar registro
     edit(data) {
       let self = this;
       this.dialog = true;
       self.mapData(data);
     },
-
-    showInfo(data) {
-      let self = this;
-      self.getImg(data.id);
-      self.mapData(data);
-      self.showCarnet = true;
-    },
-    getImg(id) {
-      let self = this;
-      self.fotoVisible = false;
-      self.$store.state.services.empleadoService
-        .getFoto(id)
-        .then(r => {
-          if (r.data === undefined) {
-            self.fotoVisible = false;
-            return;
-          } else {
-            r.data.foto !== null
-              ? (self.image = self.$store.state.base_url + r.data.foto)
-              : self.$store.state.base_url + "img/user_empty.png";
-            self.fotoVisible = true;
-          }
-        })
-        .catch({});
-    },
-    //mapear datos a formulario
     mapData(data) {
       let self = this;
-      self.form.id = data.id;
-      self.form.codigo = data.codigo;
+      self.form.idCargo = data.idCargo;
+      self.form.descripcion = data.descripcion;
+      self.form.nombre = data.nombre;
+      self.form.salario = data.salario;
+      self.form.estado = data.estado;
     },
-
-    //funcion, validar si se guarda o actualiza
     createOrEdit() {
       this.$validator.validateAll().then(result => {
         if (result) {
-          if (self.form.id > 0 && self.form.id !== null) {
+          if (self.form.idCargo > 0 && self.form.idCargo !== null) {
             self.update();
           } else {
             self.create();
@@ -391,52 +301,32 @@ export default {
       });
       let self = this;
     },
-
-    cancelar() {
-      let self = this;
-    },
-
     close() {
       let self = this;
       self.dialog = false;
-      self.showCarnet = false;
       self.clearData();
     },
-
-    print() {
+    cancelar() {
       let self = this;
-      self.loading = true;
-
-      // capturamos el div con html2canvas para despues descargarlo con pdfmake
-      html2canvas(self.$refs.print, { scale: 5 })
-        .then(canvas => {
-          self.loading = true;
-          var data = canvas.toDataURL("image/png");
-          var docDefinition = {
-            content: [
-              {
-                image: data,
-                width: 500
-              }
-            ],
-            pageSize: "LETTER"
-          };
-          pdfMake
-            .createPdf(docDefinition)
-            .download("carnet_" + self.form.codigo);
-          self.loading = false;
-        })
-        .catch(error => {
-          self.loading = false;
-        });
+    },
+    setEstado(estado) {
+      let self = this;
+      return estado == "A" ? "close " : "check";
+    },
+    setSpan(estado) {
+      let self = this;
+      return estado == "A" ? "Desactivar" : "Activar";
+    },
+    color(estado) {
+      let self = this;
+      return estado == "A" ? "error" : "primary";
     }
   },
-
   computed: {
     setTitle() {
       let self = this;
-      return self.form.id !== null
-        ? "actualizar codigo " + self.form.codigo
+      return self.form.idCargo !== null
+        ? "Actualizar Cargo " + self.form.nombre
         : "Nuevo Registro";
     }
   }

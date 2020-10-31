@@ -26,9 +26,13 @@ Route::name('cambiar_contraseña')->post('usuarios_change_password', 'Usuario\Us
 
 #=======================EMPLEADOS=========================================================#
 Route::resource('empleados', 'Empleado\EmpleadoController', ['except' => ['create', 'edit']]);
+Route::resource('empleado_prestaciones', 'Empleado\EmpleadoPrestacionController', ['except' => ['create', 'edit']]);
+Route::name('disabled_empleado')->post('empleados_disabled/{idEmpleado}', 'Empleado\EmpleadoController@disabledEmpleado');
+Route::name('get_foto')->get('empleados_foto/{idCarnet}', 'Empleado\EmpleadoController@empleado_carnet');
 
 #=======================CARGOS=========================================================#
 Route::resource('cargos', 'Cargo\CargoController', ['except' => ['create', 'edit']]);
+Route::name('disabled_cargo')->post('cargos_disabled/{idCargo}', 'Cargo\CargoController@disable');
 
 #=======================TURNOS=========================================================#
 Route::resource('turnos', 'Turno\TurnoController', ['except' => ['create', 'edit']]);
@@ -51,5 +55,6 @@ Route::resource('buques', 'Buque\BuqueController', ['except' => ['create', 'edit
 Route::resource('asignacion_empleados', 'Asignacion\AsignacionEmpleadoController', ['except' => ['create', 'edit']]);
 
 Route::name('dataTurn')->get('asignacion_empleados/{id}/{turno_id}/{fecha}', 'Asignacion\AsignacionEmpleadoController@getDataTurn');
+
 
 Route::resource('detalle_asignacion_empleados', 'Asignacion\DetalleAsignacionEmpleadoController', ['except' => ['create', 'edit']]);

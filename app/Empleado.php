@@ -3,6 +3,8 @@
 namespace App;
 
 use App\Cargo;
+use App\EmpleadoPrestacion;
+use App\CarnetEmpleado;
 use Illuminate\Database\Eloquent\Model;
 
 class Empleado extends Model
@@ -11,6 +13,7 @@ class Empleado extends Model
     protected $connection = 'planificacion';
 
     protected $table = 'empleado';
+    protected $primaryKey = 'idEmpleado';
     public $timestamps = false;
 
     protected $fillable = [
@@ -33,5 +36,14 @@ class Empleado extends Model
     public function Cargo()
     {
         return $this->belongsTo(Cargo::class, 'idCargo', 'idCargo');
+    }
+    public function empleado_prestacion()
+    {
+        return $this->hasMany(EmpleadoPrestacion::class, 'empleado_id', 'idEmpleado');
+    }
+
+    public function carnet_empleado()
+    {
+        return $this->belongsTo(CarnetEmpleado::class, 'empleado_id', 'idEmpleado');
     }
 }

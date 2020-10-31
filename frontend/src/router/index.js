@@ -11,6 +11,7 @@ import Turno from '@/components/configuracion/Turno'
 import Carnet from '@/components/configuracion/Carnet'
 import Prestacion from '@/components/configuracion/Prestacion'
 import EmpleadoIndex from '@/components/configuracion/empleado/Index'
+import Cargo from '@/components/configuracion/Cargo'
 
 import Asignacion from '@/components/administracion/Asignacion'
 
@@ -36,6 +37,7 @@ const routes = [
     { path: '/prestacion', name: 'Prestacion', component: Prestacion, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/empleado_index', name: 'EmpleadoIndex', component: EmpleadoIndex, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/asignacion', name: 'Asignacion', component: Asignacion, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/cargo', name: 'Cargo', component: Cargo, beforeEnter: multiguard([isLoggedIn]) },
 ]
 
 

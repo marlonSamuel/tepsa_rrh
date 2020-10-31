@@ -169,7 +169,18 @@
                     >
                     </v-text-field>
                   </v-flex>
-
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field
+                      prepend-icon="add"
+                      v-model="form.direccion"
+                      label="Direccion"
+                      v-validate="'required'"
+                      type="text"
+                      data-vv-name="direccion"
+                      :error-messages="errors.collect('direccion')"
+                    >
+                    </v-text-field>
+                  </v-flex>
                   <v-flex xs6 sm4 md4>
                     <v-switch
                       v-model="form.tipo_empleado"
@@ -187,6 +198,21 @@
                     >
                     </v-text-field>
                   </v-flex>
+                  <v-flex xs6 sm6 md6 v-if="form.tipo_empleado == 1">
+                    <v-select
+                      placeholder="Carnet"
+                      prepend-icon="card"
+                      v-model="form.carnet_id"
+                      v-validate="'required'"
+                      :items="carnets"
+                      :error-messages="errors.collect('carnet_id')"
+                      label="Carnet"
+                      item-value="id"
+                      item-text="codigo"
+                      data-vv-name="carnet_id"
+                      required
+                    ></v-select>
+                  </v-flex>
                 </v-layout>
               </v-container>
             </v-card-text>
@@ -197,6 +223,79 @@
               <v-btn color="blue darken-1" flat @click="createOrEdit"
                 >Guardar</v-btn
               >
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="prestacion" max-width="1000px" persistent>
+          <v-card>
+            <v-card-title>
+              <span class="headline">Asignacion de Prestaciones</span>
+            </v-card-title>
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs4>
+                    <template>
+                      <v-list dense>
+                        <v-subheader>Prestaciones Asignadas</v-subheader>
+                        <v-list-tile
+                          v-for="(item, i) in asignacionPrestacion"
+                          :key="i"
+                        >
+                          <v-list-tile-action>
+                            <v-icon
+                              color="error"
+                              fab
+                              dark
+                              @click="destroyPrestacion(item)"
+                              >delete</v-icon
+                            >
+                          </v-list-tile-action>
+                          <v-list-tile-title
+                            v-text="item.prestacion.descripcion"
+                          ></v-list-tile-title>
+                        </v-list-tile>
+                      </v-list>
+                    </template>
+                  </v-flex>
+                  <v-divider></v-divider>
+                  <v-flex xs8>
+                    <h3 class="grey--text">Seleccione Prestaciones</h3>
+                    <v-layout row wrap>
+                      <v-flex
+                        xs6
+                        sm2
+                        md2
+                        v-for="prestacion in prestaciones"
+                        :key="prestacion.id"
+                      >
+                        <v-checkbox
+                          v-model="form2.prestaciones"
+                          :label="prestacion.descripcion"
+                          color="primary"
+                          :value="prestacion.id"
+                          hide-details
+                          :disabled="validateDisabled(prestacion.id)"
+                        ></v-checkbox>
+                      </v-flex>
+                    </v-layout>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="primary"
+                small
+                dark
+                class="mb-2"
+                @click="savePrestacion"
+                ><v-icon>add</v-icon> Asignar Prestaciones</v-btn
+              >
+              <v-spacer></v-spacer>
+              <v-btn color="red darken-1" flat @click="close">Volver</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -218,6 +317,34 @@
               <template v-slot:activator="{ on }">
                 <v-icon
                   v-on="on"
+                  :color="color(props.item.estado)"
+                  fab
+                  dark
+                  @click="disabledEmpleado(props.item.idEmpleado)"
+                >
+                  {{ setEstado(props.item.estado) }}</v-icon
+                >
+              </template>
+              <span>{{ setSpan(props.item.estado) }}</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  v-on="on"
+                  color="primary"
+                  fab
+                  dark
+                  @click="addPrestacion(props.item)"
+                >
+                  add_circle</v-icon
+                >
+              </template>
+              <span>Agregar Prestaciones</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  v-on="on"
                   color="warning"
                   fab
                   dark
@@ -228,6 +355,7 @@
               </template>
               <span>Editar</span>
             </v-tooltip>
+
             <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <v-icon
@@ -263,6 +391,7 @@ export default {
       search: "",
       items: [],
       dialog: false,
+      prestacion: false,
       headers: [
         { text: "Primer Nombre", value: "primer_nombre" },
         { text: "Segundo Nombre", value: "segundo_nombre" },
@@ -285,8 +414,16 @@ export default {
         cuenta: "",
         tipo_empleado: 0,
         foto: "",
-        estado: "A"
+        estado: "A",
+        carnet_id: 0
       },
+      form2: {
+        empleado_id: null,
+        prestaciones: []
+      },
+      prestaciones: [],
+      asignacionPrestacion: [],
+      carnets: [],
       image: null,
       image_default: this.$store.state.base_url + "img/user_empty.png",
       cargos: []
@@ -296,6 +433,8 @@ export default {
     let self = this;
     self.getAll();
     self.getCargos();
+    self.getPrestacions();
+    self.getCarnets();
   },
   methods: {
     getAll() {
@@ -326,10 +465,46 @@ export default {
         })
         .catch(r => {});
     },
+    getPrestacions() {
+      let self = this;
+      self.loading = true;
+      self.$store.state.services.prestacionService
+        .getAll()
+        .then(r => {
+          self.loading = false;
+          if (self.$store.state.global.captureError(r)) {
+            return;
+          }
+          self.prestaciones = r.data;
+        })
+        .catch(r => {});
+    },
+    getCarnets() {
+      let self = this;
+      self.loading = true;
+      self.$store.state.services.carnetService
+        .getAll()
+        .then(r => {
+          self.loading = false;
+          if (self.$store.state.global.captureError(r)) {
+            return;
+          }
+          console.log(r.data);
+          //self.carnets = r.data.find(x => x.asignado === 1);
+          r.data.forEach(function(item) {
+            if (item.asignado === 0) {
+              self.carnets.push(item);
+            }
+          });
+          console.log(self.carnets);
+        })
+        .catch(r => {});
+    },
     create() {
       let self = this;
       let data = self.form;
       self.loading = true;
+      console.log(data);
       self.$store.state.services.empleadoService
         .create(data)
         .then(r => {
@@ -348,7 +523,6 @@ export default {
       let self = this;
       self.loading = true;
       let data = self.form;
-
       self.$store.state.services.empleadoService
         .update(data)
         .then(r => {
@@ -365,6 +539,7 @@ export default {
     createOrEdit() {
       this.$validator.validateAll().then(result => {
         if (result) {
+          console.log(self.form.idEmpleado);
           if (self.form.idEmpleado > 0 && self.form.idEmpleado !== null) {
             self.update();
           } else {
@@ -373,6 +548,24 @@ export default {
         }
       });
       let self = this;
+    },
+    savePrestacion() {
+      let self = this;
+      let data = self.form2;
+      self.loading = true;
+      self.$store.state.services.empleadoPrestacionService
+        .create(data)
+        .then(r => {
+          self.loading = false;
+          if (self.$store.state.global.captureError(r)) {
+            return;
+          }
+          this.$toastr.success("Registro guardado con éxito", "éxito");
+          self.prestacion = false;
+          self.asignacionPrestacion = [];
+          self.getAll();
+        })
+        .catch(r => {});
     },
     destroy(data) {
       let self = this;
@@ -395,10 +588,71 @@ export default {
         })
         .catch(cancel => {});
     },
+    disabledEmpleado(id) {
+      let self = this;
+      self.loading = true;
+      self.$store.state.services.empleadoService
+        .disabled(id)
+        .then(r => {
+          self.loading = false;
+          if (self.$store.state.global.captureError(r)) {
+            return;
+          }
+          self.getAll();
+          this.$toastr.success("Cambio de Estado exitoso", "exito");
+          self.clearData();
+          self.close();
+        })
+        .catch(r => {});
+    },
+    destroyPrestacion(data) {
+      let self = this;
+      self
+        .$confirm("Seguro que desea eliminar Prestacion?")
+        .then(res => {
+          self.loading = true;
+          self.$store.state.services.empleadoPrestacionService
+            .destroy(data)
+            .then(r => {
+              self.loading = false;
+              if (self.$store.state.global.captureError(r)) {
+                return;
+              }
+              self.getAll();
+              this.$toastr.success("registro eliminado con exito", "exito");
+              self.clearData();
+              self.close();
+            })
+            .catch(r => {});
+        })
+        .catch(cancel => {});
+    },
     edit(data) {
       let self = this;
       this.dialog = true;
       self.mapData(data);
+    },
+    addPrestacion(data) {
+      let self = this;
+      self.prestacion = true;
+      self.loading = true;
+      self.form2.empleado_id =
+        data.idEmpleado == undefined ? data.empleado_id : data.idEmpleado;
+      self.$store.state.services.empleadoService
+        .get(data.idEmpleado)
+        .then(r => {
+          self.loading = false;
+          if (self.$store.state.global.captureError(r)) {
+            return;
+          }
+          let prestacion = r.data[0].empleado_prestacion;
+          self.asignacionPrestacion = prestacion;
+        })
+        .catch(r => {});
+    },
+    validateDisabled(id) {
+      let self = this;
+      return !!self.asignacionPrestacion.find(x => x.prestacion_id === id);
     },
     mapData(data) {
       let self = this;
@@ -415,7 +669,9 @@ export default {
       self.form.telefono = data.telefono;
       self.form.cuenta = data.cuenta;
       self.form.tipo_empleado = data.tipo_empleado;
-      self.form.foto = data.foto;
+      data.foto !== null
+        ? (self.image = self.$store.state.base_url + data.foto)
+        : self.$store.state.base_url + "img/user_empty.png";
     },
     clearData() {
       let self = this;
@@ -424,12 +680,24 @@ export default {
         else if (typeof self.form[key] === "boolean") self.form[key] = true;
         else if (typeof self.form[key] === "number") self.form[key] = null;
       });
+      Object.keys(self.form2).forEach(function(key, index) {
+        if (typeof self.form2[key] === "string") self.form2[key] = "";
+        else if (typeof self.form2[key] === "boolean") self.form2[key] = true;
+        else if (typeof self.form2[key] === "number") self.form2[key] = null;
+      });
+      self.form2.prestaciones = [];
+      self.asignacionPrestacion = [];
+      self.image = null;
       self.$validator.reset();
     },
     close() {
       let self = this;
       self.dialog = false;
+      self.prestacion = false;
       self.clearData();
+    },
+    openDialogFiles() {
+      document.querySelector("#uploader .input-file").click();
     },
     selectedFile() {
       let self = this;
@@ -441,6 +709,18 @@ export default {
         self.image = oFREvent.target.result;
         self.form.foto = self.image;
       };
+    },
+    setEstado(estado) {
+      let self = this;
+      return estado == "A" ? "close " : "check";
+    },
+    setSpan(estado) {
+      let self = this;
+      return estado == "A" ? "Desactivar" : "Activar";
+    },
+    color(estado) {
+      let self = this;
+      return estado == "A" ? "error" : "primary";
     }
   },
   computed: {

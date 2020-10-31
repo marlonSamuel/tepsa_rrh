@@ -157,6 +157,12 @@ export default {
               path: "/prestacion"
             },
             {
+              name: "cargo",
+              icon: "add",
+              text: "Cargos",
+              path: "/cargo"
+            },
+            {
               name: "empleado",
               icon: "add",
               text: "Empleados",

@@ -75,4 +75,5 @@ class CarnetController extends ApiController
 
         return $this->showOne($carnet,201,'delete');
     }
+
 }

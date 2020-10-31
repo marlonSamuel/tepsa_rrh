@@ -24,12 +24,16 @@ class CargoService {
 
     update(data) {
         let self = this
-        return self.axios.put(`${self.baseUrl}/${data.id}`, data)
+        return self.axios.put(`${self.baseUrl}/${data.idCargo}`, data)
     }
 
     destroy(data) {
         let self = this
-        return self.axios.delete(`${self.baseUrl}/${data.id}`)
+        return self.axios.delete(`${self.baseUrl}/${data.idCargo}`)
+    }
+    disabled(data) {
+        let self = this;
+        return self.axios.post(`${self.baseUrl}_disabled/${data.idCargo}`);
     }
 }
 export default CargoService

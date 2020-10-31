@@ -25,12 +25,21 @@ class EmpleadoService {
 
     update(data) {
         let self = this
-        return self.axios.put(`${self.baseUrl}/${data.id}`, data)
+        console.log(data);
+        return self.axios.put(`${self.baseUrl}/${data.idEmpleado}`, data)
     }
 
     destroy(data) {
         let self = this
-        return self.axios.delete(`${self.baseUrl}/${data.id}`)
+        return self.axios.delete(`${self.baseUrl}/${data.idEmpleado}`)
+    }
+    disabled(data) {
+        let self = this;
+        return self.axios.post(`${self.baseUrl}_disabled/${data}`);
+    }
+    getFoto(data) {
+        let self = this;
+        return self.axios.get(`${self.baseUrl}_foto/${data}`);
     }
 }
 export default EmpleadoService
