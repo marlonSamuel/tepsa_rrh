@@ -10,9 +10,9 @@ Vue.use(Vuetify, {
   iconfont: 'md',
   lang: {
     locales: {
-        es
+      es
     },
-      current: 'es'
+    current: 'es'
   },
   breakpoint: {
     thresholds: {
@@ -71,7 +71,7 @@ import 'vue-toastr-2/dist/vue-toastr-2.min.css'
 // Our Style
 import '../static/style.css'
 window.toastr = require('toastr')
- 
+
 Vue.use(VueToastr2)
 store.dispatch('autoLogin')
 
@@ -80,7 +80,7 @@ store.dispatch('autoLogin')
 const moment = require('moment')
 require('moment/locale/es')
 Vue.use(require('vue-moment'), {
-    moment
+  moment
 })
 
 
