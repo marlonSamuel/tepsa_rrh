@@ -18,7 +18,7 @@
                   <v-icon>videocam</v-icon> {{!active_qr?'activar':'detener'}}
                 </v-btn>
               </v-flex>
-                <div v-if="active_qr">
+                <v-flex v-if="active_qr">
                   <br />
                   <br />
                   <br />
@@ -28,7 +28,7 @@
                         <v-icon color="white" v-else>flash_off</v-icon>
                       </button>
                     </qrcode-stream>
-                </div>
+                </v-flex>
                <v-flex v-if="error !== null">
                       <v-alert
                         v-model="alert"
@@ -55,7 +55,7 @@
 
                   
                   <v-container grid-list-md v-if="asignacion !== null && !active_qr">
-                    <v-flex v-if="asignacion.asistencia_turno.hora_salida !== null">
+                    <v-flex v-if="check_salida">
                       <v-alert
                         v-model="alert"
                         dismissible
@@ -89,7 +89,7 @@
                           <strong>HORA ENTRADA: </strong> {{asignacion.asistencia_turno.hora_entrada | moment('hh:mm:ss')}}
                           <br />
                           <strong>HORA SALIDA: </strong>
-                           <span v-if="asignacion.asistencia_turno.hora_salida !== null">
+                           <span v-if="check_salida">
                               {{asignacion.asistencia_turno.hora_salida | moment('hh:mm:ss')}}
                             </span>
                            <span v-else class="red--text">Sin asistencia de salida</span>
@@ -103,7 +103,7 @@
                           v-validate="'max:255'"
                           type="text"
                           data-vv-name="observaciones"
-                          :readonly="asignacion.asistencia_turno.hora_salida !== null ? true : false"
+                          :readonly="check_salida!== null ? true : false"
                           :error-messages="errors.collect('observaciones')">
                         </v-textarea>
                       </v-flex>
@@ -112,8 +112,7 @@
                     
                     
                     <v-layout wrap>
-                      <div v-if="asignacion.asistencia_turno == null">
-                        <v-flex sm4 md4 xs12>
+                        <v-flex sm4 md4 xs12 v-if="asignacion.asistencia_turno == null">
                           <v-autocomplete
                               v-model="form.cargo_turno_id"
                               label="Rol"
@@ -126,7 +125,7 @@
                               :error-messages="errors.collect('rol')">
                           </v-autocomplete>
                         </v-flex>
-                        <v-flex sm4 md4 xs12>
+                        <v-flex sm4 md4 xs12 v-if="asignacion.asistencia_turno == null">
                           <v-autocomplete
                               v-model="form.bodega"
                               label="Bodega"
@@ -137,9 +136,8 @@
                               :error-messages="errors.collect('bodega')">
                           </v-autocomplete>
                         </v-flex>
-                      </div>
                       
-                      <v-flex sm2 md3 xs6 v-if="asignacion.asistencia_turno.hora_salida == null">
+                      <v-flex sm2 md3 xs6 v-if="!check_salida">
                         <v-divider></v-divider>
                         <v-btn color="success" @click="createOrEdit"><v-icon>check_circle</v-icon> asistencia</v-btn>
                       </v-flex>
@@ -167,6 +165,7 @@ export default {
       alert: true,
       torchActive: false,
       torchNotSupported: false,
+      check_salida: false,
       code: '',
       error: null,
       turnos: [],
@@ -242,6 +241,7 @@ export default {
         self.form.detalle_asignacion_empleado_id = self.asignacion.id
         if(self.asignacion.asistencia_turno !== null){
           self.mapData(self.asignacion.asistencia_turno)
+          self.asignacion.asistencia_turno.hora_salida !== nul ? self.check_salida = true : self.check_salida = false
         }
         self.setBodegas(r.data.asignacion.planificacion.buque.no_bodegas)
       }).catch(e=>{})
@@ -339,11 +339,12 @@ export default {
             var start_time = moment(extra + t.hora_inicio)
             var end_time = moment(extra + t.hora_fin)
             if(t.hora_fin < t.hora_inicio){
-              var extra_e = moment().add(1,'d').format('YYYY-MM-DD') + ' '
-              var end_time = moment(extra_e + t.hora_fin)
+              var extra_e = moment().subtract(1,'d').format('YYYY-MM-DD') + ' '
+              var start_time = moment(extra_e + t.hora_inicio)
 
-              if(moment(start_time).format('YYYY-MM-DD') == moment(end_time).format('YYYY-MM-DD'))
+              if(moment(start_time).format('YYYY-MM-DD') < moment(end_time).format('YYYY-MM-DD')){
                 self.fecha = moment().subtract(1,'d').format('YYYY-MM-DD')
+              }
             }
               
             
