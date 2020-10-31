@@ -22,8 +22,8 @@
                   <br />
                   <br />
                   <br />
-                    <qrcode-stream size="40" :torch="torchActive" @decode="onDecode" @init="onInit" >
-                      <button @click="torchActive = !torchActive" :disabled="torchNotSupported">
+                    <qrcode-stream :torch="torchActive" @decode="onDecode" @init="onInit" >
+                      <button class="buttonCam" @click="torchActive = !torchActive" :disabled="torchNotSupported">
                         <v-icon color="white" v-if="!torchActive">flash_on</v-icon>
                         <v-icon color="white" v-else>flash_off</v-icon>
                       </button>
@@ -425,7 +425,7 @@ export default {
 </script>
 
 <style scoped>
-button {
+.buttonCam {
   position: absolute;
   left: 10px;
   top: 10px;

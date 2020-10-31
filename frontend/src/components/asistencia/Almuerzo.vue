@@ -23,7 +23,7 @@
                 <br />
                 <br />
                   <qrcode-stream size="40" :torch="torchActive" @decode="onDecode" @init="onInit" >
-                    <button @click="torchActive = !torchActive" :disabled="torchNotSupported">
+                    <button class="buttonCam"  @click="torchActive = !torchActive" :disabled="torchNotSupported">
                       <v-icon color="white" v-if="!torchActive">flash_on</v-icon>
                       <v-icon color="white" v-else>flash_off</v-icon>
                     </button>
@@ -175,11 +175,12 @@ export default {
             var start_time = moment(extra + t.hora_inicio)
             var end_time = moment(extra + t.hora_fin)
             if(t.hora_fin < t.hora_inicio){
-              var extra_e = moment().add(1,'d').format('YYYY-MM-DD') + ' '
-              var end_time = moment(extra_e + t.hora_fin)
+              var extra_e = moment().subtract(1,'d').format('YYYY-MM-DD') + ' '
+              var start_time = moment(extra_e + t.hora_inicio)
 
-              if(moment(start_time).format('YYYY-MM-DD') == moment(end_time).format('YYYY-MM-DD'))
+              if(moment(start_time).format('YYYY-MM-DD') < moment(end_time).format('YYYY-MM-DD')){
                 self.fecha = moment().subtract(1,'d').format('YYYY-MM-DD')
+              }
             }
               
             if(moment(currentTime).isBetween(start_time, end_time)){
@@ -270,7 +271,7 @@ export default {
 </script>
 
 <style scoped>
-button {
+.buttonCam {
   position: absolute;
   left: 10px;
   top: 10px;
