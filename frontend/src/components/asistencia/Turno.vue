@@ -395,6 +395,7 @@ export default {
               .format("YYYY-MM-DD");
           }
         }
+        console.log(self.fecha);
 
         if (moment(currentTime).isBetween(start_time, end_time)) {
           self.turno = t;
