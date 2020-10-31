@@ -177,12 +177,18 @@ export default {
           model: true,
           path: "",
           children: [
-            {
-              name: "asignacion",
-              icon: "add",
-              text: "Asignaciones",
-              path: "/asignacion"
-            }
+            { name: "asignacion",icon: "add",text: "Asignaciones",path: "/asignacion"}
+          ]
+        },
+        {
+          icon: "file_copy",
+          text: "Asistencias",
+          name: "Asistencias",
+          model: true,
+          path: "",
+          children: [
+            { name: "asistencia_turno",icon: "add",text: "Asistencia turno",path: "/asistencia_turno"},
+            { name: "asistencia_almuerzo",icon: "add",text: "Asistencia almuerzo",path: "/asistencia_almuerzo"}
           ]
         }
       ]

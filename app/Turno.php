@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\CargoTurno;
 use Illuminate\Database\Eloquent\Model;
 
 class Turno extends Model
@@ -13,4 +14,9 @@ class Turno extends Model
     	'hora_fin',
     	'numero'
     ];
+
+    public function cargo_turnos(){
+    	return $this->hasMany(CargoTurno::class);
+    }
 }
+

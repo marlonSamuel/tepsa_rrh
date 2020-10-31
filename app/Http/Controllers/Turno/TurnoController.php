@@ -11,7 +11,7 @@ class TurnoController extends ApiController
 {
    public function __construct()
     {
-        parent::__construct(); //validacion de autenticacion
+        //parent::__construct(); //validacion de autenticacion
     }
 
     public function index()
@@ -26,7 +26,7 @@ class TurnoController extends ApiController
     public function store(Request $request)
     {
         $rules = [
-            'numero'=>'required|string|unique:rrh.turnos',
+            'numero'=>'required|integer|unique:rrh.turnos',
             'hora_inicio' => 'required',
             'hora_fin' => 'required'
         ];
@@ -51,7 +51,7 @@ class TurnoController extends ApiController
     public function update(Request $request, Turno $turno)
     {
         $rules = [
-            'numero' => 'required|string|unique:rrh.turnos,numero,' . $turno->id,
+            'numero' => 'required|integer|unique:rrh.turnos,numero,' . $turno->id,
             'hora_inicio' => 'required',
             'hora_fin' => 'required'
         ];
