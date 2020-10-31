@@ -43,7 +43,6 @@
                     <v-layout>
                       <v-flex sm3 md3 xs6>
                         <br />
-                        <br />
                         <v-text-field v-model="codigo" 
                           label="Codigo de carnet"
                           type="text"
@@ -232,7 +231,7 @@ export default {
       }
       self.loading = true
       self.$store.state.services.detalleAsignacionService
-      .getAsign(self.codigo,'2020-10-14',1)
+      .getAsign(self.codigo,self.fecha,self.turno.id)
       .then(r=>{
         self.loading = false
         if(self.$store.state.global.captureError(r)){
@@ -241,7 +240,6 @@ export default {
         }
         self.asignacion = r.data
         self.form.detalle_asignacion_empleado_id = self.asignacion.id
-
         if(self.asignacion.asistencia_turno !== null){
           self.mapData(self.asignacion.asistencia_turno)
         }
