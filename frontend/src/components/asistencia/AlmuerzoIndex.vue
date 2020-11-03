@@ -83,6 +83,11 @@
           </td>
           <td class="text-xs-left">
               <span v-if="props.item.asistencia_almuerzo !== null">
+                  {{props.item.tipo_alimento}}
+              </span>
+          </td>
+          <td class="text-xs-left">
+              <span v-if="props.item.asistencia_almuerzo !== null">
                   {{props.item.asistencia_almuerzo.created_at | moment('hh:mm')}}
               </span>
           </td>
@@ -117,6 +122,7 @@ export default {
       turnos: [],
       headers: [
         { text: 'empleado', value: 'empleado' },
+        { text: 'Tipo alimento', value: 'tipo_alimeto' },
         { text: 'Hora', value: 'hora' }
       ],
       rowsPerPageItems: [10, 20, 30, 40],
@@ -206,6 +212,22 @@ export default {
     changeTurn(){
         let self = this
         self.items = self.all_items.filter(x=>x.turno_id == self.form.turno_id && x.fecha_buque == self.form.fecha_buque)
+
+        self.items.forEach((x,i)=>{
+          var extra = moment(x.asistencia_almuerzo.created_at).format("YYYY-MM-DD") + " "
+          let desayuno = moment(extra+'14:30:00')
+          let almuerzo = moment(extra+'21:30:00')
+          let cena = moment(moment(extra+'07:00:00')).add('d',1)
+          let hora = moment(x.asistencia_almuerzo.created_at)
+          if(hora.isBetween(cena,desayuno)){
+            x.tipo_alimento = "desayuno"
+          }else if(hora.isBetween(desayuno,almuerzo)){
+            x.tipo_alimento = "almuerzo"
+          }else{
+            x.tipo_alimento = "cena"
+          }
+
+        })
     },
 
     print(){

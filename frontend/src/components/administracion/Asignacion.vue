@@ -46,9 +46,9 @@
                           :key="t.id"
                           color="info"
                           small
-                          dark
                           class="mb-2"
                           @click="print(t)"
+                          :disabled="blockTurn(t)"
                         >
                           <v-icon>print</v-icon> turno {{ t.numero }}
                         </v-btn>
@@ -469,7 +469,8 @@ export default {
           if (self.$store.state.global.captureError(r)) {
             return;
           }
-          self.items = r.data;
+          self.items = r.data
+          console.log(self.items)
         })
         .catch(r => {});
     },
@@ -749,9 +750,10 @@ export default {
     },
 
     close() {
-      let self = this;
-      self.dialog = false;
-      self.clearData();
+      let self = this
+      self.dialog = false
+      self.clearData()
+      self.planificacion = null
     },
 
     detailChange() {
@@ -840,6 +842,26 @@ export default {
           link.click();
         })
         .catch(r => {});
+    },
+
+    blockTurn(data){
+      let self = this
+      let t = self.turnos.find(x=>x.id == data.turno_id)
+
+      var currentTime = moment()
+      var extra = moment(data.fecha).format("YYYY-MM-DD") + " "
+      var start_time = moment(extra + t.hora_inicio)
+      var end_time = moment(extra + t.hora_fin)
+
+      if(end_time < start_time){
+        end_time = moment(end_time).add('d',1)
+      }
+
+      if(currentTime > end_time){
+        return true
+      }
+
+      return false
     }
   },
 

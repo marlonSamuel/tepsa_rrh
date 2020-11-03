@@ -68,6 +68,10 @@ Route::name('print_almuerzo_detalle_asignacion')->get('detalle_asignacion_emplea
 
 
 Route::resource('detalle_asignacion_empleados', 'Asignacion\DetalleAsignacionEmpleadoController', ['except' => ['create', 'edit']]);
+
 #=======================ASISTENCIAS=========================================================#
 Route::resource('asistencia_turno_bodegas', 'Asistencia\AsistenciaTurnoBodegaController', ['except' => ['create', 'edit']]);
+
+Route::name('asistencia_turno_bodegas_desbloquear')->put('asistencia_turno_bodegas_desbloquear/{id}', 'Asistencia\AsistenciaTurnoBodegaController@desbloquear');
+
 Route::resource('asistencia_almuerzos', 'Asistencia\AsistenciaAlmuerzoController', ['except' => ['create', 'edit']]);

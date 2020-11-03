@@ -29,14 +29,21 @@ class AsistenciaTurnoBodegaController extends ApiController
         $rules = [
             'detalle_asignacion_empleado_id'=>'required|integer',
             'cargo_turno_id'=>'required|integer',
-            'bodega'=>'required'
+            'bodega'=>'required',
+            'bloqueado' => 'required'
         ];
 
         $this->validate($request,$rules);
         $today = Carbon::now('America/Guatemala');
         $data = $request->all();
-        $data['hora_entrada'] = $today;
 
+        if($request->bloqueado){
+            $asistenciaTurnoBodega = AsistenciaTurnoBodega::create($data);
+
+            return $this->errorResponse('no se a podido registrar la entrada, por entrada tarde, el empleado a sido bloqueado, si desea desbloquear el empleado comuniquese con el administrador',421);
+        }
+
+        $data['hora_entrada'] = $today; 
         $asistenciaTurnoBodega = AsistenciaTurnoBodega::create($data);
 
         return $this->showOne($asistenciaTurnoBodega,201,'insert');
@@ -66,6 +73,9 @@ class AsistenciaTurnoBodegaController extends ApiController
         {
             $today = Carbon::now('America/Guatemala');
             $asistencia_turno_bodega->hora_salida = $today;
+        }else{
+            $today = Carbon::now('America/Guatemala');
+            $asistencia_turno_bodega->hora_entrada = $today;
         }
         
         $asistencia_turno_bodega->bodega = $request->bodega;
@@ -82,6 +92,16 @@ class AsistenciaTurnoBodegaController extends ApiController
         return $this->showOne($asistencia_turno_bodega,201,'update');
 
     }
+
+    public function desbloquear($id, Request $request){
+        $data = AsistenciaTurnoBodega::find($id);
+
+        $data->razon_desbloqueo= $request->razon_desbloqueo;
+        $data->desbloqueado = true;
+
+        $data->save();
+        return $this->showOne($data,201,'update');
+    }   
 
     /**
      */

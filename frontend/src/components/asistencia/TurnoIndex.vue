@@ -1,5 +1,41 @@
 <template>
   <v-layout align-start v-loading="loading">
+
+    <v-dialog v-model="dialog" max-width="800px" persistent>
+          <v-card>
+            <v-card-title>
+              <span class="headline">Desbloquear empleado</span>
+            </v-card-title>
+
+            <v-card-text>
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12 sm12 md12>
+                    <v-textarea
+                      v-model="form.razon_desbloqueo"
+                      label="Justificación"
+                      v-validate="'required'"
+                      type="text"
+                      data-vv-name="razon_desbloqueo"
+                      data-vv-as="justificación de desbloqueo"
+                      :error-messages="errors.collect('razon_desbloqueo')"
+                    >
+                    </v-textarea>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="red darken-1" flat @click="close">Volver</v-btn>
+              <v-btn color="blue darken-1" flat @click="validate"
+                >Guardar</v-btn
+              >
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
     <v-flex>
         <v-layout row wrap justify-end>
         <div>
@@ -116,6 +152,41 @@
                 sin asistencia
             </span>
           </td>
+          <td class="text-xs-left">
+              <span v-if="props.item.asistencia_turno !== null">
+                  <span v-if="props.item.asistencia_turno.bloqueado" class="red--text">
+                      bloqueado
+                  </span>
+                  <span v-else class="green--text">
+                    activo
+                  </span>
+                  <span v-if="props.item.asistencia_turno.desbloqueado" class="green--text">
+                      - desbloqueado
+                  </span>
+            </span>
+            <span v-else class="red--text">
+                sin asistencia
+            </span>
+          </td>
+          <td>
+            <span v-if="props.item.asistencia_turno !== null">
+              <v-tooltip top v-if="props.item.asistencia_turno.bloqueado & !props.item.asistencia_turno.desbloqueado">
+                <template v-slot:activator="{ on }">
+                  <v-icon
+                    v-on="on"
+                    color="success"
+                    fab
+                    dark
+                    @click="desbloquear(props.item)"
+                  >
+                    check</v-icon
+                  >
+                </template>
+                <span>Desbloquear</span>
+              </v-tooltip>
+            </span>
+            
+          </td>
         </template>
         <template v-slot:no-data>
           <v-btn color="primary" @click="getAll">Reset</v-btn>
@@ -151,6 +222,8 @@ export default {
         { text: 'No. bodega', value: 'bodega' },
         { text: 'Hora entrada', value: 'hora_entrada' },
         { text: 'Hora salida', value: 'hora_salida' },
+        { text: 'estado', value: 'bloqueado' },
+        { text: 'acción', value: '' },
       ],
       rowsPerPageItems: [10, 20, 30, 40],
       pagination: {
@@ -174,6 +247,8 @@ export default {
         asignacion_id: null,
         fecha_buque: "",
         turno_id: null,
+        id: null,
+        razon_desbloqueo: ""
       },
     };
   },
@@ -260,6 +335,45 @@ export default {
           link.click();
         })
         .catch(r => {});
+    },
+
+    validate(){
+      let self = this
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          let data = self.form
+          console.log(data)
+          self.$confirm("Seguro que desbloquear empleado, esta acción se realizará una sola vez?")
+          .then(res => {
+            self.loading = true;
+            self.$store.state.services.asistenciaTurnoService
+              .desbloquear(data)
+              .then(r => {
+                self.loading = false;
+                if (self.$store.state.global.captureError(r)) {
+                  return;
+                }
+                self.getAll()
+                this.$toastr.success("empleado desbloqueado con éxito", "éxito")
+                self.close()
+              })
+              .catch(r => {});
+          })
+          .catch(cancel => {});
+        }
+      })
+    },
+
+    desbloquear(data){
+      let self = this
+      self.dialog = true
+      self.form.id = data.asistencia_turno.id
+    },
+
+    close(){
+      let self =this
+      self.dialog = false
+      self.razon_desbloqueo = ""
     }
 
   },
