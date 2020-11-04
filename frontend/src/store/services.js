@@ -23,9 +23,9 @@ import AsistenciaAlmuezoService from '../services/AsistenciaAlmuerzoService'
 import AsignacionDomoService from '../services/AsignacionDomoService'
 
 
-let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
+//let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
 
-//let baseUrl = 'https://167.172.158.187/tepsa-rrh/' //url production
+let baseUrl = 'https://167.172.158.187/tepsa-rrh/' //url production
 
 let token_data = $cookies.get('token_data')
 
