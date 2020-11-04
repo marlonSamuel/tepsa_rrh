@@ -1,10 +1,10 @@
-class AsignacionService{
+class AsignacionDomoService{
     axios
     baseUrl
 
     constructor(axios,baseUrl){
         this.axios = axios
-        this.baseUrl = `${baseUrl}asignacion_empleados`
+        this.baseUrl = `${baseUrl}asignacion_domos`
     }
 
     getAll(){
@@ -15,11 +15,6 @@ class AsignacionService{
     get(id){
         let self = this
         return self.axios.get(`${self.baseUrl}/${id}`)
-    }
-
-    getDomos(id){
-        let self = this
-        return self.axios.get(`${self.baseUrl}_domos/${id}`)
     }
 
     getDetail(id,turno_id,fecha){
@@ -43,12 +38,10 @@ class AsignacionService{
     }
 
     //imprimir contrato
-    print(id,turno_id,fecha,empleado_id) {
+    print(id,fecha) {
         let self = this
-        if (empleado_id == undefined)
-            empleado_id = 0
-        return self.axios.get(`${self.baseUrl}_print/${id}/${turno_id}/${fecha}/${empleado_id}`, { responseType: 'blob' });
+        return self.axios.get(`${self.baseUrl}_print/${id}/${fecha}`, { responseType: 'blob' });
     }
 }
 
-export default AsignacionService
+export default AsignacionDomoService

@@ -365,6 +365,20 @@
               <template v-slot:activator="{ on }">
                 <v-icon
                   v-on="on"
+                  color="green"
+                  fab
+                  dark
+                  @click="$router.push('asignacion_domo/'+props.item.id)"
+                >
+                  file_copy</v-icon
+                >
+              </template>
+              <span>asignacion domo</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  v-on="on"
                   color="warning"
                   fab
                   dark

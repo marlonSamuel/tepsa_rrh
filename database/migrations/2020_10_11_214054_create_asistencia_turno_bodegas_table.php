@@ -23,7 +23,7 @@ class CreateAsistenciaTurnoBodegasTable extends Migration
             $table->integer('bodega');
             $table->boolean('bloqueado')->default(false);
             $table->boolean('desbloqueado')->default(false);
-            $table->string('razon_desbloque',250)->nullable();
+            $table->string('razon_desbloqueo',250)->nullable();
 
             $table->timestamps();
 

@@ -4,6 +4,7 @@ namespace App;
 
 use App\PlanoEstiba;
 use App\DetalleAsignacionEmpleado;
+use App\AsignacionDomo;
 use Illuminate\Database\Eloquent\Model;
 
 class AsignacionEmpleado extends Model
@@ -21,5 +22,9 @@ class AsignacionEmpleado extends Model
 
     public function detalle_asignacion(){
     	return $this->hasMany(DetalleAsignacionEmpleado::class,'asignacion_empleado_id');
+    }
+
+    public function asignacion_domos(){
+        return $this->hasMany(AsignacionDomo::class,'asignacion_empleado_id');
     }
 }

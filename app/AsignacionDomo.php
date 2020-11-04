@@ -2,9 +2,38 @@
 
 namespace App;
 
+use App\Empleado;
+use App\Cargo;
+use App\Carnet;
 use Illuminate\Database\Eloquent\Model;
 
 class AsignacionDomo extends Model
 {
     //
+
+    protected $connection = 'rrh';
+
+    protected $fillable = [
+    	'asignacion_empleado_id',
+    	'empleado_id',
+    	'carnet_id',
+    	'cargo_id',
+    	'fecha'
+    ];
+
+    public function asignacion(){
+    	return $this->belongsTo(AsignacionEmpleado::class,'asignacion_empleado_id');
+    }
+
+    public function empleado(){
+    	return $this->belongsTo(Empleado::class,'empleado_id','idEmpleado');
+    }
+
+    public function cargo(){
+    	return $this->belongsTo(Cargo::class,'cargo_id','idCargo');
+    }
+
+    public function carnet(){
+    	return $this->belongsTo(Carnet::class);
+    }
 }

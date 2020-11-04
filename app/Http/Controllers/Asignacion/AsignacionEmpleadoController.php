@@ -70,9 +70,20 @@ class AsignacionEmpleadoController extends ApiController
     public function show(AsignacionEmpleado $asignacion_empleado)
     {
         $asignacion_empleado = AsignacionEmpleado::where('id',$asignacion_empleado->id)
-                                                    ->with('detalle_asignacion.turno')->get()->pluck('detalle_asignacion')->collapse();
+                                                    ->with('detalle_asignacion.turno')->get()->pluck('detalle_asignacion','asignacion_domos')->collapse();
 
         return $this->showAll($asignacion_empleado,200,'select');
+    }
+
+    public function showAsignacionDomo($id)
+    {
+        $asignacion_empleado = AsignacionEmpleado::where('id',$id)
+                                                    ->with('asignacion_domos.empleado',
+                                                           'asignacion_domos.cargo',
+                                                           'asignacion_domos.carnet',
+                                                           'planificacion.buque')->firstOrFail();
+
+        return $this->showOne($asignacion_empleado,200,'select');
     }
 
     //obtener asignacion por turno e id en detalle asignacion empleado
