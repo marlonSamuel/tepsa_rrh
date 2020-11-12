@@ -19,6 +19,8 @@ import AsistenciaTurnoIndex from '@/components/asistencia/TurnoIndex'
 import AsistenciaAlmuerzo from '@/components/asistencia/Almuerzo'
 import AsistenciaAlmuerzoIndex from '@/components/asistencia/AlmuerzoIndex'
 import AsignacionDomo from '@/components/administracion/AsignacionDomo'
+import AsistenciaDomo from '@/components/asistencia/Domo'
+import AsistenciaDomoIndex from '@/components/asistencia/DomoIndex'
 
 Vue.use(Router)
 
@@ -48,6 +50,8 @@ const routes = [
     { path: '/asistencia_turno_index', name: 'AsistenciaTurnoIndex', component: AsistenciaTurnoIndex, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/asistencia_almuerzo', name: 'AsistenciaAlmuerzo', component: AsistenciaAlmuerzo, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/asistencia_almuerzo_index', name: 'AsistenciaAlmuerzoIndex', component: AsistenciaAlmuerzoIndex, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/asistencia_domo', name: 'AsistenciaDomo', component: AsistenciaDomo, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/asistencia_domo_index', name: 'AsistenciaDomoIndex', component: AsistenciaDomoIndex, beforeEnter: multiguard([isLoggedIn]) },
 ]
 
 

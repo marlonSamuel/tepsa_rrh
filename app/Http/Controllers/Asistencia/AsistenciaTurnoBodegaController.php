@@ -40,13 +40,15 @@ class AsistenciaTurnoBodegaController extends ApiController
         if($request->bloqueado){
             $asistenciaTurnoBodega = AsistenciaTurnoBodega::create($data);
 
-            return $this->errorResponse('no se a podido registrar la entrada, por entrada tarde, el empleado a sido bloqueado, si desea desbloquear el empleado comuniquese con el administrador',421);
+            return $this->errorResponse('no se a podido registrar la entrada, por entrada tarde, el empleado a sido bloqueado, si desea desbloquear el empleado comuniquese con el administrador',422);
+        }else{
+             $data['hora_entrada'] = $today; 
+            $asistenciaTurnoBodega = AsistenciaTurnoBodega::create($data);
+
+            return $this->showOne($asistenciaTurnoBodega,201,'insert');
         }
 
-        $data['hora_entrada'] = $today; 
-        $asistenciaTurnoBodega = AsistenciaTurnoBodega::create($data);
-
-        return $this->showOne($asistenciaTurnoBodega,201,'insert');
+       
     }
 
     /**

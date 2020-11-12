@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Asignacion;
 
 use App\AsignacionDomo;
+use App\Carnet;
 use App\AsignacionEmpleado;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
@@ -109,5 +110,58 @@ class AsignacionDomoController extends ApiController
 
         return $pdf->download('ejemplo.pdf');
         
+    }
+
+    //imprimir pdf
+    public function printAsistencia($asignacion_id,$fecha,$turno = 0){
+        $asignacion = AsignacionEmpleado::where('id',$asignacion_id)
+                                         ->with('planificacion.buque')
+                                         ->firstOrFail();
+
+        $detalle = AsignacionDomo::where([['asignacion_empleado_id',$asignacion_id],['fecha',$fecha]])->with('empleado','cargo','carnet','asistencia_domo')->get();
+
+        $pdf_file = 'pdfs.print_asistencia_domo';
+        $detalle_filter = collect();
+        $detalle_filter_array = collect();
+
+        foreach ($detalle as $d) {
+            $detalle_filter->empleado = $d->empleado->primer_nombre.' '.$d->empleado->segundo_nombre.' '.
+                                        $d->empleado->primer_apellido.' '.$d->empleado->segundo_apellido;
+            $detalle_filter->dpi = $d->empleado->dpi;
+            $detalle_filter->carnet = $d->carnet->codigo;
+            $detalle_filter->hora_entrada = null;
+            $detalle_filter->hora_salida = null;
+            $detalle_filter->cargo = $d->cargo->nombre;
+            $detalle_filter->turno = null;
+            $detalle_filter->bloqueado = null;
+            $detalle_filter->desbloqueado = null;
+            $detalle_filter->fecha = $d->fecha;
+
+            if(count($d->asistencia_domo) > 0){
+                foreach ($d->asistencia_domo as $ad) {
+                    $d_filter = clone $detalle_filter;
+                    $d_filter->hora_entrada = $ad->hora_entrada;
+                    $d_filter->hora_salida = $ad->hora_salida;
+                    $d_filter->turno = $ad->turno;
+                    $d_filter->bloqueado = $ad->bloqueado;
+                    $d_filter->desbloqueado = $ad->desbloqueado;
+
+                    $detalle_filter_array->push($d_filter);
+                }
+            }else{
+                $detalle_filter_array->push($detalle_filter); 
+            }
+        }
+
+        if($turno > 0){
+            $detalle_filter_array = $detalle_filter_array->where('turno',$turno);
+        }
+        
+
+        $pdf = \PDF::loadView($pdf_file,['asignacion'=>$asignacion,'detalle'=>$detalle_filter_array])->setPaper('a4', 'landscape');
+        
+        #$pdf->setPaper('legal', 'portrait');
+
+        return $pdf->download('ejemplo.pdf'); 
     }
 }

@@ -188,7 +188,8 @@ export default {
           path: "",
           children: [
             { name: "asistencia_turno",icon: "add",text: "Asistencia turno",path: "/asistencia_turno"},
-            { name: "asistencia_almuerzo",icon: "add",text: "Asistencia almuerzo",path: "/asistencia_almuerzo"}
+            { name: "asistencia_almuerzo",icon: "add",text: "Asistencia almuerzo",path: "/asistencia_almuerzo"},
+            { name: "asistencia_domo",icon: "add",text: "Asistencia domo",path: "/asistencia_domo"}
           ]
         }
       ]

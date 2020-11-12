@@ -63,10 +63,13 @@ Route::name('showAsign')->get('detalle_asignacion_empleados/{codigo}/{fecha}/{tu
 Route::name('showTurnDate')->get('detalle_asignacion_empleados/{fecha}/{turno_id}', 'Asignacion\DetalleAsignacionEmpleadoController@showTurnDate');
 
 Route::resource('asignacion_domos', 'Asignacion\AsignacionDomoController', ['except' => ['create', 'edit']]);
+Route::name('showAsign')->get('asignacion_domos/{codigo}/{fecha}', 'Asignacion\AsignacionDomoController@showAsign');
 
 Route::name('print_asignacion')->get('asignacion_empleados_print/{id}/{turno_id}/{fecha}/{empleado_id?}', 'Asignacion\AsignacionEmpleadoController@print');
 
 Route::name('print_asignacion_domo')->get('asignacion_domos_print/{id}/{fecha}', 'Asignacion\AsignacionDomoController@print');
+
+Route::name('asignacion_domos_print_asistencia')->get('asignacion_domos_print_asistencia/{id}/{fecha}/{turno?}', 'Asignacion\AsignacionDomoController@printAsistencia');
 
 Route::name('print_detalle_asignacion')->get('detalle_asignacion_empleados_print/{asignacion_id}/{turno_id}/{fecha}/{a?}/{bodega?}', 'Asignacion\DetalleAsignacionEmpleadoController@print');
 
@@ -81,3 +84,6 @@ Route::resource('asistencia_turno_bodegas', 'Asistencia\AsistenciaTurnoBodegaCon
 Route::name('asistencia_turno_bodegas_desbloquear')->put('asistencia_turno_bodegas_desbloquear/{id}', 'Asistencia\AsistenciaTurnoBodegaController@desbloquear');
 
 Route::resource('asistencia_almuerzos', 'Asistencia\AsistenciaAlmuerzoController', ['except' => ['create', 'edit']]);
+
+Route::resource('asistencia_domos', 'Asistencia\AsistenciaDomoController', ['except' => ['create', 'edit']]);
+Route::name('asistencia_domos_desbloquear')->put('asistencia_domos_desbloquear/{id}', 'Asistencia\AsistenciaDomoController@desbloquear');

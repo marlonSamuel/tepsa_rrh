@@ -17,6 +17,11 @@ class AsignacionDomoService{
         return self.axios.get(`${self.baseUrl}/${id}`)
     }
 
+    getAsign(codigo,fecha){
+        let self = this
+        return self.axios.get(`${self.baseUrl}/${codigo}/${fecha}`)
+    }
+
     getDetail(id,turno_id,fecha){
         let self = this
         return self.axios.get(`${self.baseUrl}/${id}/${turno_id}/${fecha}`)
@@ -41,6 +46,12 @@ class AsignacionDomoService{
     print(id,fecha) {
         let self = this
         return self.axios.get(`${self.baseUrl}_print/${id}/${fecha}`, { responseType: 'blob' });
+    }
+
+    //imprimir asistencia
+    printAsistencia(id,fecha,turno) {
+        let self = this
+        return self.axios.get(`${self.baseUrl}_print_asistencia/${id}/${fecha}/${turno}`, { responseType: 'blob' });
     }
 }
 

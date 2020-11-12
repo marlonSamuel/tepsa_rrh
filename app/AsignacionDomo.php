@@ -5,6 +5,7 @@ namespace App;
 use App\Empleado;
 use App\Cargo;
 use App\Carnet;
+use App\AsistenciaDomo;
 use Illuminate\Database\Eloquent\Model;
 
 class AsignacionDomo extends Model
@@ -35,5 +36,10 @@ class AsignacionDomo extends Model
 
     public function carnet(){
     	return $this->belongsTo(Carnet::class);
+    }
+
+    public function asistencia_domo()
+    {
+        return $this->hasMany(AsistenciaDomo::class);
     }
 }
