@@ -241,7 +241,6 @@ class PlanillaEventualController extends ApiController
                         $calculo = (($value->prestacion->calculo/30)/24)*8*$pago->total_turnos;
                     }
 
-
                     $pago_prestacion = DetallePagoPrestacion::create([
                         'pago_empleado_eventual_id'=>$pago->id,
                         'prestacion_id'=>$value->prestacion_id,
