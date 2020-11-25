@@ -12,6 +12,8 @@ class Prestacion extends Model
     protected $fillable = [
         'descripcion',
         'fijo',
-        'calculo'
+        'calculo',
+        'debito_o_credito',
+        'formula'
     ];
 }

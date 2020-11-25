@@ -65,6 +65,14 @@ class AsignacionEmpleadoController extends ApiController
         return $this->showOne($asignacion,201,'insert');
     }
 
+
+    //obtener un solo registro para planilla
+    public function asignacion($id){
+        $asignacion = AsignacionEmpleado::where('id',$id)
+                                                    ->with('planificacion.buque')->firstOrFail();
+        return $this->showOne($asignacion);
+    }
+
     /**
      */
     public function show(AsignacionEmpleado $asignacion_empleado)

@@ -12,7 +12,7 @@ class CarnetSeeder extends Seeder
      */
     public function run()
     {
-    	for($i=1; $i<=20; $i++){
+    	for($i=1; $i<=500; $i++){
         	$data = new Carnet;
         	$data->codigo = $i<10 ? '000'.$i:'00'.$i;
         	$data->save();

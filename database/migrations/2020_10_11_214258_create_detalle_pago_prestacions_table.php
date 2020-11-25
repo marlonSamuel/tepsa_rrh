@@ -17,12 +17,12 @@ class CreateDetallePagoPrestacionsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('prestacion_id');
             $table->unsignedBigInteger('pago_empleado_eventual_id');
-            $table->decimal('total',10,2);
+            $table->decimal('total',11,6);
             $table->timestamps();
 
             $table->foreign('prestacion_id')->references('id')->on('prestacions');
 
-            $table->foreign('pago_empleado_eventual_id')->references('id')->on('pago_empleado_eventuals');
+            $table->foreign('pago_empleado_eventual_id')->references('id')->on('pago_empleado_eventuals')->onDelete('cascade');
         });
     }
 
