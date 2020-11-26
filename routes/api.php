@@ -87,3 +87,6 @@ Route::resource('asistencia_almuerzos', 'Asistencia\AsistenciaAlmuerzoController
 
 Route::resource('asistencia_domos', 'Asistencia\AsistenciaDomoController', ['except' => ['create', 'edit']]);
 Route::name('asistencia_domos_desbloquear')->put('asistencia_domos_desbloquear/{id}', 'Asistencia\AsistenciaDomoController@desbloquear');
+
+#=======================PAGOS=========================================================#
+Route::resource('planilla_eventuals', 'Pago\PlanillaEventualController', ['except' => ['create', 'edit']]);

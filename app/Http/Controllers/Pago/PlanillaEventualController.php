@@ -30,6 +30,71 @@ class PlanillaEventualController extends ApiController
         return $this->showAll($planillas);
     }
 
+    //get all payments data
+    public function payroll($pagos){
+        //data collection to insert data
+        $data = collect();
+
+        //get prestacions
+        $prestaciones = Prestacion::all();
+
+        foreach ($pagos as $key => $value) {
+                //collection of dynamics columns to prestacions
+                $prestaciones_col = collect();
+
+                $cargo = '';
+                $cargos = $value->detalle_pago->groupBy('cargo_turno.cargo.nombre');
+
+                foreach ($cargos as $key => $c) {
+                    $cargo = $cargo.', '.$key;
+                }
+
+                $cargo = substr($cargo,2);
+
+                //push general info to collection
+                $info = collect([
+                    'codigo'=>$value->empleado_id,
+                    'nombre'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
+                    'afilacion_igss'=>$value->empleado->igss,
+                    'dpi'=>$value->dpi,
+                    'cuenta'=>$value->cuenta,
+                    'cargo' => $cargo,
+                    'turnos_trabajados'=>$value->total_turnos,
+                    'costo_turnos'=>$value->total_monto_turnos,
+                    'septimo'=>$value->septimo
+                ]);
+
+                //merge info and turnos_cols to main data
+
+                //push data to prestaciones_col
+                foreach ($prestaciones as $p) {
+                     $total_p = $value->prestaciones->where('prestacion_id',$p->id)->sum('total');
+                     $prestaciones_col[$p->descripcion] = $total_p;
+                }
+
+                //merge main data and prestaciones_col
+                $main_data = $info->merge($prestaciones_col);
+
+                //total prestacions
+                $main_data['total_prestaciones'] = $value->total_prestaciones;
+
+                //dicounts
+                $main_data['descuento_prestaciones'] = $value->descuento_prestaciones;
+
+                $main_data['prestamos'] = $value->prestamos;
+                $main_data['alimentos'] = $value->alimentacion;
+                $main_data['otros_descuentos'] = $value->otros_descuentos;
+                //calculate total page
+                $main_data['liquido_a_recibir'] = $value->total_liquidado;
+
+                //push data to data collection
+                $data->push($main_data);
+                
+        }
+        return $data;
+
+    }
+
 
     //obtener array consolidado, reporte
     public function calculationMaster($pagos){
@@ -92,46 +157,54 @@ class PlanillaEventualController extends ApiController
 
                 //calculate septimo
                 $count_group = count($grouped);
+
                 $main_data['septimo'] = $value->septimo / $count_group;
 
-                $main_data['total_devengado'] = $value->total_devengado / $count_group;
+                $main_data['total_devengado'] = $main_data['monto_turnos'] + $main_data['septimo'];
+
+                $total_prestaciones = 0;
+                $descuento_prestaciones = 0;
 
                 //push data to prestaciones_col
                 foreach ($prestaciones as $p) {
-                     if($p->fijo){
+                     if(!$p->fijo){
                         if($p->descripcion == 'bono 14' || $p->descripcion == 'aguinaldo'){
-                            $calculo = ($main_data['total_devengado']*$main_data['total_turnos'])/365;
+                            $calculo = ($main_data['total_devengado']*$main_data['total_turnos'])/(365 / $count_group);
                         }else{
                             $calculo = (($p->calculo/30)/24)*8*$main_data['total_turnos'];
                         }
                     }else{
-                        $calculo = (($p->calculo/30)/24)*8*$main_data['total_turnos'];
+                        $calculo = ($main_data['total_devengado'] * $p->calculo);
                     }
 
                     $prestaciones_col[$p->descripcion]=$calculo;
 
+                    #calculo de credito o debito de prestaciones
+                    if($p->debito_o_credito){
+                        $descuento_prestaciones += $calculo;
+                    }else{
+                        $total_prestaciones+= $calculo;
+                    }
                 }
 
                 //merge main data and prestaciones_col
                 $main_data = $main_data->merge($prestaciones_col);
 
                 //total prestacions
-                $main_data['total_prestaciones'] = $value->total_prestaciones / $count_group;
+                $main_data['total_prestaciones'] = $total_prestaciones;
 
                 //dicounts
-                $main_data['descuento_prestaciones'] = $value->descuento_prestaciones / $count_group;
+                $main_data['descuento_prestaciones'] = $descuento_prestaciones;
+
                 $main_data['prestamos'] = $value->prestamos / $count_group;
-                $main_data['alimentos'] = $value->alimentos / $count_group;
+                $main_data['alimentos'] = $value->alimentacion / $count_group;
                 $main_data['otros_descuentos'] = $value->otros_descuentos / $count_group;
                 //calculate total page
-                $main_data['liquido_a_recibir'] = $value->total_liquidado / $count_group;
+                $main_data['liquido_a_recibir'] = $main_data['total_devengado'] + $main_data['total_prestaciones'] - $main_data['descuento_prestaciones'] - $main_data['prestamos'] - $main_data['alimentos'] - $main_data['otros_descuentos'];
 
                 //push data to data collection
                 $data->push($main_data);
             }
-
-            
-          break;
         }
         return $data;
     }
@@ -151,7 +224,7 @@ class PlanillaEventualController extends ApiController
                                              'pago_eventual.prestaciones.prestacion')
                                       ->firstOrFail();
 
-        $data = $this->calculationMaster($planilla->pago_eventual);
+        $data = $this->payroll($planilla->pago_eventual);
         return $this->showQuery($data);
     }
 
@@ -235,10 +308,10 @@ class PlanillaEventualController extends ApiController
                         if($value->prestacion->descripcion == 'bono 14' || $value->prestacion->descripcion == 'aguinaldo'){
                             $calculo = ($pago->total_devengado*$pago->total_turnos)/365;
                         }else{
-                            $calculo = ($pago->total_devengado * $value->prestacion->calculo);
+                            $calculo = (($value->prestacion->calculo/30)/24)*8*$pago->total_turnos;
                         }
                     }else{
-                        $calculo = (($value->prestacion->calculo/30)/24)*8*$pago->total_turnos;
+                        $calculo = ($pago->total_devengado * $value->prestacion->calculo);
                     }
 
                     $pago_prestacion = DetallePagoPrestacion::create([
