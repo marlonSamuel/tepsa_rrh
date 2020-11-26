@@ -191,6 +191,17 @@ export default {
             { name: "asistencia_almuerzo",icon: "add",text: "Asistencia almuerzo",path: "/asistencia_almuerzo"},
             { name: "asistencia_domo",icon: "add",text: "Asistencia domo",path: "/asistencia_domo"}
           ]
+        },
+
+        {
+          icon: "file_copy",
+          text: "Planillas",
+          name: "planillas",
+          model: true,
+          path: "",
+          children: [
+            { name: "planilla_eventual",icon: "add",text: "Eventuales",path: "/planilla_eventual"}
+          ]
         }
       ]
     };

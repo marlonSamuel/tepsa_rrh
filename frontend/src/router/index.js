@@ -22,6 +22,8 @@ import AsignacionDomo from '@/components/administracion/AsignacionDomo'
 import AsistenciaDomo from '@/components/asistencia/Domo'
 import AsistenciaDomoIndex from '@/components/asistencia/DomoIndex'
 
+import PlanillaEventual from '@/components/planillas/eventual/Index'
+
 Vue.use(Router)
 
 //validar authenticacion
@@ -52,6 +54,7 @@ const routes = [
     { path: '/asistencia_almuerzo_index', name: 'AsistenciaAlmuerzoIndex', component: AsistenciaAlmuerzoIndex, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/asistencia_domo', name: 'AsistenciaDomo', component: AsistenciaDomo, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/asistencia_domo_index', name: 'AsistenciaDomoIndex', component: AsistenciaDomoIndex, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/planilla_eventual', name: 'PlanillaEventual', component: PlanillaEventual, beforeEnter: multiguard([isLoggedIn]) },
 ]
 
 

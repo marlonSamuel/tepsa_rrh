@@ -55,6 +55,7 @@ Route::resource('buques', 'Buque\BuqueController', ['except' => ['create', 'edit
 
 #=======================ASIGNACIONES=========================================================#
 Route::resource('asignacion_empleados', 'Asignacion\AsignacionEmpleadoController', ['except' => ['create', 'edit']]);
+Route::name('asignacion_empleados_asignacion')->get('asignacion_empleados_asignacion/{date}/{buque}', 'Asignacion\AsignacionEmpleadoController@asignacion');
 Route::name('asignacion_empleados_domos')->get('asignacion_empleados_domos/{id}', 'Asignacion\AsignacionEmpleadoController@showAsignacionDomo');
 
 Route::name('dataTurn')->get('asignacion_empleados/{id}/{turno_id}/{fecha}', 'Asignacion\AsignacionEmpleadoController@getDataTurn');

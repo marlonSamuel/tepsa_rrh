@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Asignacion;
 
 use App\Carnet;
+use App\PlanoEstiba;
 use Barryvdh\DomPDF\PDF;
 use App\AsignacionEmpleado;
 use Illuminate\Http\Request;
@@ -67,10 +68,14 @@ class AsignacionEmpleadoController extends ApiController
 
 
     //obtener un solo registro para planilla
-    public function asignacion($id){
-        $asignacion = AsignacionEmpleado::where('id',$id)
-                                                    ->with('planificacion.buque')->firstOrFail();
-        return $this->showOne($asignacion);
+    public function asignacion($date,$buque_id){
+        $planificacion = PlanoEstiba::where([['fecha_atraque',$date],['idBuque',$buque_id]])->with('buque','asignacion.detalle_asignacion')->first();
+
+        if(is_null($planificacion)) return $this->errorResponse('no se encontró ninguna importaci con los datos especificados',404);
+
+        if(is_null($planificacion->asignacion))return $this->errorResponse('no se encontró ninguna asignación a la importación con los datos especificados',404);
+        
+        return $this->showOne($planificacion);
     }
 
     /**
