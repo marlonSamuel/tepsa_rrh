@@ -58,7 +58,7 @@ class PlanillaEventualController extends ApiController
                     'afilacion_igss'=>$value->empleado->igss,
                     'dpi'=>$value->dpi,
                     'cuenta'=>$value->cuenta,
-                    'cargo' => $cargo,
+                    'puesto' => $cargo,
                     'turnos_trabajados'=>$value->total_turnos,
                     'costo_turnos'=>$value->total_monto_turnos,
                     'septimo'=>$value->septimo
@@ -69,6 +69,7 @@ class PlanillaEventualController extends ApiController
                 //push data to prestaciones_col
                 foreach ($prestaciones as $p) {
                      $total_p = $value->prestaciones->where('prestacion_id',$p->id)->sum('total');
+                     $p->descripcion = str_replace(' ', '_', $p->descripcion);
                      $prestaciones_col[$p->descripcion] = $total_p;
                 }
 
@@ -177,6 +178,7 @@ class PlanillaEventualController extends ApiController
                         $calculo = ($main_data['total_devengado'] * $p->calculo);
                     }
 
+
                     $prestaciones_col[$p->descripcion]=$calculo;
 
                     #calculo de credito o debito de prestaciones
@@ -217,14 +219,25 @@ class PlanillaEventualController extends ApiController
      */
     public function show(PlanillaEventual $planillaEventual)
     {
-        $planilla = PlanillaEventual::where('id',$planillaEventual->id)
+       return $this->showOne($planillaEventual);
+    }
+
+
+    public function info($id,$option){
+         $planilla = PlanillaEventual::where('id',$id)
                                       ->with('pago_eventual.empleado',
                                              'pago_eventual.detalle_pago.cargo_turno.cargo',
                                              'pago_eventual.detalle_pago.cargo_turno.turno',
                                              'pago_eventual.prestaciones.prestacion')
                                       ->firstOrFail();
 
-        $data = $this->payroll($planilla->pago_eventual);
+        //option is == 'P' print payroll report else print Master calculation
+        if($option == 'P'){
+            $data = $this->payroll($planilla->pago_eventual);
+        }else{
+            $data = $this->calculationMaster($planilla->pago_eventual);
+        }
+        
         return $this->showQuery($data);
     }
 

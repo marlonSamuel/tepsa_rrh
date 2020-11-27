@@ -91,3 +91,4 @@ Route::name('asistencia_domos_desbloquear')->put('asistencia_domos_desbloquear/{
 
 #=======================PAGOS=========================================================#
 Route::resource('planilla_eventuals', 'Pago\PlanillaEventualController', ['except' => ['create', 'edit']]);
+Route::name('planilla_eventuals_info')->get('planilla_eventuals_info/{id}/{option}', 'Pago\PlanillaEventualController@info');
