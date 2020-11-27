@@ -28,7 +28,7 @@
            
                 <v-card-text class="px-0">
                     <v-container grid-list-md>
-                        <v-form data-vv-scope="form_a">
+                        <v-form data-vv-scope="form_a" v-if="form.id == null">
                         <v-layout wrap>
                             <v-flex xs12 sm6 md6>
                             <v-text-field
@@ -135,6 +135,7 @@
                                     type="date"
                                     data-vv-name="fecha"
                                     data-vv-as="fecha de planilla"
+                                    @input="setNumber"
                                     :error-messages="
                                     errors.collect('form.fecha')
                                     "
@@ -177,6 +178,12 @@
           <td class="text-xs-left">{{props.item.inicio_descarga | moment('DD/MM/YYYY')}}</td>
           <td class="text-xs-left">{{props.item.fin_descarga | moment('DD/MM/YYYY')}}</td>
           <td class="text-xs-left">
+               <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                    <v-icon v-on="on" @click="$router.push('planilla_eventual_info/'+props.item.id)"  color="success" fab dark> info</v-icon>
+                </template>
+                <span>Información planilla</span>
+            </v-tooltip>
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
                     <v-icon v-on="on"  color="warning" fab dark @click="edit(props.item)"> edit</v-icon>
@@ -200,6 +207,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 export default {
   name: "turno",
   props: {
@@ -255,6 +263,7 @@ export default {
             return
           }
           self.items = r.data
+          self.setNumber()
         })
         .catch(r => {});
     },
@@ -291,6 +300,7 @@ export default {
         .catch(r => {});
     },
 
+    //set date values
     setValues(asignaciones){
         let self = this
         asignaciones = asignaciones.sort(function(a,b){
@@ -298,8 +308,16 @@ export default {
         })
         self.form.inicio_descarga = asignaciones[0].fecha
         self.form.fin_descarga = asignaciones[asignaciones.length-1].fecha
-        let planillas_year = self.items.filter(x=>moment(x.fecha).year() == moment().year())
-        self.form.numero = 'PQ-'+planillas_year.length+1+'-'+moment().year()
+    },
+
+    //set number
+    setNumber(){
+        let self = this
+        let date = self.form.fecha !== "" ? moment(self.form.fecha) : moment() 
+        let planillas_year = self.items.filter(x=>moment(x.fecha).year() == date.year())
+        let numero = (planillas_year.length + 1) < 10 ? '0'+(planillas_year.length+1) : planillas_year.length+1
+
+        self.form.numero = 'PQ-'+numero+'-'+date.year()
         console.log(self.form)
     },
 
@@ -386,6 +404,11 @@ export default {
     mapData(data){
         let self = this
         self.form.id = data.id
+        self.form.fecha = data.fecha
+        self.form.numero = data.numero
+        self.form.inicio_descarga = data.inicio_descarga
+        self.form.fin_descarga = data.fin_descarga
+        self.form.buque = data.buque
     },
 
     //funcion, validar si se guarda o actualiza
@@ -424,7 +447,7 @@ export default {
   computed: {
     setTitle(){
       let self = this
-      return 'Nueva Planilla'
+      return self.form.id == null ? 'Nueva Planilla' : 'Actualizar planilla buque '+self.form.buque
     }
   },
 };

@@ -23,6 +23,7 @@ import AsistenciaDomo from '@/components/asistencia/Domo'
 import AsistenciaDomoIndex from '@/components/asistencia/DomoIndex'
 
 import PlanillaEventual from '@/components/planillas/eventual/Index'
+import PlanillaEventualInfo from '@/components/planillas/eventual/Info'
 
 Vue.use(Router)
 
@@ -55,6 +56,7 @@ const routes = [
     { path: '/asistencia_domo', name: 'AsistenciaDomo', component: AsistenciaDomo, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/asistencia_domo_index', name: 'AsistenciaDomoIndex', component: AsistenciaDomoIndex, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/planilla_eventual', name: 'PlanillaEventual', component: PlanillaEventual, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/planilla_eventual_info/:id', name: 'PlanillaEventualInfo', component: PlanillaEventualInfo, beforeEnter: multiguard([isLoggedIn]) },
 ]
 
 

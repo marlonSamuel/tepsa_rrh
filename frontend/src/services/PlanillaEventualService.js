@@ -17,6 +17,11 @@ class PlanillaEventualService{
         return self.axios.get(`${self.baseUrl}/${id}`)
     }
 
+    info(id,option){
+        let self = this
+        return self.axios.get(`${self.baseUrl}_info/${id}/${option}`)
+    }
+
     create(data){
         let self = this
         return self.axios.post(`${self.baseUrl}`,data)
