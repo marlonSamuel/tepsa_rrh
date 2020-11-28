@@ -17,6 +17,16 @@ class AsignacionService{
         return self.axios.get(`${self.baseUrl}/${id}`)
     }
 
+    search(date,buque_id){
+        let self = this
+        return self.axios.get(`${self.baseUrl}_asignacion/${date}/${buque_id}`)
+    }
+
+    getDomos(id){
+        let self = this
+        return self.axios.get(`${self.baseUrl}_domos/${id}`)
+    }
+
     getDetail(id,turno_id,fecha){
         let self = this
         return self.axios.get(`${self.baseUrl}/${id}/${turno_id}/${fecha}`)

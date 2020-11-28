@@ -24,7 +24,13 @@ class AsistenciaTurnoService{
 
     update(data){
         let self = this
+        console.log(data)
         return self.axios.put(`${self.baseUrl}/${data.id}`,data)
+    }
+
+    desbloquear(data){
+        let self = this
+        return self.axios.put(`${self.baseUrl}_desbloquear/${data.id}`,data)
     }
 
     destroy(data){

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Asignacion;
 
 use App\Carnet;
+use App\PlanoEstiba;
 use Barryvdh\DomPDF\PDF;
 use App\AsignacionEmpleado;
 use Illuminate\Http\Request;
@@ -20,7 +21,9 @@ class AsignacionEmpleadoController extends ApiController
 
     public function index()
     {
-        $asignaciones = AsignacionEmpleado::with('planificacion.buque','detalle_asignacion.asistencia_turno.cargo_turno.cargo','detalle_asignacion.turno','detalle_asignacion.empleado','detalle_asignacion.asistencia_almuerzo')->get();
+        $asignaciones = AsignacionEmpleado::with('planificacion.buque','detalle_asignacion.asistencia_turno.cargo_turno.cargo','detalle_asignacion.turno','detalle_asignacion.empleado','detalle_asignacion.asistencia_almuerzo','asignacion_domos.asistencia_domo','asignacion_domos.empleado')->get();
+
+        $asignaciones = $asignaciones->sortByDesc('id')->values();
         return $this->showAll($asignaciones);
     }
 
@@ -63,14 +66,37 @@ class AsignacionEmpleadoController extends ApiController
         return $this->showOne($asignacion,201,'insert');
     }
 
+
+    //obtener un solo registro para planilla
+    public function asignacion($date,$buque_id){
+        $planificacion = PlanoEstiba::where([['fecha_atraque',$date],['idBuque',$buque_id]])->with('buque','asignacion.detalle_asignacion')->first();
+
+        if(is_null($planificacion)) return $this->errorResponse('no se encontró ninguna importaci con los datos especificados',404);
+
+        if(is_null($planificacion->asignacion))return $this->errorResponse('no se encontró ninguna asignación a la importación con los datos especificados',404);
+        
+        return $this->showOne($planificacion);
+    }
+
     /**
      */
     public function show(AsignacionEmpleado $asignacion_empleado)
     {
         $asignacion_empleado = AsignacionEmpleado::where('id',$asignacion_empleado->id)
-                                                    ->with('detalle_asignacion.turno')->get()->pluck('detalle_asignacion')->collapse();
+                                                    ->with('detalle_asignacion.turno')->get()->pluck('detalle_asignacion','asignacion_domos')->collapse();
 
         return $this->showAll($asignacion_empleado,200,'select');
+    }
+
+    public function showAsignacionDomo($id)
+    {
+        $asignacion_empleado = AsignacionEmpleado::where('id',$id)
+                                                    ->with('asignacion_domos.empleado',
+                                                           'asignacion_domos.cargo',
+                                                           'asignacion_domos.carnet',
+                                                           'planificacion.buque')->firstOrFail();
+
+        return $this->showOne($asignacion_empleado,200,'select');
     }
 
     //obtener asignacion por turno e id en detalle asignacion empleado

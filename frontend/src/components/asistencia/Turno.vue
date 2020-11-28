@@ -75,6 +75,13 @@
                 ASISTENCIA TOMADA
               </v-alert>
             </v-flex>
+
+            <v-flex v-if="form.bloqueado & !form.desbloqueado">
+              <v-alert v-model="alert" dismissible color="red" type="error">
+                EMPLEADO BLOQUEADO POR RETRASO, SI DESEA DESBLOQUEARLO COMUNIQUESE CON EL ADMINISTRADOR
+              </v-alert>
+            </v-flex>
+
             <v-layout wrap>
               <v-flex sm5 md5 xs12>
                 <div>
@@ -116,6 +123,17 @@
                       | moment("hh:mm:ss")
                   }}
                   <br />
+                  <strong>BLOQUEADO: </strong>
+                  {{asignacion.asistencia_turno.bloqueado ? 'SI' : 'NO'}}
+                  <br />
+
+                  <div v-if="asignacion.asistencia_turno.bloqueado">
+                    <strong>DESBLOQUEADO: </strong>
+                    {{asignacion.asistencia_turno.desbloqueado ? 'SI' : 'NO'}}
+                    <br />
+                  </div>
+                  
+
                   <strong>HORA SALIDA: </strong>
                   <span v-if="check_salida">
                     {{
@@ -171,7 +189,7 @@
                 </v-autocomplete>
               </v-flex>
 
-              <v-flex sm2 md3 xs6 v-if="!check_salida">
+              <v-flex sm2 md3 xs6 v-if="!check_salida & (!form.bloqueado || form.desbloqueado)">
                 <v-divider></v-divider>
                 <v-btn color="success" @click="createOrEdit"
                   ><v-icon>check_circle</v-icon> asistencia</v-btn
@@ -211,6 +229,7 @@ export default {
       bodegas: [],
       cargos: [],
       active_qr: false,
+      bloqueado: false,
       form: {
         id: null,
         hora_entrada: "",
@@ -219,7 +238,9 @@ export default {
         detalle_asignacion_empleado_id: null,
         bodega: null,
         observaciones: "",
-        salida: false
+        salida: false,
+        bloqueado: false,
+        desbloqueado: false
       }
     };
   },
@@ -290,13 +311,22 @@ export default {
     create() {
       let self = this;
       let data = self.form;
-      //data.hora_entrada = moment().format('YYYY-MM-DD hh:mm:ss')
-      self.loading = true;
+      let current_time = moment()
+
+      const hourDiff = current_time.diff(self.turno._hora_inicio, "hours")
+
+      if(hourDiff >= 1){
+        data.bloqueado = true
+      }
+
+      self.loading = true
       self.$store.state.services.asistenciaTurnoService
         .create(data)
         .then(r => {
           self.loading = false;
           if (self.$store.state.global.captureError(r)) {
+            self.clearData();
+            self.active_qr = true;
             return;
           }
           this.$toastr.success(
@@ -312,10 +342,10 @@ export default {
     //funcion para actualizar registro
     update() {
       let self = this;
-      let data = self.form;
-      data.salida = true;
-      console.log(data);
-      self.loading = true;
+      let data = self.form
+      data.salida = data.hora_entrada == null ? false :  true
+      console.log(data)
+      self.loading = true
       self.$store.state.services.asistenciaTurnoService
         .update(data)
         .then(r => {
@@ -324,7 +354,7 @@ export default {
             return;
           }
           this.$toastr.success(
-            "asistencia salida registrada con éxito",
+            data.salida ? "salida registrada con éxito" : "entrada registrada con éxito",
             "éxito"
           );
           self.clearData();
@@ -336,16 +366,18 @@ export default {
     //mapear datos a formulario
     mapData(data) {
       let self = this;
-      self.form.id = data.id;
-      self.form.bodega = data.bodega;
-      self.form.cargo_turno_id = data.cargo_turno_id;
-      self.form.observaciones = data.observaciones;
+      self.form.id = data.id
+      self.form.bodega = data.bodega
+      self.form.cargo_turno_id = data.cargo_turno_id
+      self.form.observaciones = data.observaciones
+      self.form.bloqueado = data.bloqueado
+      self.form.desbloqueado = data.desbloqueado
+      self.form.hora_entrada = data.hora_entrada
     },
 
     //funcion, validar si se guarda o actualiza
     createOrEdit() {
-      let self = this;
-      console.log(self.form);
+      let self = this
       this.$validator.validateAll().then(result => {
         if (result) {
           if (self.form.id > 0 && self.form.id !== null) {
@@ -354,7 +386,7 @@ export default {
             self.create();
           }
         }
-      });
+      })
     },
 
     //limpiar data de formulario
@@ -362,7 +394,7 @@ export default {
       let self = this;
       Object.keys(self.form).forEach(function(key, index) {
         if (typeof self.form[key] === "string") self.form[key] = "";
-        else if (typeof self.form[key] === "boolean") self.form[key] = true;
+        else if (typeof self.form[key] === "boolean") self.form[key] = false;
         else if (typeof self.form[key] === "number") self.form[key] = null;
       });
       self.$validator.reset();
@@ -377,29 +409,33 @@ export default {
       var extra = moment().format("YYYY-MM-DD") + " ";
 
       turns.forEach((t, i) => {
-        var start_time = moment(extra + t.hora_inicio);
-        var end_time = moment(extra + t.hora_fin);
-        if ((t.hora_fin < t.hora_inicio) & (self.turno == null)) {
-          var extra_e =
+        var start_time = moment(extra + t.hora_inicio)
+        var end_time = moment(extra + t.hora_fin)
+        if (t.hora_fin < t.hora_inicio) {
+
+         /* var extra_e =
             moment()
               .subtract(1, "d")
               .format("YYYY-MM-DD") + " ";
-          var start_time = moment(extra_e + t.hora_inicio);
+          var start_time = moment(extra_e + t.hora_inicio);*/
+
+          end_time = end_time.add(1,'d')
 
           if (
-            moment(start_time).format("YYYY-MM-DD") <
-            moment(end_time).format("YYYY-MM-DD")
+            moment(end_time).format("YYYY-MM-DD") ==
+            moment(currentTime).format("YYYY-MM-DD")
           ) {
             self.fecha = moment()
               .subtract(1, "d")
               .format("YYYY-MM-DD");
           }
         }
-        console.log(self.fecha);
 
         if (moment(currentTime).isBetween(start_time, end_time)) {
-          self.turno = t;
-          self.getCargos(t.id);
+          self.turno = t
+          self.getCargos(t.id)
+          self.turno._hora_inicio = start_time
+          self.turno._hora_fin = end_time
         }
       });
     },

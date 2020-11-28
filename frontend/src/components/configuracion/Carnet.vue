@@ -69,7 +69,7 @@
 
         <v-dialog v-model="dialog" max-width="800px" persistent>
           <template v-slot:activator="{ on }">
-            <v-btn color="primary" small dark class="mb-2" v-on="on"
+            <v-btn @click="newCarnet" color="primary" small dark class="mb-2" v-on="on"
               ><v-icon>add</v-icon> Nuevo</v-btn
             >
           </template>
@@ -88,6 +88,7 @@
                       v-validate="'required'"
                       type="text"
                       data-vv-name="codigo"
+                      disabled
                       :error-messages="errors.collect('codigo')"
                     >
                     </v-text-field>
@@ -264,9 +265,16 @@ export default {
           if (self.$store.state.global.captureError(r)) {
             return;
           }
-          self.items = r.data;
+          self.items = r.data
+          self.newCarnet()
         })
         .catch(r => {});
+    },
+
+    newCarnet(){
+      let self = this
+      let counts = self.items.length + 1
+      self.form.codigo = counts.toString().padStart(4, "0");
     },
 
     //funcion para guardar registro

@@ -111,7 +111,7 @@ class Handler extends ExceptionHandler
 
         //dd($exception);
 
-        return $this->errorResponse($exception, 500);
+        return $this->errorResponse($exception->getMessage(), 500);
     }
 
     /**

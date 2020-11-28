@@ -13,6 +13,11 @@ class Prestacion extends Model
         'descripcion',
         'fijo',
         'calculo',
+<<<<<<< HEAD
         'debito_credito'
+=======
+        'debito_o_credito',
+        'formula'
+>>>>>>> 2e10fa034832a74abb335d60a8e9a38f37cd4d8f
     ];
 }

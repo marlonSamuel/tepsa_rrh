@@ -13,7 +13,8 @@ class CargoTurno extends Model
     protected $fillable = [
     	'cargo_id',
     	'turno_id',
-    	'salario'
+    	'salario',
+        'salario_hora'
     ];
 
     public function cargo(){

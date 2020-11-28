@@ -66,12 +66,34 @@ class DetalleAsignacionEmpleadoController extends ApiController
                                          ->with('planificacion.buque')
                                          ->firstOrFail();
 
-        $detalle = DetalleAsignacionEmpleado::where([['asignacion_empleado_id',$asignacion_id],['turno_id',$turno_id],['fecha',$fecha]])->with('empleado','turno','carnet','asistencia_turno.cargo_turno.cargo')->get();
+        $detalle = DetalleAsignacionEmpleado::where([['asignacion_empleado_id',$asignacion_id],['turno_id',$turno_id],['fecha',$fecha]])->with('empleado','turno','carnet','asistencia_turno.cargo_turno.cargo','asistencia_almuerzo')->get();
 
         $pdf_file = 'pdfs.print_asistencia_turno';
 
-        if($a=="true")
+        if($a=="true"){
             $pdf_file = 'pdfs.print_asistencia_almuerzo';
+            foreach ($detalle as $d) {
+                foreach ($d->asistencia_almuerzo as $a) {
+                    $extra = Carbon::parse($a->created_at)->format('Y-m-d');
+                    $desayuno = Carbon::create($extra.' 14:30:00');
+                    $almuerzo = Carbon::create($extra.' 21:30:00');
+                    $cena = Carbon::create($extra.' 07:00:00');//->add(1,'days');
+
+                    $hora = Carbon::parse($a->created_at);
+
+
+                    if($hora->between($desayuno,$cena)){
+                        $a->tipo_alimento = 'Desayuno';
+                    }else if($hora->between($desayuno,$almuerzo)){
+                        $a->tipo_alimento = 'Almuerzo';
+                    }else{
+                        $a->tipo_alimento = 'Cena';
+                    }
+                };
+                
+            }
+            
+        }
 
         $pdf = \PDF::loadView($pdf_file,['asignacion'=>$asignacion,'detalle'=>$detalle])->setPaper('a4', 'landscape');
         

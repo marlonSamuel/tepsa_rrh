@@ -128,6 +128,7 @@
                             <th>NOMBRE COMPLETO</th>
                             <th>DPI</th>
                             <th>NUMERO CARNET</th>
+                            <th>TIPO ALIMENTO</th>
                             <th>HORA</th>
                         </tr>
                     </thead>
@@ -141,6 +142,7 @@
                                         {{strtoupper($d->empleado->primer_apellido)}} {{strtoupper($d->empleado->segundo_apellido)}}</td>
                                     <td style="width:10%">{{$d->empleado->dpi}}</td>
                                     <td>{{$d->carnet->codigo}}</td>
+                                    <td>{{$a->tipo_alimento}}</td>
                                     <td>{{date('H:i',strtotime($a->created_at))}}</td>
                                 </tr>
                                 @endforeach

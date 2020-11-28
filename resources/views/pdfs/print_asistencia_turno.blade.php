@@ -132,6 +132,7 @@
                             <th>HORA SALIDA</th>
                             <th>ROL</th>
                             <th>BODEGA</th>
+                            <th>ESTADO</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -169,6 +170,17 @@
                                 @else
                                     <span style="color: red;">sin asistencia</span>
                                 @endif
+                            </td>
+                            <td>
+                                @if($d->asistencia_turno !== null)
+                                    @if($d->asistencia_turno->bloqueado)
+                                        <span style="color: red;">- bloqueado</span>
+                                    @endif
+                                    @if($d->asistencia_turno->desbloqueado)
+                                        <span style="color: green;"> - desbloqueado</span>
+                                    @endif
+                                @endif
+                                
                             </td>
                         </tr>
                         @endforeach

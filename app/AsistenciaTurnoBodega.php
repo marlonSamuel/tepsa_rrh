@@ -18,7 +18,10 @@ class AsistenciaTurnoBodega extends Model
     	'hora_entrada',
     	'hora_salida',
     	'bodega',
-        'observaciones'
+        'observaciones',
+        'bloqueado',
+        'desbloqueado',
+        'razon_desbloqueo'
     ];
 
     public function detalle_asignacion(){

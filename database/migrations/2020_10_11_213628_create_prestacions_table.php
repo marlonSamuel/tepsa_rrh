@@ -15,10 +15,11 @@ class CreatePrestacionsTable extends Migration
     {
         Schema::connection('rrh')->create('prestacions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('descripcion');
+            $table->string('descripcion')->unique();
             $table->boolean('fijo')->default(0);
-            $table->boolean('debito_credito')->default(0);
+            $table->boolean('debito_o_credito')->default(0);
             $table->decimal('calculo');
+            $table->string('formula',100)->nullable();
             $table->timestamps();
         });
     }
