@@ -1,38 +1,42 @@
-class TurnoService{
+class TurnoService {
     axios
     baseUrl
 
-    constructor(axios,baseUrl){
+    constructor(axios, baseUrl) {
         this.axios = axios
         this.baseUrl = `${baseUrl}turnos`
     }
 
-    getAll(){
+    getAll() {
         let self = this
         return self.axios.get(`${self.baseUrl}`)
     }
 
-    get(id){
+    get(id) {
         let self = this
         return self.axios.get(`${self.baseUrl}/${id}`)
     }
 
-    getCargos(id){
+    getCargos(id) {
         let self = this
         return self.axios.get(`${self.baseUrl}/${id}/cargos`)
     }
 
-    create(data){
+    create(data) {
         let self = this
-        return self.axios.post(`${self.baseUrl}`,data)
+        return self.axios.post(`${self.baseUrl}`, data)
+    }
+    createCargoTurno(id, data) {
+        let self = this;
+        return self.axios.post(`${self.baseUrl}/${id}/cargos`, data);
     }
 
-    update(data){
+    update(data) {
         let self = this
-        return self.axios.put(`${self.baseUrl}/${data.id}`,data)
+        return self.axios.put(`${self.baseUrl}/${data.id}`, data)
     }
 
-    destroy(data){
+    destroy(data) {
         let self = this
         return self.axios.delete(`${self.baseUrl}/${data.id}`)
     }

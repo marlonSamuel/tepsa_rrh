@@ -20,4 +20,5 @@ class CargoTurnoController extends ApiController
         $turnos = $cargo->cargo_turnos()->with('turno','cargo')->get();
         return $turnos;
     }
+
 }

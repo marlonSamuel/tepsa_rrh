@@ -30,7 +30,8 @@ class Empleado extends Model
         'foto',
         'cuenta',
         'tipo_empleado',
-        'estado'
+        'estado',
+        'igss'
     ];
 
     public function Cargo()

@@ -16,9 +16,9 @@ const state = {
     is_login: false,
     token_expired: null,
     client_id: 2,
-    //base_url: 'http://www.tepsa-rrh.com/',
-    base_url: 'https://167.172.158.187/tepsa-rrh/',
-    client_secret: 'iaTtMuXCjpFJTxIdsz4rXsVp5l5vC31WkuUCrHRp'
+    base_url: 'http://www.tepsa-rrh.com/',
+    //base_url: 'https://167.172.158.187/tepsa-rrh/',
+    client_secret: 'eucF8dpIWfLKEBJt5oanB1ZdMiw9YmwiML8AWSAR'
 }
 
 const mutations = {

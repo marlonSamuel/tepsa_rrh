@@ -35,6 +35,7 @@ Route::resource('cargos', 'Cargo\CargoController', ['except' => ['create', 'edit
 Route::name('disabled_cargo')->post('cargos_disabled/{idCargo}', 'Cargo\CargoController@disable');
 Route::resource('cargos.turnos', 'Cargo\CargoTurnoController', ['except' => ['create', 'edit']]);
 
+
 #=======================TURNOS=========================================================#
 Route::resource('turnos', 'Turno\TurnoController', ['except' => ['create', 'edit']]);
 Route::resource('turnos.cargos', 'Turno\TurnoCargoController', ['except' => ['create', 'edit']]);

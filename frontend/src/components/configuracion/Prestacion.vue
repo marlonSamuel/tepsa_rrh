@@ -37,13 +37,19 @@
                     >
                     </v-text-field>
                   </v-flex>
-                  <v-flex xs6 sm6 md6>
+                  <v-flex xs4 sm4 md4>
+                    <v-switch
+                      v-model="form.debito_credito"
+                      :label="setCreditoDebito"
+                    ></v-switch>
+                  </v-flex>
+                  <v-flex xs4 sm4 md4>
                     <v-switch
                       v-model="form.fijo"
                       label="Prestacion Fija"
                     ></v-switch>
                   </v-flex>
-                  <v-flex xs6 sm6 md6>
+                  <v-flex xs4 sm4 md4>
                     <v-text-field
                       v-model="form.calculo"
                       :label="setLabel"
@@ -76,6 +82,9 @@
       >
         <template v-slot:items="props">
           <td class="text-xs-left">{{ props.item.descripcion }}</td>
+          <td class="text-xs-left">
+            {{ props.item.debito_credito ? "Debito" : "Credito" }}
+          </td>
           <td class="text-xs-left">
             <v-chip small :color="props.item.fijo ? 'primary' : 'green'">{{
               props.item.fijo ? "Si" : "No"
@@ -134,12 +143,14 @@ export default {
       form: {
         id: null,
         descripcion: "",
-        fijo: true,
-        calculo: 0
+        fijo: false,
+        debito_credito: false,
+        calculo: null
       },
       items: [],
       headers: [
         { text: "Descripcion", value: "descripcion" },
+        { text: "Debito-Credito", value: "debito_credito" },
         { text: "Fijo", value: "fijo" },
         {
           text: "Monto o Porcentaje",
@@ -246,6 +257,7 @@ export default {
       self.form.descripcion = data.descripcion;
       self.form.fijo = data.fijo;
       self.form.calculo = data.calculo;
+      self.form.debito_credito = data.debito_credito;
     },
     createOrEdit() {
       this.$validator.validateAll().then(result => {
@@ -278,6 +290,10 @@ export default {
     setLabel() {
       let self = this;
       return self.form.fijo ? "Monto " : "Porcentaje";
+    },
+    setCreditoDebito() {
+      let self = this;
+      return self.form.debito ? "Debito " : "Credito";
     }
   }
 };

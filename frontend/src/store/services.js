@@ -22,9 +22,9 @@ import AsistenciaTurnoService from '../services/AsistenciaTurnoService'
 import AsistenciaAlmuezoService from '../services/AsistenciaAlmuerzoService'
 
 
-//let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
+let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
 
-let baseUrl = 'https://167.172.158.187/tepsa-rrh/' //url production
+//let baseUrl = 'https://167.172.158.187/tepsa-rrh/' //url production
 
 let token_data = $cookies.get('token_data')
 

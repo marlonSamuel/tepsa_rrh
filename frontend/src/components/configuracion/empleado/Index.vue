@@ -187,7 +187,7 @@
                       :label="`Empleado: ${setLabel}`"
                     ></v-switch>
                   </v-flex>
-                  <v-flex xs6 sm5 md5>
+                  <v-flex xs6 sm6 md6>
                     <v-text-field
                       prepend-icon="add"
                       v-model="form.cuenta"
@@ -195,6 +195,17 @@
                       type="text"
                       data-vv-name="cuenta"
                       :error-messages="errors.collect('cuenta')"
+                    >
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex xs6 sm6 md6>
+                    <v-text-field
+                      prepend-icon="add"
+                      v-model="form.igss"
+                      label="No. IGSS"
+                      type="text"
+                      data-vv-name="igss"
+                      :error-messages="errors.collect('igss')"
                     >
                     </v-text-field>
                   </v-flex>
@@ -415,7 +426,8 @@ export default {
         tipo_empleado: 0,
         foto: "",
         estado: "A",
-        carnet_id: 0
+        carnet_id: 0,
+        igss: ""
       },
       form2: {
         empleado_id: null,
@@ -489,14 +501,12 @@ export default {
           if (self.$store.state.global.captureError(r)) {
             return;
           }
-          console.log(r.data);
           //self.carnets = r.data.find(x => x.asignado === 1);
           r.data.forEach(function(item) {
             if (item.asignado === 0) {
               self.carnets.push(item);
             }
           });
-          console.log(self.carnets);
         })
         .catch(r => {});
     },
@@ -504,7 +514,6 @@ export default {
       let self = this;
       let data = self.form;
       self.loading = true;
-      console.log(data);
       self.$store.state.services.empleadoService
         .create(data)
         .then(r => {
@@ -539,7 +548,6 @@ export default {
     createOrEdit() {
       this.$validator.validateAll().then(result => {
         if (result) {
-          console.log(self.form.idEmpleado);
           if (self.form.idEmpleado > 0 && self.form.idEmpleado !== null) {
             self.update();
           } else {
@@ -552,20 +560,24 @@ export default {
     savePrestacion() {
       let self = this;
       let data = self.form2;
-      self.loading = true;
-      self.$store.state.services.empleadoPrestacionService
-        .create(data)
-        .then(r => {
-          self.loading = false;
-          if (self.$store.state.global.captureError(r)) {
-            return;
-          }
-          this.$toastr.success("Registro guardado con éxito", "éxito");
-          self.prestacion = false;
-          self.asignacionPrestacion = [];
-          self.getAll();
-        })
-        .catch(r => {});
+      if (data.length > 0) {
+        self.loading = true;
+        self.$store.state.services.empleadoPrestacionService
+          .create(data)
+          .then(r => {
+            self.loading = false;
+            if (self.$store.state.global.captureError(r)) {
+              return;
+            }
+            this.$toastr.success("Registro guardado con éxito", "éxito");
+            self.prestacion = false;
+            self.asignacionPrestacion = [];
+            self.getAll();
+          })
+          .catch(r => {});
+      } else {
+        this.$toastr.error("Seleccione por lo menos una Prestación", "error");
+      }
     },
     destroy(data) {
       let self = this;
@@ -669,6 +681,7 @@ export default {
       self.form.telefono = data.telefono;
       self.form.cuenta = data.cuenta;
       self.form.tipo_empleado = data.tipo_empleado;
+      self.form.igss = data.igss;
       data.foto !== null
         ? (self.image = self.$store.state.base_url + data.foto)
         : self.$store.state.base_url + "img/user_empty.png";
