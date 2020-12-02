@@ -26,45 +26,7 @@
               </v-layout>
           </v-card-title>
           <v-card-text>
-              <v-tabs
-                    centered
-                    color="primary"
-                    dark
-                    height="50"
-                    icons-and-text
-                >
-                    <v-tabs-slider color="yellow"></v-tabs-slider>
-
-                        <v-tab href="#impresion">
-                            Impresión planilla
-                        <v-icon>fas fa-list</v-icon>
-                        </v-tab>
-
-                        <v-tab href="#calculos">
-                            Maestro de calculos
-                        <v-icon>fas fa-list</v-icon>
-                        </v-tab>
-
-                        <v-tab-item 
-                            value='impresion'
-                        >
-                            <v-card flat>
-                                <v-card-text>
-                                    <impresion-planilla></impresion-planilla>
-                                </v-card-text>
-                            </v-card>
-                        </v-tab-item>
-
-                        <v-tab-item
-                            value="calculos"
-                            >
-                            <v-card flat>
-                                <v-card-text>
-                                    <maestro-calculo></maestro-calculo>
-                                </v-card-text>
-                            </v-card>
-                        </v-tab-item>
-                </v-tabs>
+            <impresion-planilla></impresion-planilla>
           </v-card-text>
       </v-card>
     </v-flex>

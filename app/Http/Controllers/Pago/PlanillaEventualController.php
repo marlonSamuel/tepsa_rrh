@@ -1,5 +1,7 @@
 <?php
 
+
+
 namespace App\Http\Controllers\Pago;
 
 use App\Turno;
@@ -53,15 +55,17 @@ class PlanillaEventualController extends ApiController
 
                 //push general info to collection
                 $info = collect([
+                    'id'=>$value->id,
                     'codigo'=>$value->empleado_id,
                     'nombre'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
                     'afilacion_igss'=>$value->empleado->igss,
-                    'dpi'=>$value->dpi,
-                    'cuenta'=>$value->cuenta,
+                    'dpi'=>$value->empleado->dpi,
+                    'cuenta'=>$value->empleado->cuenta,
                     'puesto' => $cargo,
                     'turnos_trabajados'=>$value->total_turnos,
                     'costo_turnos'=>$value->total_monto_turnos,
-                    'septimo'=>$value->septimo
+                    'septimo'=>$value->septimo,
+                    'total_devengado' => $value->total_devengado
                 ]);
 
                 //merge info and turnos_cols to main data
@@ -145,12 +149,13 @@ class PlanillaEventualController extends ApiController
 
                 //push general info to collection
                 $info = collect([
+                    'id'=>$value->id,
                     'codigo'=>$value->empleado_id,
                     'nombre'=>$value->empleado_id.$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
                     'puesto' => $key2,
-                    'afilacion_igss'=>$value->empleado->igss,
-                    'dpi'=>$value->dpi,
-                    'cuenta'=>$value->cuenta
+                    'afilacion_igss'=>$value->empleado->afilacion_igss,
+                    'dpi'=>$value->empleado->dpi,
+                    'cuenta'=>$value->empleado->cuenta
                 ]);
 
                 //merge info and turnos_cols to main data
@@ -352,34 +357,31 @@ class PlanillaEventualController extends ApiController
         return $this->showOne($planilla,201,'insert');   
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\PlanillaEventual  $planillaEventual
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(PlanillaEventual $planillaEventual)
-    {
-        //
-    }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\PlanillaEventual  $planillaEventual
-     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, PlanillaEventual $planillaEventual)
     {
-        //
+        $rules = [
+            'fecha' => 'required',
+        ];
+
+        $this->validate($request,$rules);
+
+        $planillaEventual->fecha = $request->fecha;
+
+        if(!$planillaEventual->isDirty())
+        {
+            return $this->errorResponse('se debe especificar al menos un valor para actualizar',422);
+        }
+
+        $planillaEventual->save();
+
+        return $this->showOne($planillaEventual,201,'update');
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\PlanillaEventual  $planillaEventual
-     * @return \Illuminate\Http\Response
+
      */
     public function destroy(PlanillaEventual $planillaEventual)
     {

@@ -92,3 +92,6 @@ Route::name('asistencia_domos_desbloquear')->put('asistencia_domos_desbloquear/{
 #=======================PAGOS=========================================================#
 Route::resource('planilla_eventuals', 'Pago\PlanillaEventualController', ['except' => ['create', 'edit']]);
 Route::name('planilla_eventuals_info')->get('planilla_eventuals_info/{id}/{option}', 'Pago\PlanillaEventualController@info');
+Route::resource('pago_empleado_eventuals', 'Pago\PagoEmpleadoEventualController', ['except' => ['create', 'edit']]);
+
+Route::name('pago_empleado_eventuals_print_boleta')->get('pago_empleado_eventuals_print_boleta/{planificacion_id}/{id?}', 'Pago\PagoEmpleadoEventualController@print');

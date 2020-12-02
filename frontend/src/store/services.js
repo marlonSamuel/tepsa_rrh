@@ -23,6 +23,7 @@ import AsistenciaAlmuezoService from '../services/AsistenciaAlmuerzoService'
 import AsignacionDomoService from '../services/AsignacionDomoService'
 import AsistenciaDomoService from '../services/AsistenciaDomoService'
 import PlanillaEventualService from '../services/PlanillaEventualService'
+import PagoEmpleadoEventualService from '../services/PagoEmpleadoEventualService'
 
 
 let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
@@ -96,4 +97,5 @@ export default {
     asignacionDomoService: new AsignacionDomoService(Axios, baseUrl),
     asistenciaDomoService: new AsistenciaDomoService(Axios, baseUrl),
     planillaEventualService: new PlanillaEventualService(Axios, baseUrl),
+    pagoEmpleadoEventualService: new PagoEmpleadoEventualService(Axios, baseUrl),
 }
