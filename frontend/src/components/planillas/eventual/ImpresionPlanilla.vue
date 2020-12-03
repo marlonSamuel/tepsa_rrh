@@ -279,7 +279,7 @@ export default {
           link.href = url;
           link.setAttribute(
             "download",
-            id > 0 ? "jplanilla_"+self.planilla.numero+"boleta_"+data.nombre : "planilla_"+self.planilla.numero
+            id > 0 ? "planilla_"+self.planilla.numero+"boleta_"+data.nombre : "planilla_"+self.planilla.numero
           );
           //link.target = '_blank'
           link.click()

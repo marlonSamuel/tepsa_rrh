@@ -55,7 +55,7 @@ class PagoEmpleadoEventualController extends ApiController
         //restamos los descuentos necesarios
         $pago_empleado_eventual->total_liquidado = $pago_empleado_eventual->total_liquidado - $request->prestamos - $request->alimentacion - $request->otros_descuentos;
 
-
+        
          if(!$pago_empleado_eventual->isDirty())
         {
             return $this->errorResponse('se debe especificar al menos un valor para actualizar',422);

@@ -80,7 +80,7 @@
                         
                     </v-form>
                     
-                       <v-form data-vv-scope="form">
+                       <v-form data-vv-scope="form" v-if="form.asignacion_empleado_id !== null">
                         <v-layout wrap>
                             <v-flex xs12 sm6 md6>
                                 <v-text-field
@@ -156,7 +156,7 @@
             
             <v-card-actions>
             <v-spacer></v-spacer>
-                <v-btn color="green darken-1" flat @click="validateForm('form')">Guardar</v-btn>
+                <v-btn color="green darken-1" flat @click="validateForm('form')" v-if="form.asignacion_empleado_id !== null">Guardar</v-btn>
                 <v-btn color="red darken-1" flat @click="close">Volver</v-btn>
         </v-card-actions>
                 
@@ -297,6 +297,8 @@ export default {
             return;
           }
           self.setValues(r.data.asignacion.detalle_asignacion)
+          self.form.asignacion_empleado_id = r.data.asignacion.id
+          self.form.buque = r.data.buque.nombre
         })
         .catch(r => {});
     },

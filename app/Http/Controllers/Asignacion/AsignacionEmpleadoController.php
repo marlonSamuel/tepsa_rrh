@@ -69,11 +69,17 @@ class AsignacionEmpleadoController extends ApiController
 
     //obtener un solo registro para planilla
     public function asignacion($date,$buque_id){
-        $planificacion = PlanoEstiba::where([['fecha_atraque',$date],['idBuque',$buque_id]])->with('buque','asignacion.detalle_asignacion')->first();
+        $planificacion = PlanoEstiba::where([['fecha_atraque',$date],['idBuque',$buque_id]])->with('buque','asignacion.detalle_asignacion','asignacion.planilla_eventual')->first();
 
         if(is_null($planificacion)) return $this->errorResponse('no se encontró ninguna importaci con los datos especificados',404);
 
         if(is_null($planificacion->asignacion))return $this->errorResponse('no se encontró ninguna asignación a la importación con los datos especificados',404);
+
+        $planilla_exists = $planificacion->asignacion->planilla_eventual;
+
+        if(!is_null($planilla_exists)){
+            return $this->errorResponse('Planilla ya fué registrada',422);
+        }
         
         return $this->showOne($planificacion);
     }
