@@ -5,6 +5,8 @@
 namespace App\Http\Controllers\Pago;
 ini_set('max_execution_time', 1500);
 
+use App\Exports\PlanillaEventualSheetsExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Turno;
 use App\Empleado;
 use Carbon\Carbon;
@@ -205,6 +207,34 @@ class PlanillaEventualController extends ApiController
      */
     public function destroy(PlanillaEventual $planillaEventual)
     {
-        //
+        $planillaEventual->delete();
+        return $this->showOne($planillaEventual,201,'delete');
+    }
+
+    public function export($id)
+    {
+        $planilla = PlanillaEventual::where('id',$id)
+                              ->with('pago_eventual.empleado',
+                                     'pago_eventual.detalle_pago.cargo_turno.cargo',
+                                     'pago_eventual.detalle_pago.cargo_turno.turno',
+                                     'pago_eventual.prestaciones.prestacion')
+                                      ->firstOrFail();
+
+        $impresion_planila = $this->payroll($planilla->pago_eventual);
+        $maestro_calculos = $this->calculationMaster($planilla->pago_eventual);
+
+
+        $columns_planilla = array_keys($impresion_planila[0]->toArray());
+        $columns_calculos = array_keys($maestro_calculos[0]->toArray());
+
+        $data = [
+            'impresion_planila'=>[$columns_planilla,$impresion_planila, $planilla],
+            'maestro_calculos'=>[$columns_calculos,$maestro_calculos, $planilla]
+        ];
+
+        return Excel::download(new PlanillaEventualSheetsExport($data), 'planilla_eventual.xlsx');
+
+        return $this->showQuery($data);
+
     }
 }

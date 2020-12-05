@@ -58,7 +58,20 @@
         </v-dialog>
       <v-card>
           <v-card-title>
-                IMPRESION PLANILLA <v-icon color="success" large fab dark @click="print(false)"> print</v-icon>
+                IMPRESION PLANILLA
+                
+                <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                        <v-icon color="red" v-on="on" large fab dark @click="print(false)">fas fa-file-pdf</v-icon>
+                    </template>
+                    <span>Imprimir boletas</span>
+                </v-tooltip>
+                <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                         <v-icon color="success" v-on="on" large fab dark @click="exportExcel">fas fa-file-excel</v-icon>
+                    </template>
+                    <span>Exportar excel</span>
+                </v-tooltip>         
           </v-card-title>
           <v-card-text>
               <v-flex sm4 md4 lg4>
@@ -123,6 +136,7 @@
 
 <script>
 import moment from 'moment'
+import fileSaver from 'file-saver'
 export default {
   name: "info_planilla_eventual_impresion_planilla",
   props: {
@@ -286,6 +300,26 @@ export default {
         })
         .catch(r => {});
     },
+
+    
+      exportExcel(){
+        let self = this
+        self.loading = true
+        self.$store.state.services.planillaEventualService
+            .export(self.id)
+            .then(response => {
+                var file_name = 'planilla_'+self.planilla.numero
+                self.loading = false
+                if(response.response){
+                    this.$toastr.error(r.response.data.error, 'error')
+                    return
+                }
+                var blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                fileSaver.saveAs(blob, file_name);
+                a.click();
+            })
+            .catch(r => {});
+        }
   },
 
   computed: {

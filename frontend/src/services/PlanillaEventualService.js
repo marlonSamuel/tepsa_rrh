@@ -36,6 +36,11 @@ class PlanillaEventualService{
         let self = this
         return self.axios.delete(`${self.baseUrl}/${data.id}`)
     }
+
+    export(id) {
+        let self = this;
+        return self.axios.get(`${self.baseUrl}_export/${id}`, { responseType: 'arraybuffer'});
+    }
 }
 
 export default PlanillaEventualService
