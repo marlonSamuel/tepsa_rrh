@@ -174,6 +174,8 @@ class PlanillaEventualController extends ApiController
                 $pago->total_liquidado = $pago->total_devengado + $pago->total_prestaciones - $pago->descuento_prestaciones;
                 $pago->save();
             }
+
+            
         $db->commit();
 
         return $this->showOne($planilla,201,'insert');   
