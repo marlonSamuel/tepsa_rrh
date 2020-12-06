@@ -80,7 +80,7 @@
                         
                     </v-form>
                     
-                       <v-form data-vv-scope="form">
+                       <v-form data-vv-scope="form" v-if="form.asignacion_empleado_id !== null">
                         <v-layout wrap>
                             <v-flex xs12 sm6 md6>
                                 <v-text-field
@@ -156,6 +156,7 @@
             
             <v-card-actions>
             <v-spacer></v-spacer>
+                <v-btn color="green darken-1" flat @click="validateForm('form')" v-if="form.asignacion_empleado_id !== null">Guardar</v-btn>
                 <v-btn color="red darken-1" flat @click="close">Volver</v-btn>
         </v-card-actions>
                 
@@ -221,7 +222,7 @@ export default {
       items: [],
       buques: [],
       headers: [
-        { text: '#', value: 'numero' },
+        { text: '#', value: 'numero', width:"10%"},
         { text: 'Fecha', value: 'fecha' },
         { text: 'Buque', value: 'buque' },
         { text: 'Fecha inicio descarga', value: 'inicio_descarga' },
@@ -296,6 +297,8 @@ export default {
             return;
           }
           self.setValues(r.data.asignacion.detalle_asignacion)
+          self.form.asignacion_empleado_id = r.data.asignacion.id
+          self.form.buque = r.data.buque.nombre
         })
         .catch(r => {});
     },
@@ -335,7 +338,7 @@ export default {
           }
           this.$toastr.success('planilla procesada con éxito', 'éxito')
           self.getAll()
-          self.clearData()
+          self.close()
         })
         .catch(r => {});
     },
@@ -355,7 +358,7 @@ export default {
           }
           self.getAll()
           this.$toastr.success('registro actualizado con éxito', 'éxito')
-          self.clearData()
+          self.close()
         })
         .catch(r => {});
     },
@@ -374,7 +377,7 @@ export default {
                 }
                 self.getAll()
                 this.$toastr.success('planilla eliminada con éxito', 'exito')
-                self.clearData()
+                self.close()
             })
             .catch(r => {});
       }).catch(cancel =>{

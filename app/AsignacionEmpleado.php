@@ -27,4 +27,8 @@ class AsignacionEmpleado extends Model
     public function asignacion_domos(){
         return $this->hasMany(AsignacionDomo::class,'asignacion_empleado_id');
     }
+
+    public function planilla_eventual(){
+        return $this->hasOne(PlanillaEventual::class,'asignacion_empleado_id');
+    }
 }

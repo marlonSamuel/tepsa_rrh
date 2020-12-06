@@ -34,9 +34,10 @@ class AsignacionSeeder extends Seeder
 		        'fecha'
         	*/
 
-		    #recorremos lo turnos
+		    
+		    #recorrer de 1  a 8 fechas
 		    for ($k=1; $k <= rand(1,8); $k++) { 
-		    	#recorrer de 1  a 8 fechas
+		    	#recorrer turnos
 		    	for ($i=1; $i <=3 ; $i++) { 
 		    		#asignar de 8 a 20 empleados por fecha
 		    		for ($j=1; $j<=rand(8,20); $j++) { 
@@ -49,8 +50,15 @@ class AsignacionSeeder extends Seeder
 				    	$detalle->fecha = Carbon::parse($plan->fecha_atraque)->add($k,'day');
 				    	$detalle->save();
 
-					    $turno = CargoTurno::where('turno_id',$i)->with('turno')->get()->random();
 
+				    	$cargo_t_ant = DetalleAsignacionEmpleado::where('empleado_id',$detalle->empleado_id)->with('asistencia_turno.cargo_turno.turno')->first();
+
+				    	if(!is_null($cargo_t_ant) && !is_null($cargo_t_ant->asistencia_turno)){
+				    		$turno = $cargo_t_ant->asistencia_turno->cargo_turno;
+				    	}else{
+				    		$turno = CargoTurno::where('turno_id',$i)->with('turno')->get()->random();
+				    	}
+					    
 					    $extra = Carbon::parse($detalle->fecha)->format('Y-m-d');
 
 					    $asistencia_turno = new AsistenciaTurnoBodega;

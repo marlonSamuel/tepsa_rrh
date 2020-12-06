@@ -1,7 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Pago;
 
+
+namespace App\Http\Controllers\Pago;
+ini_set('max_execution_time', 1500);
+
+use App\Exports\PlanillaEventualSheetsExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Turno;
 use App\Empleado;
 use Carbon\Carbon;
@@ -16,9 +21,11 @@ use App\DetallePagoPrestacion;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ApiController;
+use App\Traits\GlobalFunction;
 
 class PlanillaEventualController extends ApiController
 {
+   use GlobalFunction;
    public function __construct()
     {
         //parent::__construct(); //validacion de autenticacion
@@ -28,187 +35,6 @@ class PlanillaEventualController extends ApiController
     {
         $planillas = PlanillaEventual::all();
         return $this->showAll($planillas);
-    }
-
-    //get all payments data
-    public function payroll($pagos){
-        //data collection to insert data
-        $data = collect();
-
-        //get prestacions
-        $prestaciones = Prestacion::all();
-
-        foreach ($pagos as $key => $value) {
-                //collection of dynamics columns to prestacions
-                $prestaciones_col = collect();
-
-                $cargo = '';
-                $cargos = $value->detalle_pago->groupBy('cargo_turno.cargo.nombre');
-
-                foreach ($cargos as $key => $c) {
-                    $cargo = $cargo.', '.$key;
-                }
-
-                $cargo = substr($cargo,2);
-
-                //push general info to collection
-                $info = collect([
-                    'codigo'=>$value->empleado_id,
-                    'nombre'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
-                    'afilacion_igss'=>$value->empleado->igss,
-                    'dpi'=>$value->dpi,
-                    'cuenta'=>$value->cuenta,
-                    'puesto' => $cargo,
-                    'turnos_trabajados'=>$value->total_turnos,
-                    'costo_turnos'=>$value->total_monto_turnos,
-                    'septimo'=>$value->septimo
-                ]);
-
-                //merge info and turnos_cols to main data
-
-                //push data to prestaciones_col
-                foreach ($prestaciones as $p) {
-                     $total_p = $value->prestaciones->where('prestacion_id',$p->id)->sum('total');
-                     $p->descripcion = str_replace(' ', '_', $p->descripcion);
-                     $prestaciones_col[$p->descripcion] = $total_p;
-                }
-
-                //merge main data and prestaciones_col
-                $main_data = $info->merge($prestaciones_col);
-
-                //total prestacions
-                $main_data['total_prestaciones'] = $value->total_prestaciones;
-
-                //dicounts
-                $main_data['descuento_prestaciones'] = $value->descuento_prestaciones;
-
-                $main_data['prestamos'] = $value->prestamos;
-                $main_data['alimentos'] = $value->alimentacion;
-                $main_data['otros_descuentos'] = $value->otros_descuentos;
-                //calculate total page
-                $main_data['liquido_a_recibir'] = $value->total_liquidado;
-
-                //push data to data collection
-                $data->push($main_data);
-                
-        }
-        return $data;
-
-    }
-
-
-    //obtener array consolidado, reporte
-    public function calculationMaster($pagos){
-        //data collection to insert data
-        $data = collect();
-        //get turns
-        $turnos = Turno::all();
-        //get prestacions
-        $prestaciones = Prestacion::all();
-        //get cargo_turnos
-        $cargo_turnos = CargoTurno::with('cargo')->get();
-
-        foreach ($pagos as $key => $value) {
-            //grouped data by cargo
-            $grouped = $value->detalle_pago->groupBy('cargo_turno.cargo.nombre');
-
-            foreach ($grouped as $key2 => $group) {
-                //collection of dynamic columns for turns
-                $turnos_col = collect();
-                $total_turnos = 0;
-                $monto_turnos = 0;
-                //collection of dynamics columns to prestacions
-                $prestaciones_col = collect();
-
-                //push data to turnos_col collection
-                foreach ($turnos as $t) {
-                    $valor_turno = $cargo_turnos
-                                    ->where('cargo.nombre',$key2)
-                                    ->where('turno_id',$t->id)->first();
-                    $conteo = $group->where('cargo_turno.turno_id',$t->id)->sum('conteo_turnos');
-                    $total_turno = $group->where('cargo_turno.turno_id',$t->id)->sum('total');
-
-                    $turnos_col["turno_".$t->numero]=$conteo;
-                    $turnos_col["valor_".$t->numero]=$valor_turno->salario;
-                    $turnos_col["total_".$t->numero]=$total_turno;
-                    $total_turnos+= $conteo;
-                    $monto_turnos+= $total_turno;
-                }
-
-                $turnos_col["total_turnos"]=$total_turnos;
-                $turnos_col["monto_turnos"]=$monto_turnos;
-
-                //recorrer los turnos y pagos por turno
-                #$extra_cols =  $turnos_col->merge($prestaciones_col);
-
-                #return $value->prestaciones;
-
-                //push general info to collection
-                $info = collect([
-                    'codigo'=>$value->empleado_id,
-                    'nombre'=>$value->empleado_id.$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
-                    'puesto' => $key2,
-                    'afilacion_igss'=>$value->empleado->igss,
-                    'dpi'=>$value->dpi,
-                    'cuenta'=>$value->cuenta
-                ]);
-
-                //merge info and turnos_cols to main data
-                $main_data = $info->merge($turnos_col);
-
-                //calculate septimo
-                $count_group = count($grouped);
-
-                $main_data['septimo'] = $value->septimo / $count_group;
-
-                $main_data['total_devengado'] = $main_data['monto_turnos'] + $main_data['septimo'];
-
-                $total_prestaciones = 0;
-                $descuento_prestaciones = 0;
-
-                //push data to prestaciones_col
-                foreach ($prestaciones as $p) {
-                     if(!$p->fijo){
-                        if($p->descripcion == 'bono 14' || $p->descripcion == 'aguinaldo'){
-                            $calculo = ($main_data['total_devengado']*$main_data['total_turnos'])/(365 / $count_group);
-                        }else{
-                            $calculo = (($p->calculo/30)/24)*8*$main_data['total_turnos'];
-                        }
-                    }else{
-                        $calculo = ($main_data['total_devengado'] * $p->calculo);
-                    }
-
-
-                    $prestaciones_col[$p->descripcion]=$calculo;
-
-                    #calculo de credito o debito de prestaciones
-                    if($p->debito_o_credito){
-                        $descuento_prestaciones += $calculo;
-                    }else{
-                        $total_prestaciones+= $calculo;
-                    }
-                }
-
-                //merge main data and prestaciones_col
-                $main_data = $main_data->merge($prestaciones_col);
-
-                //total prestacions
-                $main_data['total_prestaciones'] = $total_prestaciones;
-
-                //dicounts
-                $main_data['descuento_prestaciones'] = $descuento_prestaciones;
-
-                $main_data['prestamos'] = $value->prestamos / $count_group;
-                $main_data['alimentos'] = $value->alimentacion / $count_group;
-                $main_data['otros_descuentos'] = $value->otros_descuentos / $count_group;
-                //calculate total page
-                $main_data['liquido_a_recibir'] = $main_data['total_devengado'] + $main_data['total_prestaciones'] - $main_data['descuento_prestaciones'] - $main_data['prestamos'] - $main_data['alimentos'] - $main_data['otros_descuentos'];
-
-                //push data to data collection
-                $data->push($main_data);
-            }
-        }
-        return $data;
     }
 
         /**
@@ -265,6 +91,7 @@ class PlanillaEventualController extends ApiController
 
         $db->beginTransaction();
             $this->validate($request,$rules);
+
             $data = $request->all();
 
             $asignaciones = AsignacionEmpleado::where('id',$request->asignacion_empleado_id)
@@ -347,42 +174,69 @@ class PlanillaEventualController extends ApiController
                 $pago->total_liquidado = $pago->total_devengado + $pago->total_prestaciones - $pago->descuento_prestaciones;
                 $pago->save();
             }
+
+            
         $db->commit();
 
         return $this->showOne($planilla,201,'insert');   
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\PlanillaEventual  $planillaEventual
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(PlanillaEventual $planillaEventual)
-    {
-        //
-    }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\PlanillaEventual  $planillaEventual
-     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, PlanillaEventual $planillaEventual)
     {
-        //
+        $rules = [
+            'fecha' => 'required',
+        ];
+
+        $this->validate($request,$rules);
+
+        $planillaEventual->fecha = $request->fecha;
+
+        if(!$planillaEventual->isDirty())
+        {
+            return $this->errorResponse('se debe especificar al menos un valor para actualizar',422);
+        }
+
+        $planillaEventual->save();
+
+        return $this->showOne($planillaEventual,201,'update');
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\PlanillaEventual  $planillaEventual
-     * @return \Illuminate\Http\Response
+
      */
     public function destroy(PlanillaEventual $planillaEventual)
     {
-        //
+        $planillaEventual->delete();
+        return $this->showOne($planillaEventual,201,'delete');
+    }
+
+    public function export($id)
+    {
+        $planilla = PlanillaEventual::where('id',$id)
+                              ->with('pago_eventual.empleado',
+                                     'pago_eventual.detalle_pago.cargo_turno.cargo',
+                                     'pago_eventual.detalle_pago.cargo_turno.turno',
+                                     'pago_eventual.prestaciones.prestacion')
+                                      ->firstOrFail();
+
+        $impresion_planila = $this->payroll($planilla->pago_eventual);
+        $maestro_calculos = $this->calculationMaster($planilla->pago_eventual);
+
+
+        $columns_planilla = array_keys($impresion_planila[0]->toArray());
+        $columns_calculos = array_keys($maestro_calculos[0]->toArray());
+
+        $data = [
+            'impresion_planila'=>[$columns_planilla,$impresion_planila, $planilla],
+            'maestro_calculos'=>[$columns_calculos,$maestro_calculos, $planilla]
+        ];
+
+        return Excel::download(new PlanillaEventualSheetsExport($data), 'planilla_eventual.xlsx');
+
+        return $this->showQuery($data);
+
     }
 }

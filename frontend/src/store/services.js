@@ -23,11 +23,12 @@ import AsistenciaAlmuezoService from '../services/AsistenciaAlmuerzoService'
 import AsignacionDomoService from '../services/AsignacionDomoService'
 import AsistenciaDomoService from '../services/AsistenciaDomoService'
 import PlanillaEventualService from '../services/PlanillaEventualService'
+import PagoEmpleadoEventualService from '../services/PagoEmpleadoEventualService'
 
 
-let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
+//let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
 
-//let baseUrl = 'https://167.172.158.187/tepsa-rrh/' //url production
+let baseUrl = 'https://167.172.158.187/tepsa-rrh/' //url production
 
 let token_data = $cookies.get('token_data')
 
@@ -96,4 +97,5 @@ export default {
     asignacionDomoService: new AsignacionDomoService(Axios, baseUrl),
     asistenciaDomoService: new AsistenciaDomoService(Axios, baseUrl),
     planillaEventualService: new PlanillaEventualService(Axios, baseUrl),
+    pagoEmpleadoEventualService: new PagoEmpleadoEventualService(Axios, baseUrl),
 }

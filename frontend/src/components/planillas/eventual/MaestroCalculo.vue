@@ -3,7 +3,7 @@
     <v-flex>
       <v-card>
           <v-card-title>
-                IMPRESION PLANILLA
+                MAESTRO DE CALCULOS
           </v-card-title>
           <v-card-text>
               TABLA REPORTE
