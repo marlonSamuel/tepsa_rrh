@@ -11,6 +11,18 @@ export default {
         cliente_secret: ''
     },
 
+    permisos_asistencia_muelle: [
+        'AsistenciaTurno','CambiarContrasenia'
+    ],
+
+    permisos_asistencia_domo: [
+        'AsistenciaDomo','CambiarContrasenia'
+    ],
+
+    permisos_asistencia_alimentos: [
+        'AsistenciaAlmuerzo','CambiarContrasenia'
+    ],
+
 
     getRefreshToken() {
         var token_data = $cookies.get('token_data')
@@ -35,6 +47,13 @@ export default {
         store.state.services.loginService.me()
             .then(r => {
                 store.dispatch('setUser', r.data)
+                if(r.data.rol.nombre.toLowerCase() == "asistencia muelle"){
+                    store.dispatch('setPermisos', self.permisos_asistencia_muelle)
+                }else if(r.data.rol.nombre.toLowerCase() == "asistencia domo"){
+                    store.dispatch('setPermisos', self.permisos_asistencia_domo)
+                }else{
+                    store.dispatch('setPermisos', self.permisos_asistencia_alimentos)
+                }
             }).catch(e => {
 
             })

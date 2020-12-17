@@ -7,6 +7,7 @@ import Default from '@/components/Default'
 import ExampleIndex from '@/components/example/Index'
 import Login from '@/components/login/Index'
 import CambiarContrasenia from '@/components/accesos/CambiarContrasenia'
+import Usuario from '@/components/accesos/Usuario'
 import Turno from '@/components/configuracion/Turno'
 import Carnet from '@/components/configuracion/Carnet'
 import Prestacion from '@/components/configuracion/Prestacion'
@@ -36,27 +37,38 @@ const isLoggedOut = (to, from, next) => {
     return store.state.is_login ? next('/') : next()
 }
 
+//proteger rutas de los sistema, verificar si tiene acceso
+const permissionValidations = (to, from, next) => {
+    if(store.state.rol.toLowerCase() == 'administrador'){
+        return next()
+    }
+    var permisos = store.state.permisos //obtener permisos del usuario
+    name = to.name
+    var permiso = _.includes(permisos, name) //verificar si permiso existe
+    return permiso ? next() : next('/')
+}
+
 const routes = [
     { path: '*', redirect: '/' },
     { path: '/', name: 'Default', component: Default, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/example_index', name: 'ExampleIndex', component: ExampleIndex, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/login', name: 'Login', component: Login, beforeEnter: multiguard([isLoggedOut]) },
+    { path: '/usuario', name: 'Usuario', component: Usuario, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
     { path: '/change_password', name: 'CambiarContrasenia', component: CambiarContrasenia, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/turno', name: 'Turno', component: Turno, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/carnet', name: 'Carnet', component: Carnet, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/prestacion', name: 'Prestacion', component: Prestacion, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/empleado_index', name: 'EmpleadoIndex', component: EmpleadoIndex, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/asignacion', name: 'Asignacion', component: Asignacion, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/asignacion_domo/:id', name: 'AsignacionDomo', component: AsignacionDomo, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/cargo', name: 'Cargo', component: Cargo, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/asistencia_turno', name: 'AsistenciaTurno', component: AsistenciaTurno, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/asistencia_turno_index', name: 'AsistenciaTurnoIndex', component: AsistenciaTurnoIndex, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/asistencia_almuerzo', name: 'AsistenciaAlmuerzo', component: AsistenciaAlmuerzo, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/asistencia_almuerzo_index', name: 'AsistenciaAlmuerzoIndex', component: AsistenciaAlmuerzoIndex, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/asistencia_domo', name: 'AsistenciaDomo', component: AsistenciaDomo, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/asistencia_domo_index', name: 'AsistenciaDomoIndex', component: AsistenciaDomoIndex, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/planilla_eventual', name: 'PlanillaEventual', component: PlanillaEventual, beforeEnter: multiguard([isLoggedIn]) },
-    { path: '/planilla_eventual_info/:id', name: 'PlanillaEventualInfo', component: PlanillaEventualInfo, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/turno', name: 'Turno', component: Turno, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/carnet', name: 'Carnet', component: Carnet, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/prestacion', name: 'Prestacion', component: Prestacion, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/empleado_index', name: 'EmpleadoIndex', component: EmpleadoIndex, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/asignacion', name: 'Asignacion', component: Asignacion, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/asignacion_domo/:id', name: 'AsignacionDomo', component: AsignacionDomo, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/cargo', name: 'Cargo', component: Cargo, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/asistencia_turno', name: 'AsistenciaTurno', component: AsistenciaTurno, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/asistencia_turno_index', name: 'AsistenciaTurnoIndex', component: AsistenciaTurnoIndex, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/asistencia_almuerzo', name: 'AsistenciaAlmuerzo', component: AsistenciaAlmuerzo, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/asistencia_almuerzo_index', name: 'AsistenciaAlmuerzoIndex', component: AsistenciaAlmuerzoIndex, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/asistencia_domo', name: 'AsistenciaDomo', component: AsistenciaDomo, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/asistencia_domo_index', name: 'AsistenciaDomoIndex', component: AsistenciaDomoIndex, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/planilla_eventual', name: 'PlanillaEventual', component: PlanillaEventual, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
+    { path: '/planilla_eventual_info/:id', name: 'PlanillaEventualInfo', component: PlanillaEventualInfo, beforeEnter: multiguard([isLoggedIn,permissionValidations]) },
 ]
 
 

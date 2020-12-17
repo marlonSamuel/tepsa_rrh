@@ -12,6 +12,8 @@ const state = {
     services,
     global,
     usuario: {},
+    rol: '',
+    permisos: [],
     token: null,
     is_login: false,
     token_expired: null,
@@ -24,6 +26,11 @@ const state = {
 const mutations = {
     setUser(state, usuario) {
         state.usuario = usuario
+        state.rol = usuario.rol.nombre
+    },
+
+    setPermisos(state, permisos) {
+        state.permisos = permisos
     },
 
     setToken(state, token) {
@@ -34,6 +41,7 @@ const mutations = {
     logout(state) {
         state.is_login = false
         state.token = null
+        state.rol = ''
     },
 
     setState(state) {
@@ -70,6 +78,10 @@ const actions = {
 
     setUser({ commit }, user) {
         commit('setUser', user)
+    },
+
+    setPermisos({ commit }, permisos) {
+        commit('setPermisos', permisos)
     }
 }
 

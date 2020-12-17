@@ -28,14 +28,28 @@
             <v-card-text>
               <v-container grid-list-md>
                 <v-layout wrap>
-                  <v-flex xs12 sm12 md12>
-                    <v-text-field v-model="form.name" 
-                        label="Nombre"
-                        v-validate="'required'"
-                        type="text"
-                        data-vv-name="nombre"
-                        :error-messages="errors.collect('nombre')">
-                    </v-text-field>
+                   <v-flex xs12 sm12 md12>
+                    <v-select
+                      v-model="form.empleado_id"
+                      placeholder="seleccione empleado"
+                      v-validate="'required'"
+                      :items="empleados"
+                      item-value="idEmpleado"
+                      :error-messages="errors.collect('empleado')"
+                      label="Empleado"
+                      item-text=""
+                      data-vv-name="empleado"
+                      clearable
+                    >
+                    <template slot="selection" slot-scope="data">
+                        {{ data.item.primer_nombre }} {{ data.item.segundo_nombre }}
+                        {{ data.item.primer_apellido }} {{ data.item.segundo_apellido }}
+                      </template>
+                      <template slot="item" slot-scope="data">
+                        {{ data.item.primer_nombre }} {{ data.item.segundo_nombre }}
+                        {{ data.item.primer_apellido }} {{ data.item.segundo_apellido }}
+                      </template>
+                    </v-select>
                     </v-flex>
                     <v-flex xs12 sm6 md6>
                     <v-text-field v-model="form.email" 
@@ -55,7 +69,7 @@
                       :error-messages="errors.collect('rol')"
                       label="Rol usuario"
                       item-value="id"
-                      item-text="rol"
+                      item-text="nombre"
                       data-vv-name="rol"
                       clearable
                     ></v-select>
@@ -98,9 +112,10 @@
         class="elevation-1"
       >
         <template v-slot:items="props">
-          <td class="text-xs-left">{{ props.item.name }}</td>
+          <td class="text-xs-left">{{ props.item.empleado.primer_nombre }} 
+                                   {{ props.item.empleado.primer_apellido }}</td>
           <td class="text-xs-left">{{ props.item.email }}</td>
-          <td class="text-xs-left">{{ props.item.rol.rol }}</td>
+          <td class="text-xs-left">{{ props.item.rol.nombre }}</td>
           <td class="text-xs-left">
             <v-tooltip top>
               <template v-slot:activator="{ on }">
@@ -137,8 +152,9 @@ export default {
       loading: false,
       items: [],
       roles: [],
+      empleados: [],
       headers: [
-        { text: 'Nombre', value: 'name' },
+        { text: 'Empleado', value: 'empleado' },
         { text: 'Correo electronico', value: 'email' },
         { text: 'Rol', value: 'rol.rol' },
         { text: 'Acciones', value: '', sortable: false }
@@ -147,7 +163,7 @@ export default {
       form: {
         id: null,
         rol_id: null,
-        name: '',
+        empleado_id: null,
         email: '',
         password: '',
         password_confirmation: ''
@@ -159,6 +175,7 @@ export default {
     let self = this
     self.getAll()
     self.getRoles()
+    self.getEmpleados()
   },
 
   methods: {
@@ -184,6 +201,19 @@ export default {
         .then(r => {
           self.loading = false
           self.roles = r.data
+        })
+        .catch(r => {});
+    },
+
+    getEmpleados() {
+      let self = this
+      self.loading = true
+
+      self.$store.state.services.empleadoService
+        .getAll()
+        .then(r => {
+          self.loading = false
+          self.empleados = r.data
         })
         .catch(r => {});
     },
@@ -278,7 +308,7 @@ export default {
     mapData(data){
         let self = this
         self.form.id = data.id
-        self.form.name = data.name
+        self.form.empleado_id = data.empleado_id
         self.form.email = data.email
         self.form.rol_id =data.rol_id
     },

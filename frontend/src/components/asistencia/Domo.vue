@@ -3,7 +3,7 @@
     <v-flex wrap>
       <v-toolbar flat color="white">
         <v-toolbar-title>ASISTENCIA DOMO </v-toolbar-title>
-        <v-flex>
+        <v-flex v-if="isAdmin">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-icon
@@ -422,13 +422,12 @@ export default {
     }
   },
 
-  computed: {},
-
-   mounted() {
-        setInterval(() => {
-            this.momentInstance = moment()
-        }, 1000)
+  computed: {
+    isAdmin(){
+      let self = this
+      return self.$store.state.rol == 'administrador' ? true : false
     }
+  }
 };
 </script>
 

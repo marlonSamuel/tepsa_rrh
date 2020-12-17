@@ -1,5 +1,5 @@
 <template>
-  <v-layout align-start>
+  <v-layout align-start v-loading="loading">
     <v-flex>
         <v-alert
         v-if="exit"
@@ -15,29 +15,29 @@
             <v-card-text>
               <v-container grid-list-md>
                 <v-layout wrap>
-                    <v-flex v-if="form.id == null" xs12 sm4 md4>
+                    <v-flex v-if="form.id == null" xs12 sm4 md4 lg4>
                         <v-text-field v-model="form.old_password" 
                             ref="password"
                             label="Contraseña anterior"
                             v-validate="'required|min:6'"
                             type="password"
-                            data-vv-name="contraseña"
+                            data-vv-name="old_password"
                             data-vv-as="contraseña anterior"
-                            :error-messages="errors.collect('contraseña')">
+                            :error-messages="errors.collect('old_password')">
                         </v-text-field>
                     </v-flex>
-                    <v-flex v-if="form.id == null" xs12 sm4 md4>
+                    <v-flex v-if="form.id == null" xs12 sm4 md4 lg4>
                     <v-text-field v-model="form.new_password" 
                         ref="password"
                         label="Nueva contraseña"
                         v-validate="'required|min:6'"
                         type="password"
-                        data-vv-name="contraseña"
+                        data-vv-name="new_password"
                         data-vv-as="nueva contraseña"
-                        :error-messages="errors.collect('contraseña')">
+                        :error-messages="errors.collect('new_password')">
                     </v-text-field>
                     </v-flex>
-                    <v-flex v-if="form.id == null" xs12 sm4 md4>
+                    <v-flex v-if="form.id == null" xs12 sm4 md4 lg4>
                     <v-text-field v-model="form.password_confirmation" 
                         label="Confirmar Contraseña"
                         v-validate="'required|confirmed:password'" data-vv-as="password"
@@ -69,6 +69,7 @@ export default {
   data() {
     return {
       exit: false,
+      loading: false,
       exit_message: '',
       form: {
         user_id: '',
@@ -90,8 +91,10 @@ export default {
       let self = this
       var data = self.form
       data.user_id = self.$store.state.usuario.id
+      self.loading = true
       self.$store.state.services.usuarioService.changePassword(data)
       .then(r=>{
+        self.loading = false
         if(r.response){
           this.$toastr.error(r.response.data.error, 'error')
           return
@@ -112,6 +115,7 @@ export default {
       var close = setInterval(function()
         { 
             counter --
+            self.exit_message = 'contraseña ah sido reiniciado correctamente, vuelve a iniciar sessión en '+counter
             if(counter == 0){
                 clearInterval(close)
                 self.$store.dispatch("logout")

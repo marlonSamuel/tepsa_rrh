@@ -18,6 +18,7 @@ Route::name('login')->post('auth/login', 'Usuario\AuthController@login');
 Route::name('logout')->get('auth/logout', 'Usuario\AuthController@logout');
 
 Route::resource('usuarios', 'Usuario\UsuarioController', ['except' => ['create', 'edit']]);
+Route::resource('roles', 'Rol\RolController', ['except' => ['create', 'edit']]);
 Route::post('oauth/token', '\Laravel\Passport\Http\Controllers\AccessTokenController@issueToken');
 
 Route::name('me')->get('auth/me', 'Usuario\AuthController@user');

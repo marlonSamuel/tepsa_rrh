@@ -8,6 +8,7 @@ import { isNullOrUndefined } from 'util';
 import exampleService from '../services/ExampleService'
 import LoginService from '../services/LoginService'
 import UsuarioService from '../services/UsuarioService'
+import RolService from '../services/RolService'
 import TurnoService from '../services/TurnoService'
 import CarnetService from '../services/CarnetService'
 import PrestacionService from '../services/PrestacionService'
@@ -82,6 +83,7 @@ export default {
     exampleService: new exampleService(Axios),
     loginService: new LoginService(Axios, baseUrl),
     usuarioService: new UsuarioService(Axios, baseUrl),
+    rolService: new RolService(Axios, baseUrl),
     turnoService: new TurnoService(Axios, baseUrl),
     carnetService: new CarnetService(Axios, baseUrl),
     prestacionService: new PrestacionService(Axios, baseUrl),

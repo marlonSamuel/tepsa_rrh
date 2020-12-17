@@ -191,4 +191,34 @@ trait GlobalFunction
         }
         return $data;
     }
+
+    public function pagoCuentasYcheques($fecha,$pagos)
+    {
+        $data = collect();
+        $data2 = collect();
+        foreach ($pagos as $key => $value) {
+
+            if(!is_null($value->empleado->cuenta)){
+                $info = collect([
+                    'cuenta_origen'=>'902895911',
+                    'cuenta_destino'=>$value->empleado->cuenta,
+                    'fecha'=>date('d M Y', strtotime($fecha)),
+                    'monto'=>$value->total_liquidado,
+                    'beneficiario'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
+                ]);
+                $data->push($info);
+            }else{
+                $info = collect([
+                    'fecha'=>date('d M Y', strtotime($fecha)),
+                    'monto'=>$value->total_liquidado,
+                    'beneficiario'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
+                ]);
+
+                $data2->push($info);
+             
+            }
+        }
+
+        return [$data,$data2];
+    }
 }
