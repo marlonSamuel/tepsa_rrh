@@ -95,7 +95,9 @@ class PlanillaEventualController extends ApiController
             $data = $request->all();
 
             $asignaciones = AsignacionEmpleado::where('id',$request->asignacion_empleado_id)
-                                            ->with('detalle_asignacion.carnet','detalle_asignacion','detalle_asignacion.turno','detalle_asignacion.asistencia_turno.cargo_turno')->get()->pluck('detalle_asignacion')->collapse()->values();
+                                            ->with('detalle_asignacion.carnet','detalle_asignacion.empleado','detalle_asignacion','detalle_asignacion.turno','detalle_asignacion.asistencia_turno.cargo_turno')->get()->pluck('detalle_asignacion')->collapse()->values();
+
+            $asignaciones = $asignaciones->where('empleado.tipo_empleado',0)->values();
 
             $planilla = PlanillaEventual::create($data);
 
