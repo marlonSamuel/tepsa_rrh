@@ -98,3 +98,7 @@ Route::resource('pago_empleado_eventuals', 'Pago\PagoEmpleadoEventualController'
 Route::name('pago_empleado_eventuals_print_boleta')->get('pago_empleado_eventuals_print_boleta/{planificacion_id}/{id?}', 'Pago\PagoEmpleadoEventualController@print');
 
 Route::name('planilla_eventuals_export')->get('planilla_eventuals_export/{id}', 'Pago\PlanillaEventualController@export');
+
+#=======================DASHBOARD=========================================================#
+Route::resource('dashboard', 'Dashboard\DashboardController', ['except' => ['create', 'edit']]);
+Route::name('dashboard_group_by_planilla')->get('dashboard_group_by_planilla', 'Dashboard\DashboardController@groupByPlanilla');

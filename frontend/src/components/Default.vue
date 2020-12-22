@@ -5,6 +5,11 @@
           <v-card v-loading="rol == ''">
               <v-card-text v-if="isAdmin">
                   ADMINISTRADOR {{user | uppercase}}
+                  <v-layout wrap>
+                    <counts></counts>
+                    <el-divider></el-divider>
+                    <planillas></planillas>
+                  </v-layout>
               </v-card-text>
               <v-card-text v-else>
                 BIENVENIDO {{user | uppercase}} USTED HA INGRESADO CON ROL DE {{rol | uppercase}}
@@ -27,13 +32,15 @@
 </template>
 
 <script>
+
+import Counts from './dashboard/Counts'
+import Planillas from './dashboard/Planillas.vue'
 export default {
   name: "default",
   components: {
+    Counts,
+    Planillas
   },
-  props: {
-      source: String
-    },
   data() {
     return {
       loading: false,
