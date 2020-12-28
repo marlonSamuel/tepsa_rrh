@@ -13,7 +13,7 @@ class CreateAniosTable extends Migration
      */
     public function up()
     {
-        Schema::create('anios', function (Blueprint $table) {
+        Schema::connection('rrh')->create('anios', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('anio');
             $table->timestamps();

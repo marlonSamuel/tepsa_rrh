@@ -13,7 +13,7 @@ class CreatePagoEmpleadoFijosTable extends Migration
      */
     public function up()
     {
-        Schema::create('pago_empleado_fijos', function (Blueprint $table) {
+        Schema::connection('rrh')->create('pago_empleado_fijos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('empleado_id');
             $table->unsignedBigInteger('quincena_id');

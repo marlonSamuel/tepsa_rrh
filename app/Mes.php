@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Quincena;
 
 class Mes extends Model
 {
@@ -12,4 +13,8 @@ class Mes extends Model
         'id',
         'mes'
     ];
+
+    public function quincenas(){
+    	return $this->hasMany(Quincena::class);
+    }
 }

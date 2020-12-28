@@ -18,6 +18,7 @@ use App\DetallePagoEventual;
 use Illuminate\Http\Request;
 use App\PagoEmpleadoEventual;
 use App\DetallePagoPrestacion;
+use App\PagoEmpleadoDomo;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ApiController;
@@ -175,10 +176,43 @@ class PlanillaEventualController extends ApiController
                 $pago->save();
             }
 
-            
+        $this->pago_domo($request->asignacion_empleado_id,$planilla->id);
         $db->commit();
 
         return $this->showOne($planilla,201,'insert');   
+    }
+
+    public function pago_domo($asignacion_empleado_id,$planilla_id){
+        
+        $db = DB::connection('rrh');
+        $db->beginTransaction();
+            
+        $asignaciones = AsignacionEmpleado::where('id',$asignacion_empleado_id)
+                                            ->with('asignacion_domos.carnet','asignacion_domos','asignacion_domos.asistencia_domo','asignacion_domos.cargo')->get()->pluck('asignacion_domos')->collapse()->values();
+                                            #agrupar asignaciones por empleado y por cargo turno
+        $asignaciones = $asignaciones->groupBy(['empleado_id','asignacion_domos.asistencia_domo.turno']);
+
+        foreach ($asignaciones as $key => $value) {
+            $pago = PagoEmpleadoDomo::create([
+                            'planilla_eventual_id' => $planilla_id,
+                            'empleado_id' => $key,
+                            'conteo_turno' => 0,
+                            'total' => 0,
+                        ]);
+            $total = 0;
+            $conteo = 0;
+            foreach ($value as $key2 => $value2) {
+                $conteo = $conteo + count($value2[0]->asistencia_domo);
+                $total = $total + ($value2[0]->cargo->salario * count($value2[0]->asistencia_domo));
+            }
+            $pago->total = $total;
+            $pago->conteo_turno = $conteo;
+
+            dd($conteo);
+            //$pago->save();
+        }
+        $db->commit();
+
     }
 
 

@@ -200,7 +200,8 @@ export default {
           model: true,
           path: "",
           children: [
-            { name: "planilla_eventual",icon: "add",text: "Eventuales",path: "/planilla_eventual"}
+            { name: "planilla_eventual",icon: "add",text: "Eventuales",path: "/planilla_eventual"},
+            { name: "planilla_fijo",icon: "add",text: "Fijos",path: "/planilla_fijo"}
           ]
         }
       ]

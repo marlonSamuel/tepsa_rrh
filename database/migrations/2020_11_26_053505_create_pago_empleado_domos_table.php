@@ -13,13 +13,13 @@ class CreatePagoEmpleadoDomosTable extends Migration
      */
     public function up()
     {
-        Schema::create('pago_empleado_domos', function (Blueprint $table) {
+        Schema::connection('rrh')->create('pago_empleado_domos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('planilla_eventual_id');
-            $table->unsignedBigInteger('asistencia_domo_id');
+            $table->unsignedBigInteger('empleado_id');
             $table->integer('conteo_turno');
             $table->decimal('total',11,2);
-            $table->boolean('confirmar_pago');
+            $table->boolean('confirmar_pago')->default(false);
             $table->timestamps();
         });
         $table->foreign('planilla_eventual_id')->references('id')->on('planilla_eventuals')->onDelete('cascade');

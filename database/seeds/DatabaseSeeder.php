@@ -18,5 +18,8 @@ class DatabaseSeeder extends Seeder
         $this->call(CargoSeeder::class);
         $this->call(AsignacionSeeder::class);
         $this->call(PrestacionSeeder::class);
+        $this->call(AnioSeeder::class);
+        $this->call(MesSeeder::class);
+        $this->call(QuincenaSeeder::class);
     }
 }

@@ -13,7 +13,7 @@ class CreateQuincenasTable extends Migration
      */
     public function up()
     {
-        Schema::create('quincenas', function (Blueprint $table) {
+        Schema::connection('rrh')->create('quincenas', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('quincena');
             $table->date('fecha_inicio');

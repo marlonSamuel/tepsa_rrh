@@ -94,6 +94,10 @@ Route::name('asistencia_domos_desbloquear')->put('asistencia_domos_desbloquear/{
 Route::resource('planilla_eventuals', 'Pago\PlanillaEventualController', ['except' => ['create', 'edit']]);
 Route::name('planilla_eventuals_info')->get('planilla_eventuals_info/{id}/{option}', 'Pago\PlanillaEventualController@info');
 Route::resource('pago_empleado_eventuals', 'Pago\PagoEmpleadoEventualController', ['except' => ['create', 'edit']]);
+Route::resource('pago_empleado_fijos', 'Pago\PagoEmpleadoFijoController', ['except' => ['create', 'edit']]);
+Route::name('pago_empleado_fijos_mes')->get('pago_empleado_fijos_mes/', 'Pago\PagoEmpleadoFijoController@getMes');
+Route::name('pago_empleado_fijos_quincena')->get('pago_empleado_fijos_quincena/{id}', 'Pago\PagoEmpleadoFijoController@getQuincenas');
+/*Route::name('planilla_eventuals_domo')->get('planilla_eventuals_domo/{id}/{planilla_id}', 'Pago\PlanillaEventualController@pago_domo');*/
 
 Route::name('pago_empleado_eventuals_print_boleta')->get('pago_empleado_eventuals_print_boleta/{planificacion_id}/{id?}', 'Pago\PagoEmpleadoEventualController@print');
 
