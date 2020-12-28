@@ -15,6 +15,7 @@ class UserSeeder extends Seeder
         $data = new User();
         $data->email = "secret@secret.com";
         $data->password = bcrypt("secret");
+        $data->empleado_id = 17;
         $data->rol_id = 1;
 
         $data->save();

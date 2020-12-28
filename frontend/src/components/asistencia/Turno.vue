@@ -3,7 +3,7 @@
     <v-flex wrap>
       <v-toolbar flat color="white">
         <v-toolbar-title>ASISTENCIA TURNOS </v-toolbar-title>
-        <v-flex>
+        <v-flex v-if="isAdmin">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-icon
@@ -506,6 +506,10 @@ export default {
     icon() {
       if (this.torchActive) return "/flash-off.svg";
       else return "/flash-on.svg";
+    },
+    isAdmin(){
+      let self = this
+      return self.$store.state.rol == 'administrador' ? true : false
     }
   }
 };

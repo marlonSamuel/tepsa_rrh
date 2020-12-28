@@ -96,7 +96,9 @@ class PlanillaEventualController extends ApiController
             $data = $request->all();
 
             $asignaciones = AsignacionEmpleado::where('id',$request->asignacion_empleado_id)
-                                            ->with('detalle_asignacion.carnet','detalle_asignacion','detalle_asignacion.turno','detalle_asignacion.asistencia_turno.cargo_turno')->get()->pluck('detalle_asignacion')->collapse()->values();
+                                            ->with('detalle_asignacion.carnet','detalle_asignacion.empleado','detalle_asignacion','detalle_asignacion.turno','detalle_asignacion.asistencia_turno.cargo_turno')->get()->pluck('detalle_asignacion')->collapse()->values();
+
+            $asignaciones = $asignaciones->where('empleado.tipo_empleado',0)->values();
 
             $planilla = PlanillaEventual::create($data);
 
@@ -258,19 +260,26 @@ class PlanillaEventualController extends ApiController
 
         $impresion_planila = $this->payroll($planilla->pago_eventual);
         $maestro_calculos = $this->calculationMaster($planilla->pago_eventual);
+        $pago_general = $this->pagoCuentasYcheques($planilla->fecha,$planilla->pago_eventual);
 
 
         $columns_planilla = array_keys($impresion_planila[0]->toArray());
         $columns_calculos = array_keys($maestro_calculos[0]->toArray());
+        $columns_acreditacion_cuentas = array_keys($pago_general[0][0]->toArray());
+        $columns_acreditacion_cheques = array_keys($pago_general[1][0]->toArray());
+
+        //return $this->showQuery($pago_general);
 
         $data = [
             'impresion_planila'=>[$columns_planilla,$impresion_planila, $planilla],
-            'maestro_calculos'=>[$columns_calculos,$maestro_calculos, $planilla]
+            'maestro_calculos'=>[$columns_calculos,$maestro_calculos, $planilla],
+            'acreditacion_cuentas'=>[$columns_acreditacion_cuentas,$pago_general[0], $planilla],
+            'acreditacion_cheques'=>[$columns_acreditacion_cheques,$pago_general[1], $planilla]
         ];
 
         return Excel::download(new PlanillaEventualSheetsExport($data), 'planilla_eventual.xlsx');
 
-        return $this->showQuery($data);
+        
 
     }
 }

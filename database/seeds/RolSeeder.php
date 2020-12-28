@@ -13,7 +13,19 @@ class RolSeeder extends Seeder
     public function run()
     {
         $data = new Rol;
-        $data->nombre = "nombre";
+        $data->nombre = "administrador";
+        $data->save();
+
+        $data = new Rol;
+        $data->nombre = "asistencia muelle";
+        $data->save();
+
+        $data = new Rol;
+        $data->nombre = "asistencia domo";
+        $data->save();
+
+        $data = new Rol;
+        $data->nombre = "asistencia alimentos";
         $data->save();
     }
 }

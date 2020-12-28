@@ -6,6 +6,10 @@
       fixed
       app
       dark
+      element-loading-text="cargando menú..."
+      element-loading-spinner="el-icon-loading"
+      v-loading="loading_menu" 
+      element-loading-background="rgba(0, 0, 0, 0.8)"
     >
       <v-list dense>
         <template>
@@ -18,7 +22,7 @@
             </v-list-tile-title>
           </v-list-tile>
         </template>
-        <template v-for="item in items">
+        <template v-for="item in getMenu" >
           <v-list-group v-if="item.children" :prepend-icon="item.icon">
             <v-list-tile slot="activator">
               <v-list-tile-content>
@@ -124,12 +128,13 @@ export default {
       dialog: false,
       drawer: null,
       loading: false,
+      loading_menu: false,
       logo: this.$store.state.global.getLogo(),
       options: [
         {
           icon: "account_circle",
           href: "",
-          title: "Cambiar contraseĂ±a",
+          title: "Cambiar contraseña",
           click: this.change
         },
         {
@@ -150,24 +155,9 @@ export default {
           children: [
             { name: "turno", icon: "add", text: "Turnos", path: "/turno" },
             { name: "carnet", icon: "add", text: "Carnets", path: "/carnet" },
-            {
-              name: "prestacion",
-              icon: "add",
-              text: "Prestaciones",
-              path: "/prestacion"
-            },
-            {
-              name: "cargo",
-              icon: "add",
-              text: "Cargos",
-              path: "/cargo"
-            },
-            {
-              name: "empleado",
-              icon: "add",
-              text: "Empleados",
-              path: "/empleado_index"
-            }
+            { name: "prestacion", icon: "add", text: "Prestaciones", path: "/prestacion"},
+            {name: "cargo", icon: "add", text: "Cargos", path: "/cargo"},
+            {name: "empleado",icon: "add",text: "Empleados",path: "/empleado_index"}
           ]
         },
         {
@@ -203,6 +193,16 @@ export default {
             { name: "planilla_eventual",icon: "add",text: "Eventuales",path: "/planilla_eventual"},
             { name: "planilla_fijo",icon: "add",text: "Fijos",path: "/planilla_fijo"}
           ]
+        },
+        {
+          icon: "file_copy",
+          text: "Acceso",
+          name: "Acceso",
+          model: true,
+          path: "",
+          children: [
+            { name: "usuario",icon: "add",text: "Usuarios",path: "/usuario"}
+          ]
         }
       ]
     };
@@ -235,10 +235,53 @@ export default {
   computed: {
     userName() {
       let self = this;
-      return self.$store.state.usuario.name;
+      return self.$store.state.usuario.nombre+' ('+self.$store.state.rol+')';
     },
-    ciclo() {
-      return this.$store.state.ciclo;
+    getMenu(){
+      let self = this
+      let rol = self.$store.state.rol
+      self.loading_menu = true
+      if(rol !== ""){
+        self.loading_menu = false
+        if(rol.toLowerCase() == 'administrador'){
+        return self.items
+        }else{
+          if(rol.toLowerCase() == 'asistencia muelle'){
+            return [{
+                icon: "file_copy",
+                text: "Asistencias",
+                name: "Asistencias",
+                model: true,
+                path: "",
+                children: [
+                  { name: "asistencia_turno",icon: "add",text: "Asistencia turno",path: "/asistencia_turno"}
+                ]
+              }]
+          }else if(rol.toLowerCase() == 'asistencia domo'){
+            return [{
+                icon: "file_copy",
+                text: "Asistencias",
+                name: "Asistencias",
+                model: true,
+                path: "",
+                children: [
+                   { name: "asistencia_domo",icon: "add",text: "Asistencia domo",path: "/asistencia_domo"}
+                ]
+              }]
+          }else{
+            return [{
+                icon: "file_copy",
+                text: "Asistencias",
+                name: "Asistencias",
+                model: true,
+                path: "",
+                children: [
+                   { name: "asistencia_almuerzo",icon: "add",text: "Asistencia almuerzo",path: "/asistencia_almuerzo"}
+                ]
+              }]
+          }
+        }
+      }
     }
   }
 };

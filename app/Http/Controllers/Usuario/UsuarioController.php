@@ -21,7 +21,7 @@ class UsuarioController extends ApiController
 
     public function index()
     {
-        $usuarios = User::with('rol')->get();
+        $usuarios = User::with('rol','empleado')->get();
         
         return $this->showAll($usuarios);
     }
@@ -29,14 +29,14 @@ class UsuarioController extends ApiController
     public function store(Request $request)
     {
         $request->validate([
-            'name'     => 'required|string',
+            'empleado_id'     => 'required|integer',
             'email'    => 'required|string|email|unique:users',
             'password' => 'required|string|confirmed',
             'rol_id' => 'required'
         ]);
 
         $user = new User([
-            'name'     => $request->name,
+            'empleado_id'     => $request->empleado_id,
             'email'    => $request->email,
             'rol_id' => $request->rol_id,
             'password' => bcrypt($request->password),
@@ -72,7 +72,7 @@ class UsuarioController extends ApiController
 
         $usuario->email = $request->email;
         $usuario->rol_id = $request->rol_id;
-        $usuario->name = $request->name;
+        $usuario->empleado_id = $request->empleado_id;
 
         if (!$usuario->isDirty()) {
             return $this->errorResponse('Se debe especificar al menos un valor diferente para actualizar', 422);

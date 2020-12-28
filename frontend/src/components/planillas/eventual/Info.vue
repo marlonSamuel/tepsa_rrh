@@ -1,6 +1,15 @@
 <template>
   <v-layout align-start v-loading="loading">
     <v-flex>
+      <v-layout row wrap justify-end>
+            <div>
+            <v-breadcrumbs :items="itemsB">
+                <template v-slot:divider>
+                <v-icon>forward</v-icon>
+                </template>
+            </v-breadcrumbs>
+            </div>
+        </v-layout>
       <v-toolbar flat color="white">
         <v-toolbar-title v-if="planilla !== null">
             DEPARTAMENTO DE OPERACIONES  PLANILLA PERSONAL EVENTUAL {{planilla.fecha | moment('DD/MM/YYYY')}}
@@ -52,7 +61,20 @@ export default {
       loading: false,
       id: null,
       planilla: null,
-      text: ''
+      text: '',
+
+      itemsB: [
+        {
+          text: 'PLANILLAS',
+          disabled: false,
+          href: '#/planilla_eventual',
+        },
+        {
+          text: 'INFORMACION PLANILLA',
+          disabled: true,
+          href: '#',
+        },
+      ],
     }
   },
 

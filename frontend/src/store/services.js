@@ -8,6 +8,7 @@ import { isNullOrUndefined } from 'util';
 import exampleService from '../services/ExampleService'
 import LoginService from '../services/LoginService'
 import UsuarioService from '../services/UsuarioService'
+import RolService from '../services/RolService'
 import TurnoService from '../services/TurnoService'
 import CarnetService from '../services/CarnetService'
 import PrestacionService from '../services/PrestacionService'
@@ -26,6 +27,7 @@ import PlanillaEventualService from '../services/PlanillaEventualService'
 import PagoEmpleadoEventualService from '../services/PagoEmpleadoEventualService'
 import PagoEmpleadoFijoService from '../services/PagoEmpleadoFijoService'
 
+import DashboardService from '../services/DashboardService'
 
 let baseUrl = 'http://www.tepsa-rrh.com/' //base url desarrollo
 
@@ -83,6 +85,7 @@ export default {
     exampleService: new exampleService(Axios),
     loginService: new LoginService(Axios, baseUrl),
     usuarioService: new UsuarioService(Axios, baseUrl),
+    rolService: new RolService(Axios, baseUrl),
     turnoService: new TurnoService(Axios, baseUrl),
     carnetService: new CarnetService(Axios, baseUrl),
     prestacionService: new PrestacionService(Axios, baseUrl),
@@ -99,5 +102,6 @@ export default {
     asistenciaDomoService: new AsistenciaDomoService(Axios, baseUrl),
     planillaEventualService: new PlanillaEventualService(Axios, baseUrl),
     pagoEmpleadoEventualService: new PagoEmpleadoEventualService(Axios, baseUrl),
-    pagoEmpleadoFijoService : new PagoEmpleadoFijoService(Axios,baseUrl)
+    pagoEmpleadoFijoService : new PagoEmpleadoFijoService(Axios,baseUrl),
+    dashboardService: new DashboardService(Axios, baseUrl),
 }
