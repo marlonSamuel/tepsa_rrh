@@ -86,37 +86,15 @@
             <v-chip
               small
               :color="props.item.cerrada == true ? 'primary' : 'error'"
-              >{{ props.item.cerrada == false ? "Abierta" : "Cerrada" }}</v-chip
+              >{{ props.item.cerrada == false ? "Sin Paga" : "Pagada" }}</v-chip
             >
           </td>
           <td class="text-xs-left">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-icon
-                  v-on="on"
-                  :color="color(props.item.cerrada)"
-                  fab
-                  dark
-                  
-                >
-                  {{ setEstado(props.item.cerrada) }}</v-icon
-                >
-              </template>
-              <span>{{ setSpan(props.item.cerrada) }}</span>
-            </v-tooltip>
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-icon
-                  v-on="on"
-                  color="warning"
-                  fab
-                  dark
-                 
-                >
-                  edit</v-icon
-                >
-              </template>
-              <span>Editar</span>
+           <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                    <v-icon v-on="on" @click="$router.push('planilla_fijo_info/'+props.item.id)"  color="success" fab dark> info</v-icon>
+                </template>
+                <span>Información planilla</span>
             </v-tooltip>
             <v-tooltip top>
               <template v-slot:activator="{ on }">
@@ -192,6 +170,7 @@ export default {
           if (self.$store.state.global.captureError(r)) {
             return;
           }
+          self.items = [];
           r.data.forEach(function(item) {
             if (item.pago_empleado_fijo.length > 0) {
               self.items.push(item);
@@ -228,7 +207,13 @@ export default {
             return;
           }
           self.quincenas = r.data;
-          console.log(self.quincenas);
+          self.quincenas = [];
+          r.data.forEach(function(item) {
+            if (!item.cerrada) {
+              self.quincenas.push(item);
+            }
+          });
+          
         })
         .catch((r) => {});
     },
@@ -246,6 +231,7 @@ export default {
             return;
           }
           this.$toastr.success("Quincena procesada con éxito", "éxito");
+          self.getAll();
           self.close();
         })
         .catch((r) => {});

@@ -194,6 +194,7 @@ trait GlobalFunction
 
     public function pagoCuentasYcheques($fecha,$pagos)
     {
+
         $data = collect();
         $data2 = collect();
         foreach ($pagos as $key => $value) {
@@ -220,5 +221,109 @@ trait GlobalFunction
         }
 
         return [$data,$data2];
+    }
+
+    public function pagoCuentasYchequesFijos($fecha,$pagos)
+    {
+        
+        $data = collect();
+        $data2 = collect();
+        foreach ($pagos as $key => $value) {
+
+            if(!is_null($value->empleado->cuenta)){
+                $info = collect([
+                    'cuenta_origen'=>'902895911',
+                    'cuenta_destino'=>$value->empleado->cuenta,
+                    'fecha'=>date('d M Y', strtotime($fecha)),
+                    'monto'=>$value->total,
+                    'beneficiario'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
+                ]);
+                $data->push($info);
+            }else{
+                $info = collect([
+                    'fecha'=>date('d M Y', strtotime($fecha)),
+                    'monto'=>$value->total,
+                    'beneficiario'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
+                ]);
+
+                $data2->push($info);
+             
+            }
+        }
+
+        return [$data,$data2];
+    }
+
+    //get all payments data
+    public function payrollFijo($pagos){
+        //data collection to insert data
+        $data = collect();
+
+        //get prestacions
+
+
+        foreach ($pagos as $key => $value) {
+                //collection of dynamics columns to prestacions
+                $prestaciones_col = collect();
+                /*
+                $cargo = '';
+                $cargos = $value->detalle_pago->groupBy('cargo_turno.cargo.nombre');
+
+                foreach ($cargos as $key => $c) {
+                    $cargo = $cargo.', '.$key;
+                }
+
+                $cargo = substr($cargo,2); */
+                //push general info to collection
+                $info = collect([
+                    'id'=>$value->id,
+                    'codigo'=>$value->empleado_id,
+                    'nombre'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
+                    'afilacion_igss'=>$value->empleado->igss,
+                    'dpi'=>$value->empleado->dpi,
+                    'cuenta'=>$value->empleado->cuenta,
+                    'puesto' => $value->empleado->cargo->nombre,
+                    'salario'=>$value->empleado->cargo->salario,
+                    'anticipo'=>$value->anticipo,
+                    'otro_ingreso'=>$value->otro_ingreso,
+                    'hora_extra_simple'=>$value->hora_extra_simple,
+                    'hora_extra_doble'=>$value->hora_extra_doble,
+                    'otro_descuento'=>$value->otro_descuento,
+                    'total' => $value->total,
+                    'mes' => $value->quincena->mes_id,
+                    'quincena'=>$value->quincena->quincena
+                ]);
+               
+                //merge info and turnos_cols to main data
+
+                //push data to prestaciones_col
+                foreach ($value->detalle_pago as $p) {
+                     $total_p = $p->total;
+                     $descripcion_p = str_replace(' ', '_', $p->prestacion->descripcion);
+                     $prestaciones_col[$descripcion_p] = $total_p;
+                }
+                 /*
+                */
+                //merge main data and prestaciones_col
+                $main_data = $info->merge($prestaciones_col);
+                /*
+                //total prestacions
+                $main_data['total_prestaciones'] = $value->total_prestaciones;
+
+                //dicounts
+                $main_data['descuento_prestaciones'] = $value->descuento_prestaciones;
+
+                $main_data['prestamos'] = $value->prestamos;
+                $main_data['alimentos'] = $value->alimentacion;
+                $main_data['otros_descuentos'] = $value->otros_descuentos;
+                //calculate total page
+                $main_data['liquido_a_recibir'] = $value->total_liquidado;
+                */
+                //push data to data collection
+                $data->push($main_data);
+                
+        }
+        return $data;
+
     }
 }

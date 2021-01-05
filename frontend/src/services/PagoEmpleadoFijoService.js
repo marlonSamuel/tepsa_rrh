@@ -16,6 +16,10 @@ class PagoEmpleadoFijoService {
         let self = this
         return self.axios.get(`${self.baseUrl}/${id}`)
     }
+    info(id,option){
+        let self = this
+        return self.axios.get(`${self.baseUrl}_info/${id}/${option}`)
+    }
 
     create(data){
         let self = this
@@ -40,11 +44,20 @@ class PagoEmpleadoFijoService {
         let self = this
         return self.axios.get(`${self.baseUrl}_quincena/${mes_id}`);
     }
+    getPlanilla(id){
+        let self = this
+        return self.axios.get(`${self.baseUrl}_planilla/${id}`);
+    }
 
     //imprimir contrato
     print(planilla_id,id) {
         let self = this
         return self.axios.get(`${self.baseUrl}_print_boleta/${planilla_id}/${id}`, { responseType: 'blob' });
+    }
+
+    export(id) {
+        let self = this;
+        return self.axios.get(`${self.baseUrl}_export/${id}`, { responseType: 'arraybuffer'});
     }
 }
 

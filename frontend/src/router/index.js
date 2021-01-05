@@ -26,6 +26,7 @@ import AsistenciaDomoIndex from '@/components/asistencia/DomoIndex'
 import PlanillaEventual from '@/components/planillas/eventual/Index'
 import PlanillaEventualInfo from '@/components/planillas/eventual/Info'
 import PlanillaFijo from '@/components/pago_fijos/Index'
+import PlanillaFijoInfo from '@/components/pago_fijos/Info'
 
 Vue.use(Router)
 
@@ -71,6 +72,7 @@ const routes = [
     { path: '/planilla_eventual', name: 'PlanillaEventual', component: PlanillaEventual, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/planilla_eventual_info/:id', name: 'PlanillaEventualInfo', component: PlanillaEventualInfo, beforeEnter: multiguard([isLoggedIn]) },
     { path: '/planilla_fijo', name: 'PlanillaFijo', component: PlanillaFijo, beforeEnter: multiguard([isLoggedIn]) },
+    { path: '/planilla_fijo_info/:id', name: 'PlanillaFijoInfo', component: PlanillaFijoInfo, beforeEnter: multiguard([isLoggedIn]) },
 ]
 
 

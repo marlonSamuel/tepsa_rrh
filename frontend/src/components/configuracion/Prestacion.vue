@@ -39,7 +39,7 @@
                   </v-flex>
                   <v-flex xs4 sm4 md4>
                     <v-switch
-                      v-model="form.debito_credito"
+                      v-model="form.debito_o_credito"
                       :label="setCreditoDebito"
                     ></v-switch>
                   </v-flex>
@@ -83,11 +83,11 @@
         <template v-slot:items="props">
           <td class="text-xs-left">{{ props.item.descripcion }}</td>
           <td class="text-xs-left">
-            {{ props.item.debito_credito ? "Debito" : "Credito" }}
+            {{ !props.item.debito_o_credito ? "Debito" : "Credito" }}
           </td>
           <td class="text-xs-left">
-            <v-chip small :color="props.item.fijo ? 'primary' : 'green'">{{
-              props.item.fijo ? "Si" : "No"
+            <v-chip small :color="!props.item.fijo ? 'primary' : 'green'">{{
+              !props.item.fijo ? "Si" : "No"
             }}</v-chip>
           </td>
           <td class="text-xs-left">{{ props.item.calculo }}</td>
@@ -144,13 +144,13 @@ export default {
         id: null,
         descripcion: "",
         fijo: false,
-        debito_credito: false,
+        debito_o_credito: false,
         calculo: null
       },
       items: [],
       headers: [
         { text: "Descripcion", value: "descripcion" },
-        { text: "Debito-Credito", value: "debito_credito" },
+        { text: "Debito-Credito", value: "debito_o_credito" },
         { text: "Fijo", value: "fijo" },
         {
           text: "Monto o Porcentaje",
@@ -257,7 +257,7 @@ export default {
       self.form.descripcion = data.descripcion;
       self.form.fijo = data.fijo;
       self.form.calculo = data.calculo;
-      self.form.debito_credito = data.debito_credito;
+      self.form.debito_o_credito = data.debito_o_credito;
     },
     createOrEdit() {
       this.$validator.validateAll().then(result => {
@@ -289,11 +289,11 @@ export default {
     },
     setLabel() {
       let self = this;
-      return self.form.fijo ? "Monto " : "Porcentaje";
+      return !self.form.fijo ? "Monto " : "Porcentaje";
     },
     setCreditoDebito() {
       let self = this;
-      return self.form.debito ? "Debito " : "Credito";
+      return !self.form.debito_o_credito ? "Debito " : "Credito";
     }
   }
 };

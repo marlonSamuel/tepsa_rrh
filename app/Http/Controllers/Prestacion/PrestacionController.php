@@ -28,7 +28,7 @@ class PrestacionController extends ApiController
         $rules = [
             'descripcion' => 'required|string|unique:rrh.prestacions',
             'fijo' => 'required',
-            'debito_credito'=>'required'
+            'debito_o_credito'=>'required'
         ];
 
         $this->validate($request, $rules);
@@ -58,7 +58,7 @@ class PrestacionController extends ApiController
 
         $prestacion->descripcion = $request->descripcion;
         $prestacion->fijo = $request->fijo;
-        $Prestacion->debito_credito = $request->debito_credito;
+        $prestacion->debito_o_credito = $request->debito_o_credito;
 
         if (!$prestacion->isDirty()) {
             return $this->errorResponse('se debe especificar al menos un valor para actualizar', 422);
