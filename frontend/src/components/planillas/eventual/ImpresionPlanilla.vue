@@ -97,7 +97,7 @@
                         <td class="text-xs-left">{{props.item.dpi}}</td>
                         <td class="text-xs-left">{{props.item.puesto}}</td>
                         <td class="text-xs-left">{{props.item.cuenta}}</td>
-                        <td class="text-xs-left">{{props.item.turnos}}</td>
+                        <td class="text-xs-left">{{props.item.turnos_trabajados}}</td>
                         <td class="text-xs-left">{{props.item.septimo | currency('Q ')}}</td>
                         <td class="text-xs-left">{{props.item.total_devengado | currency('Q ')}}</td>
                         <td class="text-xs-left">{{props.item.igss | currency('Q ')}}</td>
