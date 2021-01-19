@@ -21,8 +21,10 @@ class CreatePagoEmpleadoDomosTable extends Migration
             $table->decimal('total',11,2);
             $table->boolean('confirmar_pago')->default(false);
             $table->timestamps();
+
+
+            $table->foreign('planilla_eventual_id')->references('id')->on('planilla_eventuals')->onDelete('cascade');
         });
-        $table->foreign('planilla_eventual_id')->references('id')->on('planilla_eventuals')->onDelete('cascade');
     }
 
     /**

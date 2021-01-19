@@ -210,8 +210,8 @@ class PlanillaEventualController extends ApiController
             $pago->total = $total;
             $pago->conteo_turno = $conteo;
 
-            dd($conteo);
-            //$pago->save();
+            //dd($conteo);
+            $pago->save();
         }
         $db->commit();
 
