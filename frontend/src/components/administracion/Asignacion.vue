@@ -347,7 +347,7 @@
           </td>
 
           <td class="text-xs-left">
-            <v-tooltip top>
+            <v-tooltip top v-if="!props.item.terminada">
               <template v-slot:activator="{ on }">
                 <v-icon
                   v-on="on"
@@ -361,7 +361,7 @@
               </template>
               <span>imprimir</span>
             </v-tooltip>
-            <v-tooltip top>
+            <v-tooltip top v-if="!props.item.terminada">
               <template v-slot:activator="{ on }">
                 <v-icon
                   v-on="on"
@@ -375,7 +375,7 @@
               </template>
               <span>asignacion domo</span>
             </v-tooltip>
-            <v-tooltip top>
+            <v-tooltip top v-if="!props.item.terminada">
               <template v-slot:activator="{ on }">
                 <v-icon
                   v-on="on"
@@ -389,7 +389,21 @@
               </template>
               <span>Editar</span>
             </v-tooltip>
-            <v-tooltip top>
+            <v-tooltip top v-if="!props.item.terminada">
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  v-on="on"
+                  color="success"
+                  fab
+                  dark
+                  @click="releaseCards(props.item)"
+                >
+                  lock_open</v-icon
+                >
+              </template>
+              <span>Liberar carnets</span>
+            </v-tooltip>
+            <v-tooltip top  v-if="!props.item.terminada">
               <template v-slot:activator="{ on }">
                 <v-icon
                   v-on="on"
@@ -403,6 +417,9 @@
               </template>
               <span>Eliminar</span>
             </v-tooltip>
+            <div v-if="props.item.terminada">
+              <v-chip color="success" text-color="white">terminada</v-chip>
+            </div>
           </td>
         </template>
         <template v-slot:no-data>
@@ -479,12 +496,12 @@ export default {
       self.$store.state.services.asignacionService
         .getAll()
         .then(r => {
-          self.loading = false;
+          self.loading = false
+          console.log("llego");
           if (self.$store.state.global.captureError(r)) {
             return;
           }
           self.items = r.data
-          console.log(self.items)
         })
         .catch(r => {});
     },
@@ -496,7 +513,6 @@ export default {
       self.$store.state.services.buqueService
         .getAll()
         .then(r => {
-          self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
           }
@@ -512,7 +528,6 @@ export default {
       self.$store.state.services.empleadoService
         .getAll()
         .then(r => {
-          self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
           }
@@ -538,7 +553,6 @@ export default {
       self.$store.state.services.turnoService
         .getAll()
         .then(r => {
-          self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
           }
@@ -559,15 +573,14 @@ export default {
     //obtener buques
     getCarnets() {
       let self = this;
-      self.loading = true;
       self.$store.state.services.carnetService
         .getAll()
         .then(r => {
-          self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
           }
-          self.carnets = r.data;
+          r.data = r.data.filter(x=>!x.asignado)
+          self.carnets = r.data
         })
         .catch(r => {});
     },
@@ -604,7 +617,8 @@ export default {
           if (self.$store.state.global.captureError(r)) {
             return;
           }
-          self.detalle_asignacion = r.data;
+          self.detalle_asignacion = r.data
+          self.getCarnets()
         })
         .catch(r => {});
     },
@@ -677,6 +691,28 @@ export default {
               self.getAll();
               this.$toastr.success("registro eliminado con éxito", "éxito");
               self.clearData();
+            })
+            .catch(r => {});
+        })
+        .catch(cancel => {});
+    },
+
+    //liberar carnets
+    releaseCards(data){
+      let self = this;
+      self
+        .$confirm("Seguro que desea liberar carnets, la asignación se marcará como terminada, ya no se podrán ingresar nuevas fechas para esta asignacion?")
+        .then(res => {
+          self.loading = true;
+          self.$store.state.services.asignacionService
+            .releaseCards(data)
+            .then(r => {
+              self.loading = false;
+              if (self.$store.state.global.captureError(r)) {
+                return;
+              }
+              self.getAll()
+              this.$toastr.success("carnets han sido liberados con éxito", "éxito")
             })
             .catch(r => {});
         })
@@ -773,7 +809,7 @@ export default {
     detailChange() {
       let self = this;
       let data = self.form;
-      if (data.id !== null && data.turno_id !== null && data.fecha !== null) {
+      if (data.id !== null && data.turno_id !== null && data.fecha !== null && data.fecha !== "" && data.fecha !== undefined) {
         self.getDetailData(data.id, data.turno_id, data.fecha);
       }
     },
@@ -804,10 +840,12 @@ export default {
       self.$store.state.services.asignacionService
         .get(data.id)
         .then(r => {
-          self.loading = false;
+          self.loading = false
+
           if (self.$store.state.global.captureError(r)) {
             return;
           }
+
 
           self.turnos_print = _(r.data)
             .groupBy("fecha")

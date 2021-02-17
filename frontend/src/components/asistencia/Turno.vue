@@ -102,10 +102,10 @@
                       | moment("DD/MM/YYYY")
                   }}
                   <br />
-                  <strong>TURNO: </strong># {{ turno.numero }}
+                  <strong>TURNO: </strong># {{ asignacion.turno.numero }}
                   <br />
                   <strong>FECHA TURNO: </strong> {{ fecha }} de
-                  {{ turno.hora_inicio }} a {{ turno.hora_fin }}
+                  {{ asignacion.turno.hora_inicio }} a {{ asignacion.turno.hora_fin }}
                   <br />
                 </div>
               </v-flex>
@@ -153,7 +153,6 @@
                     v-validate="'max:255'"
                     type="text"
                     data-vv-name="observaciones"
-                    :readonly="check_salida !== null ? true : false"
                     :error-messages="errors.collect('observaciones')"
                   >
                   </v-textarea>
@@ -167,7 +166,7 @@
                   v-model="form.cargo_turno_id"
                   label="Rol"
                   placeholder="seleccione rol"
-                  :items="cargos"
+                  :items="cargosTurn(asignacion.turno.numero)"
                   item-text="cargo.nombre"
                   item-value="id"
                   v-validate="'required'"
@@ -222,12 +221,15 @@ export default {
       error: null,
       turnos: [],
       turno: null,
+      turno2: null,
       codigo: "",
       turno_id: null,
+      turno_id_2: null,
       fecha: null,
       asignacion: null,
       bodegas: [],
       cargos: [],
+      cargos2: [],
       active_qr: false,
       bloqueado: false,
       form: {
@@ -266,14 +268,18 @@ export default {
     },
 
     //obtener roles
-    getCargos(turno_id) {
-      let self = this;
-      self.loading = true;
+    getCargos(turno_id,turno) {
+      let self = this
+      self.loading = true
       self.$store.state.services.turnoService
         .getCargos(turno_id)
         .then(r => {
-          self.loading = false;
-          self.cargos = r.data;
+          self.loading = false
+          if(turno < 4){
+            self.cargos = r.data
+          }else{
+            self.cargos2 = r.data
+          }
         })
         .catch(e => {});
     },
@@ -287,7 +293,7 @@ export default {
       }
       self.loading = true;
       self.$store.state.services.detalleAsignacionService
-        .getAsign(self.codigo, self.fecha, self.turno.id)
+        .getAsign(self.codigo, self.fecha, self.turno.id, self.turno2.id)
         .then(r => {
           self.loading = false;
           if (self.$store.state.global.captureError(r)) {
@@ -432,12 +438,19 @@ export default {
         }
 
         if (moment(currentTime).isBetween(start_time, end_time)) {
-          self.turno = t
-          self.getCargos(t.id)
-          self.turno._hora_inicio = start_time
-          self.turno._hora_fin = end_time
+          if(t.numero < 4){
+            self.turno = t
+            self.getCargos(t.id,t.numero)
+            self.turno._hora_inicio = start_time
+            self.turno._hora_fin = end_time
+          }else{
+            self.getCargos(t.id,t.numero)
+            self.turno2 = t
+            self.turno2._hora_inicio = start_time
+            self.turno2._hora_fin = end_time
+          }
         }
-      });
+      })
     },
 
     //setear bodegas en buque
@@ -465,6 +478,15 @@ export default {
       self.search();
     },
 
+    cargosTurn(numero){
+      let self = this
+      if(numero < 4){
+        return self.cargos
+      }else{
+        return self.cargos2
+      }
+    },
+
     //erorroa sicncronos
     async onInit(promise) {
       let self = this;
@@ -480,6 +502,8 @@ export default {
         }
       } catch (error) {
         console.log(error.name);
+        self.active_qr = false
+        self.alert = true
         if (error.name === "NotAllowedError") {
           this.error = "ERROR: necesitas permiso para utilizar la camara";
         } else if (error.name === "NotFoundError") {

@@ -16,6 +16,7 @@
             margin-left: 2cm;
             margin-right: 2cm;
             margin-bottom: 2cm;
+            font-size: 9px;
         }
 
         /** Define the header rules **/
@@ -28,8 +29,8 @@
 
             /** Extra personal styles **/
             text-align: center;
-            line-height: 0.5cm;
-            font-size: 13px;
+            line-height: 0.3cm;
+            font-size: 10px;
         }
 
         table {
@@ -39,9 +40,9 @@
 
         table, th, td {
           border: 1px solid black;
-          font-size: 11px;
+          font-size: 8px;
           text-align: left;
-          padding: 3px;
+          padding: 2px;
         }
 
         /** Define the footer rules **/
@@ -51,6 +52,7 @@
             left: 0cm;
             right: 0cm;
             height: 2cm;
+            font-size: 9px;
         }
 
         span{
@@ -107,23 +109,24 @@
 <body>
     <!-- Define header and footer blocks before your content -->
     <header>
-        <img class="logo" src="{{asset('img/logo.jpg')}}" width="200px" height="100px" />
+        <img class="logo" src="{{asset('img/logo.jpg')}}" width="90px" height="40px" />
         <b>EMPRESA PORTUARIA QUETZAL, DEPARTAMENTO DE PROTECCIÓN <br />
             CONTROL DE INGRESO/EGRESO DE VISITA AL BUQUE</b>
-        <img class="logo_left" src="{{asset('img/portuaria.JPG')}}" width="100px" height="90px" />
-        <img style="padding-left: 100px;" class="logo_left" src="{{asset('img/cap.JPG')}}" width="100px" height="90px" />
+        <img class="logo_left" src="{{asset('img/portuaria.JPG')}}" width="90px" height="40px" />
+        <img style="padding-left: 100px;" class="logo_left" src="{{asset('img/cap.JPG')}}" width="90px" height="40px" />
     </header>
 
     <!-- Wrap the content of your PDF inside a main tag -->
-    <main style="margin-top: 50px;">
+    <main>
         <div>
-            <p>
+            <p style="font-size: 8px;">
                 NOMBRE DE LA ESTIBADORA: <label style="color: blue;">TERMINALES ESPECIALIZADAS DEL PACIFICO, S.A. (TEPSA)</label><br />
                 NOMBRE DE BUQUE: <label style="color: blue;">{{strtoupper($asignacion->planificacion->buque->nombre)}}</label><br />
                 FECHA DE ATRAQUE: <label style="color: blue;">{{date('d-m-Y',strtotime($asignacion->planificacion->fecha_atraque))}}</label><br />
-                FECHA DE TURNO: <label style="color: blue;">{{date('d-m-Y',strtotime($detalle[0]->fecha))}}</label> <span style="margin-left: 60px;"> HORARIO TURNO: <label style="color: blue;">{{$detalle[0]->turno->hora_inicio}} - {{$detalle[0]->turno->hora_fin}}</label></span>
+                FECHA DE TURNO: <label style="color: blue;">{{date('d-m-Y',strtotime($detalle[0]->fecha))}}</label> <span style="margin-left: 60px;"> HORARIO TURNO: <label style="color: blue;">{{$detalle[0]->turno->hora_inicio}} - {{$detalle[0]->turno->hora_fin}}</label>
+                               <b style="margin-left: 400px;">CÓDIGO: SGSI-DP-EPQ-IEVP-021</b></span>
             </p>
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 10px;">
                 <table>
                     <thead>
                         <tr>
@@ -134,31 +137,31 @@
                             <th>FECHA INGRESO</th>
                             <th>HORA INGRESO</th>
                             <th>HORA SALIDA</th>
-                            <th>NUMERO CARNET</th>
+                            <th>NO. DE BRAZALETE</th>
                         </tr>
                     </thead>
                     <tbody>
                          @foreach($detalle as $d)
                         <tr>
-                            <td style="width:4%">{{ $loop->index + 1}}</td>
-                            <td style="width:25%">{{strtoupper($d->empleado->primer_nombre)}} {{strtoupper($d->empleado->segundo_nombre)}}
+                            <td style="width:2%">{{ $loop->index + 1}}</td>
+                            <td style="width:28%">{{strtoupper($d->empleado->primer_nombre)}} {{strtoupper($d->empleado->segundo_nombre)}}
                                 {{strtoupper($d->empleado->primer_apellido)}} {{strtoupper($d->empleado->segundo_apellido)}}</td>
-                            <td style="width:10%">{{$d->empleado->dpi}}</td>
-                            <td>{{$d->empleado->dpi}}</td>
+                            <td style="width:9%">{{$d->empleado->dpi}}</td>
+                            <td>{{$d->empleado->igss}}</td>
                             <td>{{$d->fecha}}</td>
                             <td>{{$d->turno->hora_inicio}}</td>
                             <td>{{$d->turno->hora_fin}}</td>
-                            <td>{{$d->carnet->codigo}}</td>
+                            <td> </td>
                         </tr>
                         @endforeach
                     </tbody>
-                    <label style="color:blue; margin-left: 40px;">PUERTO QUETZAL, {{ date('d-m-Y') }}</label>
+                    <label style="color:blue; margin-left: 40px;">PUERTO QUETZAL, {{date('d-m-Y',strtotime($detalle[0]->fecha))}}</label>
                 </table>
                 
             </div>
             <br />
             <br />
-            <p>
+            <p style="font-size: 9px;">
                 <div class="row">
                     <div class="column">
                        <span> Observaciones: ________________________________________</span><br />

@@ -16,6 +16,7 @@ class CreateAsignacionEmpleadosTable extends Migration
         Schema::connection('rrh')->create('asignacion_empleados', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('planificacion_id');
+            $table->boolean('terminada')->default(0);
             $table->timestamps();
         });
     }

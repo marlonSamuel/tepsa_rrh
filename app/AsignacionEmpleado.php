@@ -13,7 +13,8 @@ class AsignacionEmpleado extends Model
     protected $table = 'asignacion_empleados';
 
     protected $fillable = [
-    	'planificacion_id'
+    	'planificacion_id',
+        'terminada'
     ];
 
     public function planificacion(){

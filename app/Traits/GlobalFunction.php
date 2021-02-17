@@ -36,7 +36,7 @@ trait GlobalFunction
                     'codigo'=>$value->empleado_id,
                     'nombre'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
                     'afilacion_igss'=>$value->empleado->igss,
-                    'dpi'=>$value->empleado->dpi,
+                    'dpi'=>' '.$value->empleado->dpi,
                     'cuenta'=>$value->empleado->cuenta,
                     'puesto' => $cargo,
                     'turnos_trabajados'=>$value->total_turnos,
@@ -50,7 +50,7 @@ trait GlobalFunction
                 //push data to prestaciones_col
                 foreach ($prestaciones as $p) {
                      $total_p = $value->prestaciones->where('prestacion_id',$p->id)->sum('total');
-                     $p->descripcion = str_replace(' ', '_', $p->descripcion);
+                     $p->descripcion = strtolower(str_replace(' ', '_', $p->descripcion));
                      $prestaciones_col[$p->descripcion] = $total_p;
                 }
 
@@ -156,10 +156,13 @@ trait GlobalFunction
                             $calculo = (($p->calculo/30)/24)*8*$main_data['total_turnos'];
                         }
                     }else{
-                        $calculo = ($main_data['total_devengado'] * $p->calculo);
+                        $calculo = 0;
+                        if(strtolower($p->descripcion) != "isr"){
+                            $calculo = ($main_data['total_devengado'] * $p->calculo);
+                        }
                     }
 
-                    $desc = str_replace(' ', '_', $p->descripcion);
+                    $desc = strtolower(str_replace(' ', '_', $p->descripcion));
                     $prestaciones_col[$desc]=$calculo;
 
                     #calculo de credito o debito de prestaciones

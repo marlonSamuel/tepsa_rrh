@@ -159,12 +159,6 @@
                     </template>
                 </v-data-table>
             </v-card-text>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="red darken-1" flat @click="close">Volver</v-btn>
-              >
-            </v-card-actions>
           </v-card>
     </v-flex>
   </v-layout>
@@ -288,6 +282,7 @@ export default {
           if (self.$store.state.global.captureError(r)) {
             return;
           }
+          r.data = r.data.filter(x=>!x.asignado)
           self.carnets = r.data
         })
         .catch(r => {});

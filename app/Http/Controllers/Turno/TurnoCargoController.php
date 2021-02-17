@@ -23,6 +23,7 @@ class TurnoCargoController extends ApiController
 
     	foreach ($request->cargos as $item) {
     		$cargo_turno = new CargoTurno();
+            $cargo_turno->salario_hora = 0;
             if ($item['id'] != null || $item['id'] > 0 ) {
                 $id = $item['id'];
                 $cargo_turno = CargoTurno::find($id);

@@ -27,6 +27,14 @@ class AsignacionEmpleadoController extends ApiController
         return $this->showAll($asignaciones);
     }
 
+    public function showOneRow($id)
+    {
+        $asignacion_empleado = AsignacionEmpleado::where('id',$id)
+                                                    ->with('planificacion.buque','detalle_asignacion.asistencia_turno.cargo_turno.cargo','detalle_asignacion.turno','detalle_asignacion.empleado','detalle_asignacion.asistencia_almuerzo','asignacion_domos.asistencia_domo','asignacion_domos.empleado')->first();
+
+        return $this->showOne($asignacion_empleado);
+    }
+
 
     /**
      */
@@ -43,9 +51,15 @@ class AsignacionEmpleadoController extends ApiController
         $db = DB::connection('rrh');
 
         $db->beginTransaction();
+
             $this->validate($request,$rules);
 
             $data = $request->all();
+
+            $exits = DetalleAsignacionEmpleado::where([['empleado_id',$request->empleado_id],['turno_id',$request->turno_id],['fecha',$request->fecha]])
+                                                     ->first();
+
+            if(!is_null($exits)) return $this->errorResponse('empleado ya ha sido asignado a otro turno en la fecha que trata de asignar','421');
 
             $asignacion = AsignacionEmpleado::create($data);
 
@@ -129,6 +143,11 @@ class AsignacionEmpleadoController extends ApiController
         $db->beginTransaction();
             $this->validate($request,$rules);
 
+            $exits = DetalleAsignacionEmpleado::where([['empleado_id',$request->empleado_id],['turno_id',$request->turno_id],['fecha',$request->fecha]])
+                                                     ->first();
+
+            if(!is_null($exits)) return $this->errorResponse('empleado ya ha sido asignado a otro turno en la fecha que trata de asignar','421');
+
             $data_d = new DetalleAsignacionEmpleado;
             $data_d->turno_id = $request->turno_id;
             $data_d->asignacion_empleado_id = $asignacion_empleado->id;
@@ -152,9 +171,50 @@ class AsignacionEmpleadoController extends ApiController
      */
     public function destroy(AsignacionEmpleado $asignacion_empleado)
     {
-        $asignacion_empleado->delete();
+        DB::beginTransaction();
 
+        //
+        $carnets_muelle = $asignacion_empleado->detalle_asignacion()->with('carnet')->get();
+
+        foreach ($carnets_muelle as $c) {
+            $c->carnet->asignado = false;
+            $c->carnet->save();
+        }
+
+        $carnets_domo = $asignacion_empleado->asignacion_domos()->with('carnet')->get();
+        foreach ($carnets_domo as $carnet) {
+            $c->carnet->asignado = false;
+            $c->carnet->save();
+        }
+
+        $asignacion_empleado->delete();
+        DB::commit();
         return $this->showOne($asignacion_empleado,201,'delete');
+    }
+
+    //release cards from asignations
+    public function releaseCards($id){
+        //
+        $asignacion_empleado = AsignacionEmpleado::find($id);
+        DB::beginTransaction();
+        $carnets_muelle = $asignacion_empleado->detalle_asignacion()->with('carnet')->get();
+
+        foreach ($carnets_muelle as $c) {
+            $c->carnet->asignado = false;
+            $c->carnet->save();
+        }
+
+        $carnets_domo = $asignacion_empleado->asignacion_domos()->with('carnet')->get();
+        foreach ($carnets_domo as $carnet) {
+            $c->carnet->asignado = false;
+            $c->carnet->save();
+        }
+
+        $asignacion_empleado->terminada = true;
+        $asignacion_empleado->save();
+
+        DB::commit();
+        return $this->showOne($asignacion_empleado,201,'update');
     }
 
     //imprimir pdf

@@ -21,7 +21,7 @@ class PlanillaEventualSheetsExport implements WithMultipleSheets
         $sheets = [];
 
         foreach ($this->data as $key => $d) {
-        	$sheets[] = new PlanillaEventualExport($key,$d[0],$d[1],$d[2]);
+        	$sheets[] = new PlanillaEventualExport($key,$d[0],$d[1],$d[2],$d[3],$d[4]);
         }
 
         return $sheets;

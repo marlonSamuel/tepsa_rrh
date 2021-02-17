@@ -57,16 +57,22 @@ Route::resource('buques', 'Buque\BuqueController', ['except' => ['create', 'edit
 
 #=======================ASIGNACIONES=========================================================#
 Route::resource('asignacion_empleados', 'Asignacion\AsignacionEmpleadoController', ['except' => ['create', 'edit']]);
+Route::name('releaseCards')->get('asignacion_empleados_show_one/{id}', 'Asignacion\AsignacionEmpleadoController@showOneRow');
+
 Route::name('asignacion_empleados_asignacion')->get('asignacion_empleados_asignacion/{date}/{buque}', 'Asignacion\AsignacionEmpleadoController@asignacion');
 Route::name('asignacion_empleados_domos')->get('asignacion_empleados_domos/{id}', 'Asignacion\AsignacionEmpleadoController@showAsignacionDomo');
 
+
+Route::name('releaseCards')->put('asignacion_empleados_release/{id}', 'Asignacion\AsignacionEmpleadoController@releaseCards');
+
 Route::name('dataTurn')->get('asignacion_empleados/{id}/{turno_id}/{fecha}', 'Asignacion\AsignacionEmpleadoController@getDataTurn');
 Route::resource('detalle_asignacion_empleados', 'Asignacion\DetalleAsignacionEmpleadoController', ['except' => ['create', 'edit']]);
-Route::name('showAsign')->get('detalle_asignacion_empleados/{codigo}/{fecha}/{turno_id}', 'Asignacion\DetalleAsignacionEmpleadoController@showAsign');
+Route::name('showAsign')->get('detalle_asignacion_empleados/{codigo}/{fecha}/{turno_id}/{turno_id_2}', 'Asignacion\DetalleAsignacionEmpleadoController@showAsign');
 Route::name('showTurnDate')->get('detalle_asignacion_empleados/{fecha}/{turno_id}', 'Asignacion\DetalleAsignacionEmpleadoController@showTurnDate');
 
 Route::resource('asignacion_domos', 'Asignacion\AsignacionDomoController', ['except' => ['create', 'edit']]);
 Route::name('showAsign')->get('asignacion_domos/{codigo}/{fecha}', 'Asignacion\AsignacionDomoController@showAsign');
+
 
 Route::name('print_asignacion')->get('asignacion_empleados_print/{id}/{turno_id}/{fecha}/{empleado_id?}', 'Asignacion\AsignacionEmpleadoController@print');
 

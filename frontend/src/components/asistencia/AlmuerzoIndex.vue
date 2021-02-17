@@ -83,7 +83,9 @@
           </td>
           <td class="text-xs-left">
               <span v-if="props.item.asistencia_almuerzo !== null">
-                  {{props.item.tipo_alimento}}
+                  {{props.item.asistencia_almuerzo.tipo_alimento == "D" ? "Desayuno" : 
+                    props.item.asistencia_almuerzo.tipo_alimento == "A" ? "Almuerzo" : 
+                    props.item.asistencia_almuerzo.tipo_alimento == "C" ? "Cena" : "Refacción"}}
               </span>
           </td>
           <td class="text-xs-left">
@@ -196,14 +198,12 @@ export default {
                    
                 })
             })
-            console.log(self.all_items)
         }).catch(e=>{})
     },
 
     change(){
         let self = this
         self.turnos = self.all_items.filter(x=>x.fecha_buque == self.form.fecha_buque)
-        
         if(self.form.turno_id !== null){
           self.changeTurn()
         }
@@ -212,8 +212,9 @@ export default {
     changeTurn(){
         let self = this
         self.items = self.all_items.filter(x=>x.turno_id == self.form.turno_id && x.fecha_buque == self.form.fecha_buque)
+        console.log(self.items)
 
-        self.items.forEach((x,i)=>{
+      /*  self.items.forEach((x,i)=>{
           var extra = moment(x.asistencia_almuerzo.created_at).format("YYYY-MM-DD") + " "
           let desayuno = moment(extra+'14:30:00')
           let almuerzo = moment(extra+'21:30:00')
@@ -227,7 +228,7 @@ export default {
             x.tipo_alimento = "cena"
           }
 
-        })
+        })*/
     },
 
     print(){

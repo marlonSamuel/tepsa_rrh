@@ -49,10 +49,10 @@
                 </v-btn>
                 </v-bottom-nav>
                 <v-flex v-if="tipo_asistencia !== ''">
-                    <v-alert v-model="alert" :type="tipo_asistencia=='entrada'?'info':'warning'">
+                    <v-alert v-model="alert2" :type="tipo_asistencia=='entrada'?'info':'warning'">
                         ATENCIÓN: Se está tomando asistencia de {{ tipo_asistencia | uppercase }}, <br />
                         Fecha de asignación: {{fecha | moment('dddd[] DD [de] MMMM [del año] YYYY')}}<br />
-                        Fecha y Hora actual: {{ this.momentInstance.format('dddd[] DD [de] MMMM [del año] YYYY HH:mm:ss') }}<br />
+                        <!--Fecha y Hora actual: {{ this.momentInstance.format('dddd[] DD [de] MMMM [del año] YYYY HH:mm:ss') }}<br />-->
                         Turno: {{turno}}
                     </v-alert>
                     </v-flex>
@@ -169,6 +169,7 @@ export default {
       loading: false,
       tipo_asistencia: '',
       alert: true,
+      alert2: true,
       active_qr: false,
       torchActive: false,
       torchNotSupported: false,
@@ -400,6 +401,8 @@ export default {
         }
       } catch (error) {
         console.log(error.name);
+        self.active_qr = false
+        self.alert = true
         if (error.name === "NotAllowedError") {
           this.error = "ERROR: necesitas permiso para utilizar la camara";
         } else if (error.name === "NotFoundError") {

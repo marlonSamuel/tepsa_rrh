@@ -12,7 +12,8 @@ class Turno extends Model
     protected $fillable = [
     	'hora_inicio',
     	'hora_fin',
-    	'numero'
+    	'numero',
+    	'doce_horas'
     ];
 
     public function cargo_turnos(){

@@ -301,6 +301,7 @@ export default {
 
     change(){
         let self = this
+        console.log(self.all_items)
         self.turnos = self.all_items.filter(x=>x.fecha_buque == self.form.fecha_buque)
         if(self.form.turno_id !== null){
           self.changeTurn()
@@ -310,6 +311,7 @@ export default {
     changeTurn(){
         let self = this
         self.items = self.all_items.filter(x=>x.turno_id == self.form.turno_id && x.fecha_buque == self.form.fecha_buque)
+        console.log(self.items)
     },
 
     print(){
