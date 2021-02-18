@@ -116,6 +116,7 @@ class EmpleadoController extends ApiController
         $empleado->idCargo = $request->idCargo;
         $empleado->estado = $request->estado;
         $empleado->igss = $request->igss;
+        $empleado->fecha_ingreso = $request->fecha_ingreso;
 
         //$employment->idEmpleado = $request->idEmpleado;
 

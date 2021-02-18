@@ -142,7 +142,19 @@
                     >
                     </v-text-field>
                   </v-flex>
-                  <v-flex xs6 sm6 md6>
+                  <v-flex xs12 sm12 md4>
+                    <v-text-field
+                      v-model="form.fecha_ingreso"
+                      label="Fecha Ingreso"
+                      v-validate="'required'"
+                      type="date"
+                      data-vv-name="fecha_ingreso"
+                      data-vv-as="fecha de ingreso"
+                      :error-messages="errors.collect('fecha_ingreso')"
+                    >
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex xs6 sm4 md4>
                     <v-select
                       placeholder="Cargo"
                       prepend-icon="person_add"
@@ -157,7 +169,7 @@
                       required
                     ></v-select>
                   </v-flex>
-                  <v-flex xs12 sm3 md3>
+                  <v-flex xs12 sm4 md4>
                     <v-text-field
                       prepend-icon="phone"
                       v-model="form.telefono"
@@ -391,10 +403,11 @@
   </v-layout>
 </template>
 <script>
+import moment from "moment";
 export default {
   name: "empleadoIndex",
   props: {
-    source: String
+    source: String,
   },
   data() {
     return {
@@ -409,7 +422,7 @@ export default {
         { text: "Primer Apellido", value: "primer_apellido" },
         { text: "Segundo Apellido", value: "segundo_apellido" },
         { text: "Cargo", value: "cargo.nombre" },
-        { text: "Acciones", value: "", sortable: false }
+        { text: "Acciones", value: "", sortable: false },
       ],
       form: {
         idEmpleado: null,
@@ -427,18 +440,19 @@ export default {
         foto: "",
         estado: "A",
         carnet_id: 0,
-        igss: ""
+        igss: "",
+        fecha_ingreso: null,
       },
       form2: {
         empleado_id: null,
-        prestaciones: []
+        prestaciones: [],
       },
       prestaciones: [],
       asignacionPrestacion: [],
       carnets: [],
       image: null,
       image_default: this.$store.state.base_url + "img/user_empty.png",
-      cargos: []
+      cargos: [],
     };
   },
   created() {
@@ -454,61 +468,61 @@ export default {
       self.loading = true;
       self.$store.state.services.empleadoService
         .getAll()
-        .then(r => {
+        .then((r) => {
           self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
           }
           self.items = r.data;
         })
-        .catch(r => {});
+        .catch((r) => {});
     },
     getCargos() {
       let self = this;
       self.loading = true;
       self.$store.state.services.cargoService
         .getAll()
-        .then(r => {
+        .then((r) => {
           self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
           }
           self.cargos = r.data;
         })
-        .catch(r => {});
+        .catch((r) => {});
     },
     getPrestacions() {
       let self = this;
       self.loading = true;
       self.$store.state.services.prestacionService
         .getAll()
-        .then(r => {
+        .then((r) => {
           self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
           }
           self.prestaciones = r.data;
         })
-        .catch(r => {});
+        .catch((r) => {});
     },
     getCarnets() {
       let self = this;
       self.loading = true;
       self.$store.state.services.carnetService
         .getAll()
-        .then(r => {
+        .then((r) => {
           self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
           }
           //self.carnets = r.data.find(x => x.asignado === 1);
-          r.data.forEach(function(item) {
+          r.data.forEach(function (item) {
             if (item.asignado === 0) {
               self.carnets.push(item);
             }
           });
         })
-        .catch(r => {});
+        .catch((r) => {});
     },
     create() {
       let self = this;
@@ -516,7 +530,7 @@ export default {
       self.loading = true;
       self.$store.state.services.empleadoService
         .create(data)
-        .then(r => {
+        .then((r) => {
           self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
@@ -525,7 +539,7 @@ export default {
           self.getAll();
           self.clearData();
         })
-        .catch(r => {});
+        .catch((r) => {});
     },
 
     update() {
@@ -534,7 +548,7 @@ export default {
       let data = self.form;
       self.$store.state.services.empleadoService
         .update(data)
-        .then(r => {
+        .then((r) => {
           self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
@@ -543,10 +557,10 @@ export default {
           this.$toastr.success("registro actualizado con éxito", "éxito");
           self.clearData();
         })
-        .catch(r => {});
+        .catch((r) => {});
     },
     createOrEdit() {
-      this.$validator.validateAll().then(result => {
+      this.$validator.validateAll().then((result) => {
         if (result) {
           if (self.form.idEmpleado > 0 && self.form.idEmpleado !== null) {
             self.update();
@@ -564,7 +578,7 @@ export default {
         self.loading = true;
         self.$store.state.services.empleadoPrestacionService
           .create(data)
-          .then(r => {
+          .then((r) => {
             self.loading = false;
             if (self.$store.state.global.captureError(r)) {
               return;
@@ -574,7 +588,7 @@ export default {
             self.asignacionPrestacion = [];
             self.getAll();
           })
-          .catch(r => {});
+          .catch((r) => {});
       } else {
         this.$toastr.error("Seleccione por lo menos una Prestación", "error");
       }
@@ -583,11 +597,11 @@ export default {
       let self = this;
       self
         .$confirm("Seguro que desea eliminar Empleado?")
-        .then(res => {
+        .then((res) => {
           self.loading = true;
           self.$store.state.services.empleadoService
             .destroy(data)
-            .then(r => {
+            .then((r) => {
               self.loading = false;
               if (self.$store.state.global.captureError(r)) {
                 return;
@@ -596,16 +610,16 @@ export default {
               this.$toastr.success("registro eliminado con exito", "exito");
               self.clearData();
             })
-            .catch(r => {});
+            .catch((r) => {});
         })
-        .catch(cancel => {});
+        .catch((cancel) => {});
     },
     disabledEmpleado(id) {
       let self = this;
       self.loading = true;
       self.$store.state.services.empleadoService
         .disabled(id)
-        .then(r => {
+        .then((r) => {
           self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
@@ -615,17 +629,17 @@ export default {
           self.clearData();
           self.close();
         })
-        .catch(r => {});
+        .catch((r) => {});
     },
     destroyPrestacion(data) {
       let self = this;
       self
         .$confirm("Seguro que desea eliminar Prestacion?")
-        .then(res => {
+        .then((res) => {
           self.loading = true;
           self.$store.state.services.empleadoPrestacionService
             .destroy(data)
-            .then(r => {
+            .then((r) => {
               self.loading = false;
               if (self.$store.state.global.captureError(r)) {
                 return;
@@ -635,9 +649,9 @@ export default {
               self.clearData();
               self.close();
             })
-            .catch(r => {});
+            .catch((r) => {});
         })
-        .catch(cancel => {});
+        .catch((cancel) => {});
     },
     edit(data) {
       let self = this;
@@ -652,7 +666,7 @@ export default {
         data.idEmpleado == undefined ? data.empleado_id : data.idEmpleado;
       self.$store.state.services.empleadoService
         .get(data.idEmpleado)
-        .then(r => {
+        .then((r) => {
           self.loading = false;
           if (self.$store.state.global.captureError(r)) {
             return;
@@ -660,14 +674,15 @@ export default {
           let prestacion = r.data[0].empleado_prestacion;
           self.asignacionPrestacion = prestacion;
         })
-        .catch(r => {});
+        .catch((r) => {});
     },
     validateDisabled(id) {
       let self = this;
-      return !!self.asignacionPrestacion.find(x => x.prestacion_id === id);
+      return !!self.asignacionPrestacion.find((x) => x.prestacion_id === id);
     },
     mapData(data) {
       let self = this;
+
       self.form.idEmpleado = data.idEmpleado;
       self.form.primer_nombre = data.primer_nombre;
       self.form.segundo_nombre = data.segundo_nombre;
@@ -682,18 +697,20 @@ export default {
       self.form.cuenta = data.cuenta;
       self.form.tipo_empleado = data.tipo_empleado;
       self.form.igss = data.igss;
+      self.form.fecha_ingreso = data.fecha_ingreso;
       data.foto !== null
         ? (self.image = self.$store.state.base_url + data.foto)
         : self.$store.state.base_url + "img/user_empty.png";
+        console.log(self.form);
     },
     clearData() {
       let self = this;
-      Object.keys(self.form).forEach(function(key, index) {
+      Object.keys(self.form).forEach(function (key, index) {
         if (typeof self.form[key] === "string") self.form[key] = "";
         else if (typeof self.form[key] === "boolean") self.form[key] = true;
         else if (typeof self.form[key] === "number") self.form[key] = null;
       });
-      Object.keys(self.form2).forEach(function(key, index) {
+      Object.keys(self.form2).forEach(function (key, index) {
         if (typeof self.form2[key] === "string") self.form2[key] = "";
         else if (typeof self.form2[key] === "boolean") self.form2[key] = true;
         else if (typeof self.form2[key] === "number") self.form2[key] = null;
@@ -718,7 +735,7 @@ export default {
       var files = input.files;
       var oFReader = new FileReader();
       oFReader.readAsDataURL(files[0]);
-      oFReader.onload = function(oFREvent) {
+      oFReader.onload = function (oFREvent) {
         self.image = oFREvent.target.result;
         self.form.foto = self.image;
       };
@@ -734,7 +751,7 @@ export default {
     color(estado) {
       let self = this;
       return estado == "A" ? "error" : "primary";
-    }
+    },
   },
   computed: {
     setTitle() {
@@ -752,7 +769,7 @@ export default {
     setLabel() {
       let self = this;
       return self.form.tipo_empleado ? "Fijo " : "Eventual";
-    }
-  }
+    },
+  },
 };
 </script>
