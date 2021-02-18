@@ -10,6 +10,7 @@ use App\AsignacionEmpleado;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ApiController;
 use Barryvdh\DomPDF\PDF;
+use Illuminate\Support\Facades\DB;
 
 class DetalleAsignacionEmpleadoController extends ApiController
 {
@@ -25,11 +26,15 @@ class DetalleAsignacionEmpleadoController extends ApiController
     }
 
     //retornar asignacion de empleado, codigo turno y fecha
-    public function showAsign($codigo,$fecha,$turno_id){
+    public function showAsign($codigo,$fecha,$turno_id,$turno_id_2){
 
         $carnet = Carnet::where('codigo',$codigo)->firstOrFail();
 
         $asignacion = DetalleAsignacionEmpleado::where([['carnet_id',$carnet->id],['fecha',$fecha],['turno_id',$turno_id]])->with('empleado','asistencia_turno.cargo_turno.cargo','asignacion.planificacion.buque','turno','asistencia_turno.cargo_turno.turno')->first();
+
+        if(is_null($asignacion)){
+            $asignacion = DetalleAsignacionEmpleado::where([['carnet_id',$carnet->id],['fecha',$fecha],['turno_id',$turno_id_2]])->with('empleado','asistencia_turno.cargo_turno.cargo','asignacion.planificacion.buque','turno','asistencia_turno.cargo_turno.turno')->first();
+        }
         
         if(is_null($asignacion)){
             return $this->errorResponse('no se encontró asignación de este empleado con el codigo '.$codigo.' fecha y turno correspondiente', 421);
@@ -121,7 +126,12 @@ class DetalleAsignacionEmpleadoController extends ApiController
      */
     public function destroy(DetalleAsignacionEmpleado $detalle_asignacion_empleado)
     {
+        DB::beginTransaction();
+        $carnet = Carnet::find($detalle_asignacion_empleado->carnet_id);
+        $carnet->asignado = false;
+        $carnet->save();
         $detalle_asignacion_empleado->delete();
+        DB::commit();
         return $this->showOne($detalle_asignacion_empleado,201,'delete');
     }
 }

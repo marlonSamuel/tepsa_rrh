@@ -147,7 +147,7 @@
                         <td width="80px;">Fecha inicio:</td>
                         <td class="title-body">{{date('d M Y', strtotime($planilla->inicio_descarga))}}</td>
                         <td width="80px;">Fecha: final</td>
-                        <td class="title-body">{{date('d M Y', strtotime($planilla->fin_descarga))}}</td>
+                        <td class="title-body" width="80px;">{{date('d M Y', strtotime($planilla->fin_descarga))}}</td>
                         <td>Buque:</td>
                         <td width="125px;" class="title-body">{{$planilla->buque}}</td>
                     </tr>
@@ -164,14 +164,25 @@
                         <td colspan="3" class="title-body">{{$d['puesto']}}</td>
                     </tr>
                     <tr class="title-body">
-                        <td width="80px;" colspan="2">
-                            <span style="margin-left: 90px;">Valor turno 1</span>
-                        </td>
-                        <td>{{number_format($d['valor_1'],2)}}</td>
-                        <td width="80px;">Valor turno 2</td>
-                        <td>{{number_format($d['valor_2'],2)}}</td>
-                        <td width="80px;">Valor turno 3</td>
-                        <td colspan="2">{{$d['valor_3']}}</td>
+                        @if($d['turno_4'] > 0 || $d['turno_5'] > 0)
+                            <td width="80px;" colspan="2">
+                                <span style="margin-left: 90px;">Valor turno 4</span>
+                            </td>
+                            <td>{{number_format($d['valor_4'],2)}}</td>
+                            <td width="80px;">Valor turno 5</td>
+                            <td>{{number_format($d['valor_5'],2)}}</td>
+                            <td width="80px;"></td>
+                            <td colspan="2"></td>
+                        @else
+                            <td width="80px;" colspan="2">
+                                <span style="margin-left: 90px;">Valor turno 1</span>
+                            </td>
+                            <td>{{number_format($d['valor_1'],2)}}</td>
+                            <td width="80px;">Valor turno 2</td>
+                            <td>{{number_format($d['valor_2'],2)}}</td>
+                            <td width="80px;">Valor turno 3</td>
+                            <td colspan="2">{{$d['valor_3']}}</td>
+                         @endif
                     </tr>
                     
                 </tbody>
@@ -191,7 +202,24 @@
                                             <td width="30%">CANT. TURNOS</td>
                                             <td>Costo Turnos</td>
                                         </tr>
+                                        @if($d['turno_4'] > 0 || $d['turno_5'] > 0)
                                         <tr>
+                                            <td>&nbsp;</td>
+                                            <td class="title-body">&nbsp;</td>
+                                            <td class="title-body">&nbsp;</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Turno 4</td>
+                                            <td class="title-body">{{$d['turno_4']}}</td>
+                                            <td class="title-body">{{number_format($d['total_4'],2)}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Turno 5</td>
+                                            <td class="title-body">{{$d['turno_5']}}</td>
+                                            <td class="title-body">{{number_format($d['total_5'],2)}}</td>
+                                        </tr>
+                                        @else
+                                            <tr>
                                             <td>Turno 1</td>
                                             <td class="title-body">{{$d['turno_1']}}</td>
                                             <td class="title-body">{{number_format($d['total_1'],2)}}</td>
@@ -206,9 +234,10 @@
                                             <td class="title-body">{{$d['turno_3']}}</td>
                                             <td class="title-body">{{number_format($d['total_3'],2)}}</td>
                                         </tr>
+                                        @endif
                                         <tr style="background: #DDDCDF">
                                             <td>Subtotal:</td>
-                                            <td class="title-body">{{number_format($d['total_turnos'],2)}}</td>
+                                            <td class="title-body">{{$d['total_turnos']}}</td>
                                             <td class="title-body">{{number_format($d['monto_turnos'],2)}}</td>
                                         </tr>
                                         <tr>
@@ -251,7 +280,7 @@
                                         </tr>
                                         <tr>
                                             <td>Isr</td>
-                                            <td class="title-body">0.00</td>
+                                            <td class="title-body">{{number_format($d['isr'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td>Prestamos</td>

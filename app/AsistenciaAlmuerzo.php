@@ -11,6 +11,7 @@ class AsistenciaAlmuerzo extends Model
     protected $table = 'asistencia_almuerzos';
 
     protected $fillable = [
-    	'detalle_asignacion_empleado_id'
+    	'detalle_asignacion_empleado_id',
+    	'tipo_alimento'
     ];
 }

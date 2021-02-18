@@ -23,9 +23,9 @@ trait HelperReporteStyle
                     //Set font style
                     'font' => [
                         'name'      =>  'Calibri',
-                        'size'      =>  15,
+                        'size'      =>  11,
                         'bold'      =>  true,
-                        'color' => ['argb' => 'EB2B02'],
+                        'color' => ['argb' => '000000'],
                     ],
 
                     //Set background style
@@ -34,6 +34,10 @@ trait HelperReporteStyle
                         'startColor' => [
                             'rgb' => 'a1dae7',
                         ] 
+                    ],
+
+                    'alignment' => [
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
                     ] 
              ]; 
     }
@@ -54,16 +58,16 @@ trait HelperReporteStyle
                     //Set font style
                     'font' => [
                         'name'      =>  'Calibri',
-                        'size'      =>  15,
+                        'size'      =>  11,
                         'bold'      =>  true,
-                        'color' => ['argb' => '354D73'],
+                        'color' => ['argb' => '000000'],
                     ],
 
                     //Set background style
                     'fill' => [
                         'fillType' => Fill::FILL_SOLID,
                         'startColor' => [
-                            'rgb' => 'F6F6F6',
+                            //'rgb' => 'F6F6F6',
                         ] 
                     ] 
              ]; 
@@ -105,5 +109,40 @@ trait HelperReporteStyle
                 'size'      =>  $size
             ]
         ];
+    }
+
+    protected function getBorder()
+    {
+        return [
+            'borders' => [ 
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    //'color' => ['argb' => 'EB2B04'],
+                ],
+
+            ]
+        ];
+    }
+
+    protected function getBold()
+    {
+        return  [
+                    //Set border Style
+                    'borders' => [ 
+                        'top' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE,
+                            //'color' => ['argb' => 'EB2B04'],
+                        ],
+
+                    ],
+
+                    //Set font style
+                    'font' => [
+                        'name'      =>  'Calibri',
+                        'size'      =>  11,
+                        'bold'      =>  true,
+                        'color' => ['argb' => '000000'],
+                    ]
+             ]; 
     }
 }

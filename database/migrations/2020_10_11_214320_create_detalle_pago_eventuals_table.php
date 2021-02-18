@@ -16,6 +16,7 @@ class CreateDetallePagoEventualsTable extends Migration
             $table->unsignedBigInteger('cargo_turno_id');
             $table->unsignedBigInteger('pago_empleado_eventual_id');
             $table->integer('conteo_turnos');
+            $table->decimal('bono_turno',8,2);
             $table->decimal('valor_turno',6,2);
             $table->decimal('total',11,2);
             $table->timestamps();

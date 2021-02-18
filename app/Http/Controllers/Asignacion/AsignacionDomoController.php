@@ -43,18 +43,9 @@ class AsignacionDomoController extends ApiController
 
             $asignacion = AsignacionDomo::create($data);
 
-            /*$data_d = new DetalleAsignacionEmpleado;
-            $data_d->turno_id = $request->turno_id;
-            $data_d->asignacion_empleado_id = $asignacion->id;
-            $data_d->carnet_id = $request->carnet_id;
-            $data_d->empleado_id = $request->empleado_id;
-            $data_d->fecha = $request->fecha;
-
-            $data_d->save();
-
             $carnet = Carnet::find($request->carnet_id);
             $carnet->asignado = true;
-            $carnet->save();*/
+            $carnet->save();
         $db->commit();
 
         return $this->showOne($asignacion,201,'insert');

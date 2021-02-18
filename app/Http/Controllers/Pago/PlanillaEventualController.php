@@ -100,6 +100,8 @@ class PlanillaEventualController extends ApiController
 
             $asignaciones = $asignaciones->where('empleado.tipo_empleado',0)->values();
 
+            $asignaciones = $asignaciones->where('asistencia_turno','!=',null)->values();
+
             $planilla = PlanillaEventual::create($data);
 
             #agrupar asignaciones por empleado y por cargo turno
@@ -126,13 +128,14 @@ class PlanillaEventualController extends ApiController
                                         'cargo_turno_id' => $key2,
                                         'conteo_turnos' => count($value2),
                                         'valor_turno' => $value2[0]->asistencia_turno->cargo_turno->salario,
-                                        'total' => $value2[0]->asistencia_turno->cargo_turno->salario * count($value2)
+                                        'total' => $value2[0]->asistencia_turno->cargo_turno->salario * count($value2),
+                                        'bono_turno' => count($value2) * $request->bono_turno
                                     ]);
                     $pago->total_turnos += $detalle_pago->conteo_turnos;
                     $pago->total_monto_turnos += $detalle_pago->total;
                 }
 
-                $pago->total_devengado = $pago->total_monto_turnos;
+                $pago->total_devengado = $pago->total_monto_turnos + $pago->bono_turno;
                 if($detalle_pago->conteo_turnos > 6){
                     $pago->septimo = $pago->total_monto_turnos/6;
                     $pago->total_devengado+=$pago->septimo;
@@ -154,7 +157,9 @@ class PlanillaEventualController extends ApiController
                             $calculo = (($value->prestacion->calculo/30)/24)*8*$pago->total_turnos;
                         }
                     }else{
-                        $calculo = ($pago->total_devengado * $value->prestacion->calculo);
+                        if(strtolower($value->prestacion->descripcion) != "isr"){
+                            $calculo = ($pago->total_devengado * $value->prestacion->calculo);
+                        }
                     }
 
                     $pago_prestacion = DetallePagoPrestacion::create([
@@ -263,23 +268,54 @@ class PlanillaEventualController extends ApiController
         $pago_general = $this->pagoCuentasYcheques($planilla->fecha,$planilla->pago_eventual);
 
 
-        $columns_planilla = array_keys($impresion_planila[0]->toArray());
-        $columns_calculos = array_keys($maestro_calculos[0]->toArray());
-        $columns_acreditacion_cuentas = array_keys($pago_general[0][0]->toArray());
-        $columns_acreditacion_cheques = array_keys($pago_general[1][0]->toArray());
+        $impresion_planila->transform(function($i) {
+            unset($i['id']);
+            return $i;
+        });
 
-        //return $this->showQuery($pago_general);
+        $maestro_calculos->transform(function($i) {
+            unset($i['id']);
+            return $i;
+        });
+
+        //obtener footer totales
+        $impresion_planila = $impresion_planila->merge($this->getSumValues($impresion_planila));
+        $maestro_calculos = $maestro_calculos->merge($this->getSumValues($maestro_calculos));
+        $pago_general[0] = $pago_general[0]->merge($this->getSumValues($pago_general[0]));
+        $pago_general[1] = $pago_general[1]->merge($this->getSumValues($pago_general[1]));
+        //$pago_general = $pago_general->merge($this->getSumValues($pago_general));
+
+        $columns_planilla = str_replace( '_', ' ',array_keys($impresion_planila[0]->toArray()));
+        $columns_calculos = str_replace( '_', ' ',array_keys($maestro_calculos[0]->toArray()));
+
+        $columns_acreditacion_cuentas = count($pago_general[0]) > 0 ? str_replace( '_', ' ',array_keys($pago_general[0][0]->toArray())) : array();
+
+        $columns_acreditacion_cheques = count($pago_general[1]) > 0 ? str_replace( '_', ' ',array_keys($pago_general[1][0]->toArray())) : array();
 
         $data = [
-            'impresion_planila'=>[$columns_planilla,$impresion_planila, $planilla],
-            'maestro_calculos'=>[$columns_calculos,$maestro_calculos, $planilla],
-            'acreditacion_cuentas'=>[$columns_acreditacion_cuentas,$pago_general[0], $planilla],
-            'acreditacion_cheques'=>[$columns_acreditacion_cheques,$pago_general[1], $planilla]
+            'impresion_planila'=>[$columns_planilla,$impresion_planila, $planilla, 'V','IP'],
+            'maestro_calculos'=>[$columns_calculos,$maestro_calculos, $planilla,'AK','MC'],
+            'acreditacion_cuentas'=>[$columns_acreditacion_cuentas,$pago_general[0], $planilla,'E','AC'],
+            'acreditacion_cheques'=>[$columns_acreditacion_cheques,$pago_general[1], $planilla,'C','ACC']
         ];
 
         return Excel::download(new PlanillaEventualSheetsExport($data), 'planilla_eventual.xlsx');
+    }
 
-        
-
+    public function getSumValues($data)
+    {
+        $data_return = collect();
+        $data_sum = collect();
+        if(count($data) > 0){
+            foreach (array_keys($data[0]->toArray()) as $d) {
+                $data_sum[$d] = '';
+                if(is_numeric($data[0][$d]) && $d != 'codigo')
+                {
+                    $data_sum[$d] = $data->sum($d);
+                }
+            } 
+        }
+        $data_return->push($data_sum);
+        return $data_return;
     }
 }

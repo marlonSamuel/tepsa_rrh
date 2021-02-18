@@ -99,6 +99,20 @@
                             </v-flex>
                             <v-flex xs12 sm6 md6>
                                 <v-text-field
+                                    v-model="form.bono_turno"
+                                    label="Bono por turno"
+                                    v-validate="'required'"
+                                    type="text"
+                                    data-vv-name="bono_turno"
+                                    data-vv-as="bono por turno"
+                                    :error-messages="
+                                    errors.collect('form.bono_turno')
+                                    "
+                                >
+                                </v-text-field>
+                            </v-flex>
+                            <v-flex xs12 sm6 md6>
+                                <v-text-field
                                     v-model="form.inicio_descarga"
                                     label="Fecha inicio descarga"
                                     v-validate="'required'"
@@ -236,7 +250,8 @@ export default {
             numero:"PQ-01-2020",
             inicio_descarga:"",
             fecha:"",
-            fin_descarga:""
+            fin_descarga:"",
+            bono_turno: ""
       },
 
       form_a: {
@@ -395,6 +410,7 @@ export default {
             self.form[key] = null
         });
         self.$validator.reset()
+        self.setNumber()
     },
     //editar registro
     edit(data){

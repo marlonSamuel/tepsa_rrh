@@ -15,28 +15,34 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class PlanillaEventualExport implements FromCollection, WithEvents, ShouldAutoSize, WithCustomStartCell, WithTitle, WithStrictNullComparison, WithDrawings,WithHeadings
+class PlanillaEventualExport implements FromCollection, WithEvents,  ShouldAutoSize,  WithCustomStartCell, WithColumnFormatting, WithTitle, WithStrictNullComparison, WithDrawings,WithHeadings
 {
 
 	use HelperReporteStyle;
 
-	private $star_cell = 10;
+	private $star_cell = 5;
 	private $data;
 	private $finish_header;
 	private $title;
 	private $heading;
 	private $planilla;
+    private $columns_to_filter;
+    private $p_name;
 
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct($title,$heading,$data,$planilla)
+    public function __construct($title,$heading,$data,$planilla,$columns_to_filter = 'AD',$p_name = 'IP')
     {
     	$this->title = $title;
     	$this->heading = $heading;
         $this->data = $data;
         $this->planilla = $planilla;
+        $this->columns_to_filter = $columns_to_filter;
+        $this->p_name = $p_name;
     }
 
     public function collection()
@@ -60,8 +66,8 @@ class PlanillaEventualExport implements FromCollection, WithEvents, ShouldAutoSi
         $drawing->setName('Logo');
         $drawing->setDescription('logo_tepsa_rrh');
         $drawing->setPath(public_path('img/logo.jpg'));
-        $drawing->setHeight(60);
-        $drawing->setCoordinates('A2');
+        $drawing->setHeight(45);
+        $drawing->setCoordinates('I2');
 
         return $drawing;
     }
@@ -70,39 +76,38 @@ class PlanillaEventualExport implements FromCollection, WithEvents, ShouldAutoSi
     {
         return [
             AfterSheet::class    => function(AfterSheet $event) {
-                $event->sheet->mergeCells('C2:I4');
-                $event->sheet->setCellValue('C2', mb_strtoupper('TERMINAL ESTIBADORA DEL PACIFICO TEPSA S.A', 'UTF-8'));
 
-                $event->sheet->mergeCells('A5:B5');
-            	$event->sheet->setCellValue('A5','DEPARTAMENTO DE OPERACIONES');
+                $rows = count($this->data);
 
-            	//$event->sheet->mergeCells('B6:C6');
-            	$event->sheet->setCellValue('A6','PLANILLA NO:');
-            	$event->sheet->setCellValue('B6',$this->planilla->numero);
+                $event->sheet->mergeCells('A2:F2');
+                $event->sheet->setCellValue('A2', mb_strtoupper('DEPARTAMENTO DE OPERACIONES                                                                PLANILLA PERSONAL EVENTUAL', 'UTF-8'));
 
-            	$event->sheet->setCellValue('C6','FECHA PLANILLA:');
-            	$event->sheet->setCellValue('D6',date('d M Y', strtotime($this->planilla->fecha)));
+            	$event->sheet->mergeCells('A3:C3');
+            	$event->sheet->setCellValue('A3','PLANILLA NO: '.$this->planilla->numero);
+            	$event->sheet->mergeCells('A4:D4');
+            	$event->sheet->setCellValue('A4',
+                                            'FECHA INICIO DESCARGA: '.date('d M Y', strtotime($this->planilla->inicio_descarga)).'          '.
+                                            'FECHA FIN DESCARGA:    '.date('d M Y', strtotime($this->planilla->fin_descarga)));
 
-            	//$event->sheet->mergeCells('B7:C7');
-            	$event->sheet->setCellValue('A7','FECHA INICIO DESCARGA: ');
-            	$event->sheet->setCellValue('B7',date('d M Y', strtotime($this->planilla->inicio_descarga)));
+                $event->sheet->setCellValue('G2','LUGAR:');
+                $event->sheet->setCellValue('H2','MUELLE EPQ');
 
-            	//$event->sheet->mergeCells('E7:F7');
-            	$event->sheet->setCellValue('C7','FECHA FIN DESCARGA: ');
-            	$event->sheet->setCellValue('D7',date('d M Y', strtotime($this->planilla->fin_descarga)));
-
-            	$event->sheet->setCellValue('A8','BUQUE:');
-            	$event->sheet->setCellValue('B8',$this->planilla->buque);
+            	$event->sheet->setCellValue('G3','BUQUE:');
+            	$event->sheet->setCellValue('H3',$this->planilla->buque);
 
             	$styleHeadings = $this->getStyleToHead();
                 $styleHeaderArray = $this->getStyleToTitle(); 
 
-                $event->sheet->getStyle('A1:R8')->applyFromArray($styleHeaderArray);//title header
+                $event->sheet->getStyle('A1:R4')->applyFromArray($styleHeaderArray);//title header
 
-                $event->sheet->getStyle('A10:AD10')->applyFromArray($styleHeadings);
-                $event->sheet->setAutoFilter('A10:AD10');
+                $event->sheet->getStyle('A5:'.$this->columns_to_filter.'5')->applyFromArray($styleHeadings);
+                $event->sheet->setAutoFilter('A5:'.$this->columns_to_filter.'5');
 
-                //$event->sheet->getStyle('A11:B11')->applyFromArray($styleArray); //setear rango de estilos para header
+                $border = $this->getBorder();
+
+                $event->sheet->getStyle('A6:'.$this->columns_to_filter.(string)(4+$rows))->applyFromArray($border);
+
+                $event->sheet->getStyle('A'.(string)(5+$rows).':'.$this->columns_to_filter.(string)(5+$rows))->applyFromArray($this->getBold());
             },
         ];
     }
@@ -112,4 +117,75 @@ class PlanillaEventualExport implements FromCollection, WithEvents, ShouldAutoSi
         return $this->title;
     }
 
+    public function columnFormats(): array
+    {
+        switch ($this->p_name) {
+            case 'IP':
+                return [
+                    'H6:U'.count($this->data) => "Q 0.00"
+                ];
+                break;
+
+            case 'MC':
+                return [
+                    'H6:I'.count($this->data) => "Q 0.00",
+                    'K6:L'.count($this->data) => "Q 0.00",
+                    'N6:O'.count($this->data) => "Q 0.00",
+                    'W6:AJ'.count($this->data) => "Q 0.00"
+                ];
+                break;
+            default:
+                return [];
+                break;
+        }
+    }
+
+    //retornar footer
+    public function footer()
+    {
+        $init = $this->star_cell+1;
+        $c = $init;
+
+        $data_sums = collect();
+
+        $turnos_trabajados = $this->data->sum('turnos_trabajados');
+
+        dd($turnos_trabajados);
+
+        $tiempo_extra_l = $m['data']->sum('horario_laboral_tiempo_extra');
+        $tiempo_tarde_a = $m['data']->sum('horario_almuerzo_tiempo_tarde');
+
+        foreach ($data as $d) {
+
+            $c = $c+count($m['data']);
+
+            $cell_d = 'D'.($c);
+            $cell_e = 'E'.($c);
+            $cell_h = 'H'.($c);
+            $c = $c+8;
+
+            if($reporte=='lm'){
+                $data_sums->push([
+                    ['cell'=>$cell_d,'value'=>$tiempo_tarde_l],
+                    ['cell'=>$cell_e,'value'=>$tiempo_extra_l],
+                    ['cell'=>$cell_h,'value'=>$tiempo_tarde_a]
+                ]);
+            }else if($reporte == 'ea'){
+                $data_sums->push([
+                    ['cell'=>$cell_d,'value'=>$tiempo_tarde_a]
+                ]);
+            }else if($reporte == 'ti'){
+                $data_sums->push([
+                    ['cell'=>$cell_d,'value'=>$tiempo_tarde_l]
+                ]);
+            }else{
+                $data_sums->push([
+                    ['cell'=>$cell_d,'value'=>$tiempo_extra_l]
+                ]);
+            }
+        }
+
+
+        return $data_sums;
+    }
 }

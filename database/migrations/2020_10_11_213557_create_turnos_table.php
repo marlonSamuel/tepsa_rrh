@@ -18,6 +18,7 @@ class CreateTurnosTable extends Migration
             $table->integer('numero')->unique();
             $table->time('hora_inicio');
             $table->time('hora_fin');
+            $table->boolean('doce_horas')->default(0);
             $table->timestamps();
         });
     }

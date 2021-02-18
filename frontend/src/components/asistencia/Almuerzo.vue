@@ -74,12 +74,7 @@
             </v-layout>
           </v-container>
 
-          <v-container grid-list-md v-if="asignacion !== null">
-            <v-flex v-if="false">
-              <v-alert v-model="alert" dismissible type="info">
-                ASISTENCIA TOMADA
-              </v-alert>
-            </v-flex>
+          <v-container grid-list-md v-if="asignacion !== null && !active_qr">
             <v-layout wrap>
               <v-flex sm5 md5 xs12>
                 <div>
@@ -103,9 +98,31 @@
                   <strong>TURNO: </strong># {{ asignacion.turno.numero }}
                   <br />
                   <strong>FECHA TURNO: </strong> {{ fecha }} de
-                  {{ turno.hora_inicio }} a {{ turno.hora_fin }}
+                  {{ asignacion.turno.hora_inicio }} a {{ asignacion.turno.hora_fin }}
                   <br />
                 </div>
+              </v-flex>
+            </v-layout>
+
+            <v-layout wrap>
+              <v-flex sm4 md4 xs12>
+                <v-autocomplete
+                  v-model="form.tipo_alimento"
+                  label="Tiempo alimento"
+                  placeholder="seleccione tiempo de alimento"
+                  :items="tipo_alimentos"
+                  v-validate="'required'"
+                  data-vv-name="tipo_alimento"
+                  :error-messages="errors.collect('tipo_alimento')"
+                >
+                </v-autocomplete>
+              </v-flex>
+
+              <v-flex sm2 md3 xs6>
+                <v-divider></v-divider>
+                <v-btn color="success" @click="createOrEdit"
+                  ><v-icon>check_circle</v-icon> asistencia</v-btn
+                >
               </v-flex>
             </v-layout>
           </v-container>
@@ -133,13 +150,21 @@ export default {
       code: "",
       error: null,
       turno: null,
+      turno2: null,
       codigo: "",
       turno_id: null,
       fecha: null,
       asignacion: null,
+      tipo_alimentos: [
+        {text:"Desayuno",value:'D'},
+        {text:"Almuerzo",value:'A'},
+        {text:"Cena",value:'C'},
+        {text:"Refacción",value:'R'}
+      ],
       form: {
         id: null,
         detalle_asignacion_empleado_id: null,
+        tipo_alimento: '',
         created_at: ""
       }
     };
@@ -174,17 +199,17 @@ export default {
       }
       self.loading = true;
       self.$store.state.services.detalleAsignacionService
-        .getAsign(self.codigo, self.fecha, self.turno.id)
+        .getAsign(self.codigo, self.fecha, self.turno.id, self.turno2.id)
         .then(r => {
-          self.loading = false;
-          self.active_qr = true;
+          self.loading = false
+          //self.active_qr = true
           if (self.$store.state.global.captureError(r)) {
             self.clearData();
             return;
           }
           self.asignacion = r.data;
           self.form.detalle_asignacion_empleado_id = self.asignacion.id;
-          self.create();
+          //self.create();
         })
         .catch(e => {});
     },
@@ -216,7 +241,11 @@ export default {
         }
 
         if (moment(currentTime).isBetween(start_time, end_time)) {
-          self.turno = t;
+          if(t.numero < 4){
+            self.turno = t
+          }else{
+            self.turno2 = t
+          }
         }
       });
     },
@@ -241,6 +270,15 @@ export default {
           self.clearData();
         })
         .catch(r => {});
+    },
+
+    createOrEdit() {
+      let self = this
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          self.create();
+        }
+      })
     },
 
     //limpiar data de formulario
@@ -281,6 +319,8 @@ export default {
         }
       } catch (error) {
         console.log(error.name);
+        self.active_qr = false
+        self.alert = true
         if (error.name === "NotAllowedError") {
           this.error = "ERROR: necesitas permiso para utilizar la camara";
         } else if (error.name === "NotFoundError") {

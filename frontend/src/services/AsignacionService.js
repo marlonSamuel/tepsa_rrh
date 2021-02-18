@@ -47,6 +47,11 @@ class AsignacionService{
         return self.axios.delete(`${self.baseUrl}/${data.id}`)
     }
 
+    releaseCards(data){
+        let self = this
+        return self.axios.put(`${self.baseUrl}_release/${data.id}`)
+    }
+
     //imprimir contrato
     print(id,turno_id,fecha,empleado_id) {
         let self = this

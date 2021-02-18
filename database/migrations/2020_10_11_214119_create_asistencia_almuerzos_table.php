@@ -16,6 +16,7 @@ class CreateAsistenciaAlmuerzosTable extends Migration
         Schema::connection('rrh')->create('asistencia_almuerzos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('detalle_asignacion_empleado_id');
+            $table->char('tipo_alimento',1);
             $table->timestamps();
 
             $table->foreign('detalle_asignacion_empleado_id')->references('id')->on('detalle_asignacion_empleados');

@@ -18,7 +18,8 @@ class PlanillaEventual extends Model
     	'numero',
     	'inicio_descarga',
         'fecha',
-    	'fin_descarga'
+    	'fin_descarga',
+        'bono_turno'
     ];
 
     public function asignacion(){

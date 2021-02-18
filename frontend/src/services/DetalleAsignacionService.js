@@ -7,9 +7,9 @@ class DetalleAsignacionService{
         this.baseUrl = `${baseUrl}detalle_asignacion_empleados`
     }
 
-    getAsign(codigo,fecha,turno_id){
+    getAsign(codigo,fecha,turno_id,turno_id_2){
         let self = this
-        return self.axios.get(`${self.baseUrl}/${codigo}/${fecha}/${turno_id}`)
+        return self.axios.get(`${self.baseUrl}/${codigo}/${fecha}/${turno_id}/${turno_id_2}`)
     }
 
     getTurnDate(fecha,turno_id){

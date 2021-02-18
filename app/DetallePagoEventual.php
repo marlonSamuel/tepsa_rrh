@@ -17,6 +17,7 @@ class DetallePagoEventual extends Model
     	'pago_empleado_eventual_id',
     	'conteo_turnos',
     	'valor_turno',
+        'bono_turno',
     	'total'
     ];
 

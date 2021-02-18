@@ -21,6 +21,7 @@ class CreatePlanillaEventualsTable extends Migration
             $table->date('inicio_descarga');
             $table->date('fin_descarga');
             $table->date('fecha');
+            $table->decimal('bono_turno',8,2);
             $table->timestamps();
 
             $table->foreign('asignacion_empleado_id')->references('id')->on('asignacion_empleados');
