@@ -164,25 +164,24 @@
                         <td colspan="3" class="title-body">{{$d['puesto']}}</td>
                     </tr>
                     <tr class="title-body">
-                        @if($d['turno_4'] > 0 || $d['turno_5'] > 0)
-                            <td width="80px;" colspan="2">
-                                <span style="margin-left: 90px;">Valor turno 4</span>
-                            </td>
-                            <td>{{number_format($d['valor_4'],2)}}</td>
-                            <td width="80px;">Valor turno 5</td>
-                            <td>{{number_format($d['valor_5'],2)}}</td>
-                            <td width="80px;"></td>
-                            <td colspan="2"></td>
-                        @else
                             <td width="80px;" colspan="2">
                                 <span style="margin-left: 90px;">Valor turno 1</span>
                             </td>
-                            <td>{{number_format($d['valor_1'],2)}}</td>
+                            <td>Q {{number_format($d['valor_turno_1'],2)}}</td>
                             <td width="80px;">Valor turno 2</td>
-                            <td>{{number_format($d['valor_2'],2)}}</td>
+                            <td>Q {{number_format($d['valor_turno_2'],2)}}</td>
                             <td width="80px;">Valor turno 3</td>
-                            <td colspan="2">{{$d['valor_3']}}</td>
-                         @endif
+                            <td colspan="2">{{$d['valor_turno_3']}}</td>
+                    </tr>
+                    <tr class="title-body">
+                            <td width="80px;" colspan="2">
+                                <span style="margin-left: 90px;">Valor turno 4</span>
+                            </td>
+                            <td>Q {{number_format($d['valor_turno_4'],2)}}</td>
+                            <td width="80px;">Valor turno 5</td>
+                            <td>Q {{number_format($d['valor_turno_5'],2)}}</td>
+                            <td width="80px;"></td>
+                            <td colspan="2"></td>
                     </tr>
                     
                 </tbody>
@@ -202,63 +201,56 @@
                                             <td width="30%">CANT. TURNOS</td>
                                             <td>Costo Turnos</td>
                                         </tr>
-                                        @if($d['turno_4'] > 0 || $d['turno_5'] > 0)
                                         <tr>
-                                            <td>&nbsp;</td>
-                                            <td class="title-body">&nbsp;</td>
-                                            <td class="title-body">&nbsp;</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Turno 4</td>
-                                            <td class="title-body">{{$d['turno_4']}}</td>
-                                            <td class="title-body">{{number_format($d['total_4'],2)}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Turno 5</td>
-                                            <td class="title-body">{{$d['turno_5']}}</td>
-                                            <td class="title-body">{{number_format($d['total_5'],2)}}</td>
-                                        </tr>
-                                        @else
-                                            <tr>
                                             <td>Turno 1</td>
-                                            <td class="title-body">{{$d['turno_1']}}</td>
-                                            <td class="title-body">{{number_format($d['total_1'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">{{$d['turno_1']}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['total_turno_1'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td>Turno 2</td>
-                                            <td class="title-body">{{$d['turno_2']}}</td>
-                                            <td class="title-body">{{number_format($d['total_2'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">{{$d['turno_2']}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['total_turno_2'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td>Turno 3</td>
-                                            <td class="title-body">{{$d['turno_3']}}</td>
-                                            <td class="title-body">{{number_format($d['total_3'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">{{$d['turno_3']}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['total_turno_3'],2)}}</td>
                                         </tr>
-                                        @endif
+                                        <tr>
+                                            <td>Turno 4</td>
+                                            <td class="title-body" style="text-align: center;">{{$d['turno_4']}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['total_turno_4'],2)}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Turno 5</td>
+                                            <td class="title-body" style="text-align: center;">{{$d['turno_5']}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['total_turno_5'],2)}}</td>
+                                        </tr>
+
                                         <tr style="background: #DDDCDF">
                                             <td>Subtotal:</td>
-                                            <td class="title-body">{{$d['total_turnos']}}</td>
-                                            <td class="title-body">{{number_format($d['monto_turnos'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">{{$d['total_turnos']}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['monto_turnos'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">Séptimo:</td>
-                                            <td class="title-body">{{number_format($d['septimo'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['septimo'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">Bonificación decreto 78-89: </td>
-                                            <td class="title-body">{{number_format($d['bonificacion_incetivo'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['bonificacion_incetivo'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">Bono 14: </td>
-                                            <td class="title-body">{{number_format($d['bono_14'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['bono_14'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">Aguinaldo</td>
-                                            <td class="title-body">{{number_format($d['aguinaldo'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['aguinaldo'],2)}}</td>
                                         </tr>
                                         <tr style="background: #DDDCDF" class="title-body">
                                             <td colspan="2">TOTAL INGRESOS</td>
-                                            <td>{{number_format($d['total_devengado'] + $d['total_prestaciones'],2)}}</td>
+                                            <td style="text-align: center;">Q {{number_format($d['total_devengado'] + $d['total_prestaciones'],2)}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -276,23 +268,31 @@
                                         </tr>
                                         <tr>
                                             <td>Cuota laboral igss (0.0483)</td>
-                                            <td class="title-body">{{number_format($d['igss'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['igss'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td>Isr</td>
-                                            <td class="title-body">{{number_format($d['isr'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['isr'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td>Prestamos</td>
-                                            <td class="title-body">{{number_format($d['prestamos'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['prestamos'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td>Alimentación</td>
-                                            <td class="title-body">{{number_format($d['alimentos'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['alimentos'],2)}}</td>
                                         </tr>
                                         <tr>
                                             <td>Otros</td>
-                                            <td class="title-body">{{number_format($d['otros_descuentos'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['otros_descuentos'],2)}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td>&nbsp;</td>
                                         </tr>
                                         <tr>
                                             <td>&nbsp;</td>
@@ -308,7 +308,7 @@
                                         </tr>
                                         <tr style="background: #DDDCDF" class="title-body">
                                             <td>TOTAL DESCUENTOS</td>
-                                            <td>{{number_format($d['descuento_prestaciones']+$d['prestamos']+$d['alimentos']+$d['otros_descuentos'],2)}}</td>
+                                            <td style="text-align: center;">Q {{number_format($d['descuento_prestaciones']+$d['prestamos']+$d['alimentos']+$d['otros_descuentos'],2)}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -322,7 +322,7 @@
                                   <tbody>
                                       <tr class="title-body">
                                           <td>Liquido a recibir</td>
-                                           <td>{{number_format($d['liquido_a_recibir'],2)}}</td>
+                                           <td style="text-align: center;">Q {{number_format($d['liquido_a_recibir'],2)}}</td>
                                       </tr>
                                   </tbody>
                               </table>

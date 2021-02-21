@@ -27,6 +27,7 @@ use App\Traits\GlobalFunction;
 class PlanillaEventualController extends ApiController
 {
    use GlobalFunction;
+
    public function __construct()
     {
         //parent::__construct(); //validacion de autenticacion
@@ -117,7 +118,8 @@ class PlanillaEventualController extends ApiController
                             'total_monto_turnos' => 0,
                             'total_liquidado' => 0,
                             'descuento_prestaciones' => 0,
-                            'total_prestaciones' => 0
+                            'total_prestaciones' => 0,
+                            'bono_turnos' => 0
                         ]);
 
 
@@ -133,9 +135,10 @@ class PlanillaEventualController extends ApiController
                                     ]);
                     $pago->total_turnos += $detalle_pago->conteo_turnos;
                     $pago->total_monto_turnos += $detalle_pago->total;
+                    $pago->bono_turnos += $detalle_pago->bono_turno;
                 }
 
-                $pago->total_devengado = $pago->total_monto_turnos + $pago->bono_turno;
+                $pago->total_devengado = $pago->total_monto_turnos + $pago->bono_turnos;
                 if($detalle_pago->conteo_turnos > 6){
                     $pago->septimo = $pago->total_monto_turnos/6;
                     $pago->total_devengado+=$pago->septimo;
@@ -278,12 +281,18 @@ class PlanillaEventualController extends ApiController
             return $i;
         });
 
-        //obtener footer totales
+
+        //$planilla_2_turnos = $maestro_calculos->where('turno_4','>',0)->orWhere('turno_5','>',0);
+        //$planilla_3_turnos = $maestro_calculos->where('turno_1','>',0)->orWhere('turno_2','>',0)->orWhere('turno_3','>',0);
+
+        //return $this->showQuery($planilla_2_horas);
+
+
         $impresion_planila = $impresion_planila->merge($this->getSumValues($impresion_planila));
         $maestro_calculos = $maestro_calculos->merge($this->getSumValues($maestro_calculos));
         $pago_general[0] = $pago_general[0]->merge($this->getSumValues($pago_general[0]));
         $pago_general[1] = $pago_general[1]->merge($this->getSumValues($pago_general[1]));
-        //$pago_general = $pago_general->merge($this->getSumValues($pago_general));
+        
 
         $columns_planilla = str_replace( '_', ' ',array_keys($impresion_planila[0]->toArray()));
         $columns_calculos = str_replace( '_', ' ',array_keys($maestro_calculos[0]->toArray()));
@@ -293,8 +302,8 @@ class PlanillaEventualController extends ApiController
         $columns_acreditacion_cheques = count($pago_general[1]) > 0 ? str_replace( '_', ' ',array_keys($pago_general[1][0]->toArray())) : array();
 
         $data = [
-            'impresion_planila'=>[$columns_planilla,$impresion_planila, $planilla, 'V','IP'],
-            'maestro_calculos'=>[$columns_calculos,$maestro_calculos, $planilla,'AK','MC'],
+            'impresion_planilla'=>[$columns_calculos,$maestro_calculos, $planilla,'AK','MC'],
+            'planilla_resumen'=>[$columns_planilla,$impresion_planila, $planilla, 'V','IP'],
             'acreditacion_cuentas'=>[$columns_acreditacion_cuentas,$pago_general[0], $planilla,'E','AC'],
             'acreditacion_cheques'=>[$columns_acreditacion_cheques,$pago_general[1], $planilla,'C','ACC']
         ];
@@ -306,16 +315,42 @@ class PlanillaEventualController extends ApiController
     {
         $data_return = collect();
         $data_sum = collect();
+        $data_sum2 = collect();
+        $data_sum3 = collect();
+
+        $count = 0;
         if(count($data) > 0){
             foreach (array_keys($data[0]->toArray()) as $d) {
                 $data_sum[$d] = '';
-                if(is_numeric($data[0][$d]) && $d != 'codigo')
+                $data_sum2[$d] = '';
+                $data_sum3[$d] = '';
+
+
+                if($count == 5){
+                    $data_sum[$d] = "Totales generales";
+                    $data_sum2[$d] = "Pagos a cuenta BAC";
+                    $data_sum3[$d] = "Pagos con cheque";
+                }
+
+                if(is_numeric($data[0][$d]) && $d != 'codigo' && $d != 'cuenta_origen' && $d != 'cuenta_destino' && $d != 'cuenta')
                 {
                     $data_sum[$d] = $data->sum($d);
+
+                    if(isset($data[0]["cuenta"])){
+
+                        $data_sum2[$d] = $data->where('cuenta','!=','')->sum($d);
+                        $data_sum3[$d] = $data->where('cuenta','==','')->sum($d); 
+                    }
                 }
+                $count++;
             } 
         }
+
+
         $data_return->push($data_sum);
+        $data_return->push($data_sum2);
+        $data_return->push($data_sum3);
+
         return $data_return;
     }
 }

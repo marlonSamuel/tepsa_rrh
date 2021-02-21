@@ -105,9 +105,9 @@ class PlanillaEventualExport implements FromCollection, WithEvents,  ShouldAutoS
 
                 $border = $this->getBorder();
 
-                $event->sheet->getStyle('A6:'.$this->columns_to_filter.(string)(4+$rows))->applyFromArray($border);
+                $event->sheet->getStyle('A6:'.$this->columns_to_filter.(string)(2+$rows))->applyFromArray($border);
 
-                $event->sheet->getStyle('A'.(string)(5+$rows).':'.$this->columns_to_filter.(string)(5+$rows))->applyFromArray($this->getBold());
+                $event->sheet->getStyle('A'.(string)(3+$rows).':'.$this->columns_to_filter.(string)(5+$rows))->applyFromArray($this->getBold());
             },
         ];
     }
@@ -122,7 +122,7 @@ class PlanillaEventualExport implements FromCollection, WithEvents,  ShouldAutoS
         switch ($this->p_name) {
             case 'IP':
                 return [
-                    'H6:U'.count($this->data) => "Q 0.00"
+                    'H6:V'.count($this->data) => "Q 0.00"
                 ];
                 break;
 
@@ -131,7 +131,7 @@ class PlanillaEventualExport implements FromCollection, WithEvents,  ShouldAutoS
                     'H6:I'.count($this->data) => "Q 0.00",
                     'K6:L'.count($this->data) => "Q 0.00",
                     'N6:O'.count($this->data) => "Q 0.00",
-                    'W6:AJ'.count($this->data) => "Q 0.00"
+                    'W6:AK'.count($this->data) => "Q 0.00"
                 ];
                 break;
             default:

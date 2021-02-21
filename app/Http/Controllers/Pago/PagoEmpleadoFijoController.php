@@ -24,7 +24,7 @@ class PagoEmpleadoFijoController extends ApiController
     use GlobalFunction;
     public function __construct()
     {
-        //parent::__construct(); //validacion de autenticacion
+        parent::__construct(); //validacion de autenticacion
     }
 
 

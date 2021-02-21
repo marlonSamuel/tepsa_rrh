@@ -14,8 +14,12 @@ class DetalleAsignacionService{
 
     getTurnDate(fecha,turno_id){
         let self = this
-        console.log(turno_id)
         return self.axios.get(`${self.baseUrl}/${fecha}/${turno_id}`)
+    }
+
+    getByEmpleado(asignacion_id,empleado_id){
+        let self = this
+        return self.axios.get(`${self.baseUrl}_asistencia/${asignacion_id}/${empleado_id}`)
     }
 
     destroy(data){

@@ -35,12 +35,13 @@ trait GlobalFunction
                     'id'=>$value->id,
                     'codigo'=>$value->empleado_id,
                     'nombre'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
-                    'afilacion_igss'=>$value->empleado->igss,
+                    'afilacion_igss'=>' '.$value->empleado->igss,
                     'dpi'=>' '.$value->empleado->dpi,
                     'cuenta'=>$value->empleado->cuenta,
                     'puesto' => $cargo,
                     'turnos_trabajados'=>$value->total_turnos,
                     'costo_turnos'=>$value->total_monto_turnos,
+                    'bono_turnos'=>$value->bono_turnos,
                     'septimo'=>$value->septimo,
                     'total_devengado' => $value->total_devengado
                 ]);
@@ -97,6 +98,7 @@ trait GlobalFunction
                 $turnos_col = collect();
                 $total_turnos = 0;
                 $monto_turnos = 0;
+
                 //collection of dynamics columns to prestacions
                 $prestaciones_col = collect();
 
@@ -105,12 +107,15 @@ trait GlobalFunction
                     $valor_turno = $cargo_turnos
                                     ->where('cargo.nombre',$key2)
                                     ->where('turno_id',$t->id)->first();
+
                     $conteo = $group->where('cargo_turno.turno_id',$t->id)->sum('conteo_turnos');
                     $total_turno = $group->where('cargo_turno.turno_id',$t->id)->sum('total');
 
                     $turnos_col["turno_".$t->numero]=$conteo;
-                    $turnos_col["valor_".$t->numero]=$valor_turno->salario;
-                    $turnos_col["total_".$t->numero]=$total_turno;
+
+                    $turnos_col["valor_turno_".$t->numero]=$valor_turno->salario;
+
+                    $turnos_col["total_turno_".$t->numero]=$total_turno;
                     $total_turnos+= $conteo;
                     $monto_turnos+= $total_turno;
                 }
@@ -129,8 +134,8 @@ trait GlobalFunction
                     'codigo'=>$value->empleado_id,
                     'nombre'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
                     'puesto' => $key2,
-                    'afilacion_igss'=>$value->empleado->afilacion_igss,
-                    'dpi'=>$value->empleado->dpi,
+                    'afilacion_igss'=>' '.$value->empleado->igss,
+                    'dpi'=>' '.$value->empleado->dpi,
                     'cuenta'=>$value->empleado->cuenta
                 ]);
 
@@ -140,9 +145,12 @@ trait GlobalFunction
                 //calculate septimo
                 $count_group = count($grouped);
 
+                $main_data['bono_turno'] = $group->sum('bono_turno');
+
                 $main_data['septimo'] = $value->septimo / $count_group;
 
-                $main_data['total_devengado'] = $main_data['monto_turnos'] + $main_data['septimo'];
+
+                $main_data['total_devengado'] = $main_data['monto_turnos'] + $main_data['septimo'] + $main_data['bono_turno'];
 
                 $total_prestaciones = 0;
                 $descuento_prestaciones = 0;

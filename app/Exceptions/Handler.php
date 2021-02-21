@@ -66,6 +66,7 @@ class Handler extends ExceptionHandler
     public function handleException($request, Exception $exception)
     {
         dd($exception);
+
         if ($exception->getCode() === 401) {
             return $this->errorResponse("Usuario o contraseña incorrectos", 401);
         }

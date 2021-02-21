@@ -32,6 +32,11 @@ class AsignacionService{
         return self.axios.get(`${self.baseUrl}/${id}/${turno_id}/${fecha}`)
     }
 
+    getByEmpleado(id,empleado_id){
+        let self = this
+        return self.axios.get(`${self.baseUrl}_get/${id}/${empleado_id}`)
+    }
+
     create(data){
         let self = this
         return self.axios.post(`${self.baseUrl}`,data)

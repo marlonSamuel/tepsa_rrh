@@ -5,9 +5,22 @@
           <v-card>
             <v-card-title>
               <span class="headline">Ingresar descuentos {{form.empleado}}</span>
+
             </v-card-title>
 
+            
+
+            
             <v-card-text>
+              
+            <span>
+              <h4>INFORMACIÓN ALIMENTOS</h4>
+              <div v-for="a in alimentos" :key="a.tipo">
+                <strong>{{a.tipo == "A" ? "ALMUERZOS" : (a.tipo == "D" ? "DESAYUNOS" : (a.tipo=="C" ? "CENAS" : "REFACCIÓNES"))}}:</strong> {{a.cantidad}}
+              </div>
+              
+            </span>
+
               <v-container grid-list-md>
                 <v-layout wrap>
                   <v-flex xs4 sm4 md4>
@@ -98,6 +111,7 @@
                         <td class="text-xs-left">{{props.item.puesto}}</td>
                         <td class="text-xs-left">{{props.item.cuenta}}</td>
                         <td class="text-xs-left">{{props.item.turnos_trabajados}}</td>
+                        <td class="text-xs-left">{{props.item.bono_turnos | currency('Q ')}}</td>
                         <td class="text-xs-left">{{props.item.septimo | currency('Q ')}}</td>
                         <td class="text-xs-left">{{props.item.total_devengado | currency('Q ')}}</td>
                         <td class="text-xs-left">{{props.item.igss | currency('Q ')}}</td>
@@ -150,6 +164,7 @@ export default {
       id: null,
       items: [],
       planilla: {},
+      alimentos: [],
       headers: [
         { text: '#', value: 'codigo'},
         { text: 'Nombre empleado', value: 'nombre' },
@@ -158,6 +173,7 @@ export default {
         { text: 'Puesto', value: 'puesto' },
         { text: 'cuenta', value: 'cuenta' },
         { text: 'Turnos trabajados', value: 'turnos' },
+        { text: 'Bono turnos',value: 'bono_turnos' },
         { text: 'Septimo',value: 'septimo' },
         { text: 'Total devengado', value: 'total_deventado' },
         { text: 'Descuento de IGSS', value: 'igss' },
@@ -219,14 +235,43 @@ export default {
         .catch(r => {});
     },
 
+
+    //obtener alimentos empleados
+    getAlimentos(data){
+      let self = this
+       self.$store.state.services.detalleAsignacionService
+        .getByEmpleado(self.planilla.asignacion_empleado_id,data.codigo)
+        .then(r => {
+          self.loading = false
+          if(self.$store.state.global.captureError(r)){
+            return
+          }
+          self.alimentos = r.data
+
+          self.alimentos = _(self.alimentos)
+          .groupBy('tipo_alimento')
+          .map(function(items, tipo_alimento) {
+           var tipo = items.filter(x=>x.tipo_alimento === tipo_alimento)
+            return {
+                tipo: tipo_alimento,
+                cantidad: tipo.length
+            };
+          }).value()
+             
+        })
+        .catch(r => {});
+    },
+
     edit(data){
       let self = this
+      self.alimentos = []
       self.dialog = true
       self.form.id = data.id
       self.form.alimentacion = data.alimentos
       self.form.prestamos = data.prestamos
       self.form.otros_descuentos = data.otros_descuentos
       self.form.empleado = data.nombre
+      self.getAlimentos(data)
     },
 
      update() {

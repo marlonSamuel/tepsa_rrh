@@ -18,7 +18,7 @@ class CreateCargoTurnosTable extends Migration
             $table->unsignedBigInteger('cargo_id');
             $table->unsignedBigInteger('turno_id');
             $table->decimal('salario',10,2);
-            $table->decimal('salario_hora',8,2);
+            $table->decimal('salario_hora',8,2)->default(0);
             $table->timestamps();
 
             $table->foreign('turno_id')->references('id')->on('turnos');

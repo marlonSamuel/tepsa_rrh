@@ -52,6 +52,7 @@
                             :items="empleados"
                             item-text="empleado"
                             item-value="idEmpleado"
+                            @input="changeEmpleado"
                             v-validate="'required'"
                             data-vv-name="empleado"
                             :error-messages="errors.collect('form.empleado')">
@@ -75,7 +76,7 @@
                             </v-autocomplete>
                         </v-flex>
 
-                        <v-flex xs12 sm4 md4>
+                        <v-flex xs12 sm4 md4 v-if="empleado_carnet == null">
                             <v-autocomplete
                             v-model="form.carnet_id"
                             label="Carnet"
@@ -88,6 +89,17 @@
                             :error-messages=" errors.collect('form.carnet')">
                             >
                             </v-autocomplete>
+                        </v-flex>
+
+                        <v-flex xs12 sm4 md4 v-else>
+                          <v-text-field
+                            v-model="empleado_carnet.carnet.codigo"
+                            label="Carnet"
+                            placeholder="seleccione carnet"
+                            readonly
+                          >
+                            
+                          </v-text-field>
                         </v-flex>
 
                         <v-flex xs6 sm2 md2>
@@ -189,6 +201,7 @@ export default {
       id: null,
       asignacion: null,
       detalle_asignacion: [],
+      empleado_carnet: null,
       headers: [
         { text: "Fecha", value: "fecha" },
         { text: "Acciones", value: "", sortable: false }
@@ -319,10 +332,10 @@ export default {
       let self = this
       let data = self.form
 
-      if (self.detalle_asignacion.some(x => x.carnet_id == data.carnet_id)) {
+     /* if (self.detalle_asignacion.some(x => x.carnet_id == data.carnet_id)) {
         self.$toastr.error("numero de carnet ya fue asignado", "error")
         return
-      }
+      }*/
 
       if (self.detalle_asignacion.some(x => x.empleado_id == data.empleado_id)) {
         self.$toastr.error("empleado ya fue asignado", "error")
@@ -364,6 +377,25 @@ export default {
             .catch(r => {});
         })
         .catch(cancel => {});
+    },
+
+            //obtener detalles
+    getByEmpleado(id, empleado_id) {
+      let self = this;
+      self.loading = true;
+      self.$store.state.services.asignacionDomoService
+        .getByEmpleado(id, empleado_id)
+        .then(r => {
+          self.loading = false;
+          if (self.$store.state.global.captureError(r)) {
+            return;
+          }
+          self.empleado_carnet = r.data.data
+          if(self.empleado_carnet !== null){
+            self.form.carnet_id = self.empleado_carnet.carnet.id
+          }
+        })
+        .catch(r => {});
     },
 
     //validar formulario
@@ -413,8 +445,20 @@ export default {
 
     detailChange() {
       let self = this
-      console.log(self.form.fecha)
       self.detalle_asignacion = self.items.filter(x=>x.fecha == self.form.fecha)
+    },
+
+    changeEmpleado(id){
+      let self = this
+      let empleado_exists = self.items.find(x=>x.empleado_id == id)
+      if(empleado_exists == undefined){
+        self.form.carnet_id = null
+        self.empleado_carnet = null
+      }else{
+        self.empleado_carnet = empleado_exists
+        self.form.carnet_id = empleado_exists.carnet.id
+      } 
+      
     },
 
      //imprimir hora entrada
