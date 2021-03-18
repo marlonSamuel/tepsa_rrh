@@ -10,12 +10,12 @@
             <v-card-text>
               <v-container grid-list-md>
                 <v-layout wrap>
-                  <v-flex xs4 sm4 md4>
+                  <v-flex xs4 sm4 md4 v-show="false">
                     <v-text-field
                       v-model="form.anticipo"
                       label="Anticipo"
                       v-validate="'decimal'"
-                      type="number"
+                      type="number"                     
                       data-vv-name="anticipo"
                       :error-messages="errors.collect('anticipo')"
                     >
@@ -24,7 +24,7 @@
                   <v-flex xs4 sm4 md4>
                     <v-text-field
                       v-model="form.otro_ingreso"
-                      label="Otros Ingresos"
+                      label="Prestamo"
                       v-validate="'decimal'"
                       type="number"
                       data-vv-name="otro_ingreso"
@@ -35,7 +35,7 @@
                   <v-flex xs4 sm4 md4>
                     <v-text-field
                       v-model="form.hora_extra_simple"
-                      label="Hora Extra Simple"
+                      label="Total de Horas Extras Simple"
                       v-validate="'decimal'"
                       type="number"
                       data-vv-name="hora_extra_simple"
@@ -46,7 +46,7 @@
                   <v-flex xs4 sm4 md4>
                     <v-text-field
                       v-model="form.hora_extra_doble"
-                      label="Hora Extra Doble"
+                      label="Total de Horas Extras Doble"
                       v-validate="'decimal'"
                       type="number"
                       data-vv-name="hora_extra_doble"
@@ -82,7 +82,7 @@
           <v-card-title>
                 IMPRESION PLANILLA
                 
-                <v-tooltip top v-if="finMes">
+                <v-tooltip top>
                     <template v-slot:activator="{ on }">
                         <v-icon color="red" v-on="on" large fab dark @click="print(false)">fas fa-file-pdf</v-icon>
                     </template>
@@ -121,12 +121,19 @@
                         <td class="text-xs-left">{{props.item.puesto}}</td>
                         <td class="text-xs-left">{{props.item.cuenta}}</td>
                         <td class="text-xs-left">{{props.item.salario | currency('Q ')}}</td>
-                        <td class="text-xs-left">{{props.item.anticipo | currency('Q ')}}</td>
+                        <td class="text-xs-left">{{props.item.bonificacion_incetivo | currency('Q ')}}</td>
                         <td class="text-xs-left">{{props.item.otro_ingreso | currency('Q ')}}</td>
-                        <td class="text-xs-left">{{props.item.hora_extra_simple | currency('Q ')}}</td>
-                        <td class="text-xs-left">{{props.item.hora_extra_doble | currency('Q ')}}</td>
+                        <td class="text-xs-left">{{props.item.hora_extra_simple}}</td>
+                        <td class="text-xs-left">{{props.item.monto_hora_extra_simple | currency('Q ')}}</td>
+                        <td class="text-xs-left">{{props.item.hora_extra_doble}}</td>
+                        <td class="text-xs-left">{{props.item.monto_hora_extra_doble | currency('Q ')}}</td>
+                        <td class="text-xs-left">{{props.item.total_ingresos | currency('Q ')}}</td> 
+                        <td class="text-xs-left">{{props.item.anticipo | currency('Q ')}}</td> 
+                        <td class="text-xs-left">{{props.item.igss | currency('Q ')}}</td>   
+                        <td class="text-xs-left">{{props.item.ISR | currency('Q ')}}</td>                     
                         <td class="text-xs-left">{{props.item.otro_descuento | currency('Q ')}}</td>
-                        <td class="text-xs-left">{{props.item.total | currency('Q ')}}</td>
+                        <td class="text-xs-left">{{props.item.total_egresos | currency('Q ')}}</td> 
+                        <td class="text-xs-left">{{props.item.liquido_a_recibir | currency('Q ')}}</td>
                         <td class="text-xs-left">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
@@ -160,11 +167,9 @@ export default {
   name: "info_planilla_fijo_impresion_planilla",
   props: {
       source: String,
-      fin_mes:Number,
     },
   data() {
     return {
-      finMes:false,
       search: '',
       loading: false,
       dialog: false,
@@ -179,12 +184,19 @@ export default {
         { text: 'Puesto', value: 'puesto' },
         { text: 'cuenta', value: 'cuenta' },
         { text: 'Salario Ordinario Mensual', value: 'salario' },
+        { text: 'Bonificacion Incentivo', value: 'bonificacion_incetivo' },
+        { text: 'Prestamo', value: 'otro_ingreso' },
+        { text: 'H. Extra Simple', value: 'hora_extra_simple' },
+        { text: 'Total H. Extra Simple', value: 'monto_hora_extra_simple' },
+        { text: 'H. Extra Doble', value: 'hora_extra_doble' },
+        { text: 'Total H. Extra Doble', value: 'monto_hora_extra_doble' },
+        { text: 'Total Ingresos', value: 'total_ingresos' },
         { text: 'Anticipo', value: 'anticipo' },
-        { text: 'Otros Ingresos', value: 'otro_ingreso' },
-        { text: 'Hora Extra Simple', value: 'hora_extra_simple' },
-        { text: 'Hora Extra Doble', value: 'hora_extra_doble' },
+        { text: 'IGSS', value: 'igss' }, 
+        { text: 'ISR', value: 'ISR' },        
         { text: 'Otros descuentos', value: 'otro_descuento' },
-        { text: 'Liquido a recibir', value: 'total' },
+        { text: 'Total Egresos', value: 'total_egresos' },
+        { text: 'Liquido a recibir', value: 'liquido_a_recibir' },
         { text: 'Acciones', value: '', sortable: false }
       ],
 
@@ -205,7 +217,6 @@ export default {
     self.id = self.$route.params.id
     console.log(self.id);
     self.getAll(self.id);
-    self.finMes = self.fin_mes===1?true:false;
     self.get(self.id)
   },
 
@@ -220,6 +231,7 @@ export default {
           if(self.$store.state.global.captureError(r)){
             return
           }
+          console.log(r.data.data);
           self.items = r.data.data
         })
         .catch(r => {});
@@ -331,7 +343,7 @@ export default {
         self.$store.state.services.pagoEmpleadoFijoService
             .export(self.id)
             .then(response => {
-                var file_name = 'planilla_'+self.planilla.quincena+'-'+self.planilla.anio.anio
+                var file_name = 'Planilla_Fijos-PQ-'+self.planilla.quincena+'-'+self.planilla.anio.anio
                 self.loading = false
                 if(response.response){
                     this.$toastr.error(r.response.data.error, 'error')

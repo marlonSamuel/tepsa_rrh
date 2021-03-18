@@ -113,6 +113,14 @@ Route::name('pago_empleado_eventuals_print_boleta')->get('pago_empleado_eventual
 
 Route::name('planilla_eventuals_export')->get('planilla_eventuals_export/{id}', 'Pago\PlanillaEventualController@export');
 
+Route::resource('pago_domo_empleados', 'Pago\PlanillaEventualDomoController', ['except' => ['create', 'edit']]);
+Route::name('pago_domo_empleados_info')->get('pago_domo_empleados_info/{id}/{option}', 'Pago\PlanillaEventualDomoController@info');
+Route::name('pago_domo_empleados_export')->get('pago_domo_empleados_export/{id}', 'Pago\PlanillaEventualDomoController@export');
+Route::name('pago_domo_empleados_print_boleta')->get('pago_domo_empleados_print_boleta/{planificacion_id}/{id?}', 'Pago\PlanillaEventualDomoController@print');
+/*
+Route::name('planilla_eventuals_domo')->get('planilla_eventuals_domo/{id}/{option}', 'Pago\PlanillaEventualController@pago_domo');*/
+
 #=======================DASHBOARD=========================================================#
 Route::resource('dashboard', 'Dashboard\DashboardController', ['except' => ['create', 'edit']]);
 Route::name('dashboard_group_by_planilla')->get('dashboard_group_by_planilla', 'Dashboard\DashboardController@groupByPlanilla');
+Route::name('turnos_start_quincena')->get('turnos_start_quincena', 'Turno\TurnoController@start_quincena');

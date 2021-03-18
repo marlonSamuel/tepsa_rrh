@@ -15,7 +15,9 @@ class Quincena extends Model
         'anio_id',
         'mes_id',
         'cerrada',
-        'fin_mes',
+        'fin_mes',       
+        'valor_hora_extra_simple',
+        'valor_hora_extra_doble',
     ];
     public function anio(){
     	return $this->belongsTo(Anio::class,'anio_id');

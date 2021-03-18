@@ -12,6 +12,8 @@
           hide-details
         ></v-text-field>
         <v-spacer></v-spacer>
+        <v-btn color="primary" @click="startQuincena"><v-icon>add</v-icon> Iniciar Quincenas</v-btn>
+        <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="800px" persistent>
           <template v-slot:activator="{ on }">
             <v-btn color="primary" small dark class="mb-2" v-on="on"
@@ -32,13 +34,12 @@
                       v-model="mes_id"
                       v-validate="'required'"
                       :items="meses"
-                      :error-messages="errors.collect('mes')"
+                      @change="getQuincenas"
                       label="Mes"
                       item-value="id"
                       item-text="mes"
                       data-vv-name="mes"
-                      required
-                      @change="getQuincenas"
+                      :error-messages="errors.collect('mes')"
                     ></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
@@ -48,13 +49,38 @@
                       v-model="quincena_id"
                       v-validate="'required'"
                       :items="quincenas"
-                      :error-messages="errors.collect('quincena')"
                       label="Quincena"
                       item-value="id"
                       item-text="quincena"
                       data-vv-name="quincena"
-                      required
+                      :error-messages="errors.collect('quincena')"
                     ></v-select>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field
+                      v-model="form.valor_hora_extra_simple"
+                      label="Valor de Horas Extras Simple"
+                      v-validate="'required|decimal'"
+                      required
+                      type="number"
+                      data-vv-name="valor_hora_extra_simple"
+                      :error-messages="
+                        errors.collect('valor_hora_extra_simple')
+                      "
+                    >
+                    </v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field
+                      v-model="form.valor_hora_extra_doble"
+                      label="Valor de Horas Extras Doble"
+                      v-validate="'required|decimal'"
+                      type="number"
+                      data-vv-name="valor_hora_extra_doble"
+                      :error-messages="errors.collect('valor_hora_extra_doble')"
+                      required
+                    >
+                    </v-text-field>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -77,8 +103,8 @@
         class="elevation-1"
       >
         <template v-slot:items="props">
-            <td class="text-xs-left">{{ props.item.anio.anio }}</td>
-            <td class="text-xs-left">{{ props.item.mes.mes }}</td>
+          <td class="text-xs-left">{{ props.item.anio.anio }}</td>
+          <td class="text-xs-left">{{ props.item.mes.mes }}</td>
           <td class="text-xs-left">{{ props.item.quincena }}</td>
           <td class="text-xs-left">{{ props.item.fecha_inicio }}</td>
           <td class="text-xs-left">{{ props.item.fecha_fin }}</td>
@@ -90,23 +116,23 @@
             >
           </td>
           <td class="text-xs-left">
-           <v-tooltip top>
-                <template v-slot:activator="{ on }">
-                    <v-icon v-on="on" @click="$router.push('planilla_fijo_info/'+props.item.id)"  color="success" fab dark> info</v-icon>
-                </template>
-                <span>Información planilla</span>
-            </v-tooltip>
             <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <v-icon
                   v-on="on"
-                  color="error"
+                  @click="$router.push('planilla_fijo_info/' + props.item.id)"
+                  color="success"
                   fab
                   dark
-                  
                 >
-                  delete</v-icon
+                  info</v-icon
                 >
+              </template>
+              <span>Información planilla</span>
+            </v-tooltip>
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-icon v-on="on" color="error" fab dark> delete</v-icon>
               </template>
               <span>Eliminar</span>
             </v-tooltip>
@@ -137,21 +163,23 @@ export default {
       form: {
         id: null,
         quincena_id: null,
+        valor_hora_extra_simple: null,
+        valor_hora_extra_doble: null,
       },
       quincena_pagada: [],
       items: [],
       headers: [
-          { text: "Año", value: "anio.anio" },
-          { text: "Mes", value: "mes.mes" },
+        { text: "Año", value: "anio.anio" },
+        { text: "Mes", value: "mes.mes" },
         { text: "Quincena", value: "quincena" },
         { text: "Fecha Inicio", value: "fecha_inicio" },
         { text: "Fecha Fin", value: "fecha_fin" },
         {
           text: "Cerrada",
-          value: "cerrada"
+          value: "cerrada",
         },
-        { text: "Acciones", value: "", sortable: false }
-      ]
+        { text: "Acciones", value: "", sortable: false },
+      ],
     };
   },
   created() {
@@ -160,6 +188,20 @@ export default {
     self.getMeses();
   },
   methods: {
+    startQuincena(){
+      let self = this;
+      self.loading = true;
+      self.$store.state.services.turnoService
+        .startQuincena()
+        .then(r => {
+          self.loading = false;
+          if (self.$store.state.global.captureError(r)) {
+            return;
+          }
+          this.$toastr.success("Quincenas Iniciadas correctamente", "éxito");
+        })
+        .catch(r => {});
+    },
     getAll() {
       let self = this;
       self.loading = true;
@@ -171,12 +213,12 @@ export default {
             return;
           }
           self.items = [];
-          r.data.forEach(function(item) {
+          r.data.forEach(function (item) {
             if (item.pago_empleado_fijo.length > 0) {
               self.items.push(item);
             }
           });
-          
+
           console.log(self.items);
         })
         .catch((r) => {});
@@ -208,12 +250,11 @@ export default {
           }
           self.quincenas = r.data;
           self.quincenas = [];
-          r.data.forEach(function(item) {
+          r.data.forEach(function (item) {
             if (!item.cerrada) {
               self.quincenas.push(item);
             }
           });
-          
         })
         .catch((r) => {});
     },
@@ -232,19 +273,37 @@ export default {
           }
           this.$toastr.success("Quincena procesada con éxito", "éxito");
           self.getAll();
+          self.clearData();
           self.close();
         })
         .catch((r) => {});
     },
-
+   //limpiar data de formulario
+    clearData(){
+        let self = this
+        Object.keys(self.form).forEach(function(key,index) {
+          if(typeof self.form[key] === "string") 
+            self.form[key] = ''
+          else if (typeof self.form[key] === "boolean") 
+            self.form[key] = true
+          else if (typeof self.form[key] === "number") 
+            self.form[key] = null
+        });
+        self.$validator.reset();
+        
+        self.quincenas = [];
+    },
     createOrEdit() {
       let self = this;
-      console.log(self.form);
-      if (self.form.id > 0 && self.form.id !== null) {
-        self.update();
-      } else {
-        self.create();
-      }
+      this.$validator.validateAll().then((result) => {
+        if (result) {
+          if (self.form.id > 0 && self.form.id !== null) {
+            self.update();
+          } else {
+            self.create();
+          }
+        }
+      });
     },
     close() {
       let self = this;
@@ -261,7 +320,7 @@ export default {
     color(estado) {
       let self = this;
       return estado == false ? "error" : "primary";
-    }
+    },
   },
 };
 </script>

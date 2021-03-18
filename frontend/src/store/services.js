@@ -26,6 +26,7 @@ import AsistenciaDomoService from '../services/AsistenciaDomoService'
 import PlanillaEventualService from '../services/PlanillaEventualService'
 import PagoEmpleadoEventualService from '../services/PagoEmpleadoEventualService'
 import PagoEmpleadoFijoService from '../services/PagoEmpleadoFijoService'
+import PlanillaDomoService from '../services/PlanillaDomoService'
 
 import DashboardService from '../services/DashboardService'
 
@@ -104,4 +105,5 @@ export default {
     pagoEmpleadoEventualService: new PagoEmpleadoEventualService(Axios, baseUrl),
     pagoEmpleadoFijoService : new PagoEmpleadoFijoService(Axios,baseUrl),
     dashboardService: new DashboardService(Axios, baseUrl),
+    planillaDomoService : new PlanillaDomoService(Axios,baseUrl)
 }

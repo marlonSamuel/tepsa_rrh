@@ -34,6 +34,8 @@ class QuincenaSeeder extends Seeder
                 $data->mes_id = $value->id;
                 $data->cerrada = false;
                 $data->fin_mes = $i == 1 ? false : true;
+                $data->valor_hora_extra_simple = 0;
+                $data->valor_hora_extra_doble = 0;
                 $data->save();
                 $contQuincena++;
             }

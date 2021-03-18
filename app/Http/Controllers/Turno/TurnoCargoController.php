@@ -21,20 +21,21 @@ class TurnoCargoController extends ApiController
 
     public function store(Request $request){
 
-    	foreach ($request->cargos as $item) {
-    		$cargo_turno = new CargoTurno();
-            $cargo_turno->salario_hora = 0;
+    	foreach ($request->cargos as $item) {            
             if ($item['id'] != null || $item['id'] > 0 ) {
                 $id = $item['id'];
                 $cargo_turno = CargoTurno::find($id);
                 $cargo_turno->cargo_id = $item['cargo_id'];
                 $cargo_turno->turno_id = $request->turno_id;
                 $cargo_turno->salario = $item['salario'];
+                $cargo_turno->salario_hora = 0;
                 $cargo_turno->save();
             }else{
+                $cargo_turno = new CargoTurno();
                 $cargo_turno->cargo_id = $item['cargo_id'];
                 $cargo_turno->turno_id = $request->turno_id;
                 $cargo_turno->salario = $item['salario'];
+                $cargo_turno->salario_hora = 0;
                 $cargo_turno->save();  
             }
     		

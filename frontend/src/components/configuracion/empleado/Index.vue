@@ -87,7 +87,7 @@
                       prepend-icon="add"
                       v-model="form.segundo_nombre"
                       label="Segundo Nombre"
-                      v-validate="'required'"
+                      
                       type="text"
                       data-vv-name="segundo_nombre"
                       :error-messages="errors.collect('segundo_nombre')"
@@ -111,7 +111,7 @@
                       prepend-icon="add"
                       v-model="form.segundo_apellido"
                       label="Segundo Apellido"
-                      v-validate="'required'"
+                      
                       type="text"
                       data-vv-name="segundo_apellido"
                       :error-messages="errors.collect('segundo_apellido')"
@@ -174,7 +174,7 @@
                       prepend-icon="phone"
                       v-model="form.telefono"
                       label="Telefono"
-                      v-validate="'required'"
+                      
                       type="text"
                       data-vv-name="telefono"
                       :error-messages="errors.collect('telefono')"

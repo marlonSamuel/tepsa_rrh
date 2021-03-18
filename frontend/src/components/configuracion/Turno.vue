@@ -11,8 +11,10 @@
           single-line
           hide-details
         ></v-text-field>
+        
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="800px" persistent>
+
           <template v-slot:activator="{ on }">
             <v-btn color="primary" small dark class="mb-2" v-on="on"
               ><v-icon>add</v-icon> Nuevo</v-btn
@@ -218,6 +220,7 @@ export default {
   },
 
   methods: {
+    
     getAll() {
       let self = this;
       self.loading = true;

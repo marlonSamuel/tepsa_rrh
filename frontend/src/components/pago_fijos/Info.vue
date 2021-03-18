@@ -31,7 +31,7 @@
               </v-layout>
           </v-card-title>
           <v-card-text>
-            <impresion-planilla :fin_mes="planilla.fin_mes"></impresion-planilla>
+            <impresion-planilla ></impresion-planilla>
           </v-card-text>
       </v-card>
     </v-flex>

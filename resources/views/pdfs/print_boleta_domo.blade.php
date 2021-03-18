@@ -123,12 +123,18 @@
                 PUERTO QUETZAL
             </div>
         </div>
+        <div class="col-25 title-body">
+            <span style="background: #DDDCDF;">
+                Fecha pago:  {{ date('d M Y', strtotime($planilla->fecha))}}
+            </span>
+        </div>
+
         <div class="col-10">
         </div>
 
         <div class="col-25 title-body" style="padding-left: -35px;">
             <span style="color: red">
-                COMPROBANTE DE PAGO
+                BOLETA DE PAGO DOMO
             </span>
         </div>
 
@@ -137,14 +143,16 @@
                 <tbody>
                     <tr>
                         <td width="80px;">Planilla:</td>
-                        <td width="80px" class="title-body">TEPPQ-{{($planilla->quincena)}}-{{($planilla->anio->anio)}}</td>
-                        <td width="80px;">Periodo:</td>
-                        <td class="title-body" colspan="2">{{date('d M Y', strtotime($planilla->fecha_inicio))}}</td>
-                        <td width="80px;">Al</td>
-                        <td class="title-body" colspan="2">{{date('d M Y', strtotime($planilla->fecha_fin))}}</td>
+                        <td width="80px" class="title-body">{{$planilla->numero}}</td>
+                        <td width="80px;">Fecha inicio:</td>
+                        <td class="title-body">{{date('d M Y', strtotime($planilla->inicio_descarga))}}</td>
+                        <td width="80px;">Fecha: final</td>
+                        <td class="title-body" width="80px;">{{date('d M Y', strtotime($planilla->fin_descarga))}}</td>
+                        <td>Buque:</td>
+                        <td width="125px;" class="title-body">{{$planilla->buque}}</td>
                     </tr>
                     <tr>
-                        <td>Codigo:</td>
+                        <td>Codigo eventual:</td>
                         <td class="title-body">{{$d['codigo']}}</td>
                         <td>Nombre:</td>
                         <td colspan="5" class="title-body">{{$d['nombre']}}</td>
@@ -153,8 +161,9 @@
                         <td>Departamento:</td>
                         <td colspan="3" class="title-body">Operaciones</td>
                         <td>Puesto</td>
-                        <td colspan="3" class="title-body">{{$d['puesto']}}</td>
+                        <td colspan="3" class="title-body">{{$d['cargo']}}</td>
                     </tr>
+                                       
                 </tbody>
             </table>
 
@@ -165,40 +174,36 @@
                                 <table width="100%" class="mytable">
                                     <tbody>
                                         <tr style="background: #DDDCDF" class="title-body">
-                                            <td colspan="3" style="text-align: center;">INGRESOS</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">Salario Base Mensual</td>
-                                            <td class="title-body">Q. {{number_format($d['salario'],2)}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">Bonif. Decreto</td>
-                                            <td class="title-body">Q. {{number_format( (isset($d['bonificacion_incetivo'])? $d['bonificacion_incetivo'] : 0 ),2)}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">Horas Extras Simples</td>
-                                            <td class="title-body">Q. {{number_format($d['monto_hora_extra_simple'],2)}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">Horas Extras Dobles</td>
-                                            <td class="title-body">Q. {{number_format($d['monto_hora_extra_doble'],2)}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">Otros Ingresos</td>
-                                            <td class="title-body">Q. {{number_format($d['otro_ingreso'],2)}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">Bono 14</td>
-                                            <td class="title-body">Q. {{number_format((isset($d['bono_14']) ? $d['bono_14'] :0),2)}}</td>
-
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">Aguinaldo</td>
-                                            <td class="title-body">Q. {{number_format((isset($d['aguinaldo']) ? $d['aguinaldo'] :0),2)}}</td>
+                                            <td colspan="2" style="text-align: center;">INGRESOS</td>
                                         </tr>
                                         <tr style="background: #DDDCDF" class="title-body">
-                                            <td colspan="2">TOTAL INGRESOS</td>
-                                            <td>Q.{{number_format($d['salario']+ (isset($d['bonificacion_incetivo']) ? $d['bonificacion_incetivo'] : 0 )  +$d['monto_hora_extra_simple']+$d['monto_hora_extra_doble']+$d['otro_ingreso']+(isset($d['bono_14']) ? $d['bono_14'] :0) + (isset($d['aguinaldo']) ? $d['aguinaldo'] :0),2)}}</td>
+                                            <td >CANT. TURNOS</td>
+                                            <td>T. DEVENGADO</td>
+                                        </tr>                                       
+                                        <tr>
+                                            <td class="title-body">{{$d['turnos_trabajados']}}</td>
+                                            <td class="title-body">{{number_format($d['total_liquido'],2)}}</td>
+                                        </tr>
+                                        
+                                        <tr style="background: #DDDCDF">
+                                            <td>Subtotal:</td>
+                                            <td class="title-body">{{number_format($d['total_liquido'],2)}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                        <tr style="background: #DDDCDF" class="title-body">
+                                            <td>TOTAL INGRESOS</td>
+                                            <td>{{number_format($d['total_liquido'],2)}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -210,37 +215,34 @@
                                         <tr style="background: #DDDCDF" class="title-body">
                                             <td colspan="2" style="text-align: center;"><span style="color: red">DESCUENTOS</span></td>
                                         </tr>
-                                        <tr>
-                                            <td>Anticipo de Sueldo</td>
-                                            <td>Q. {{number_format($d['anticipo'],2)}}</td>
+                                        <tr style="background: #DDDCDF" class="title-body">
+                                            <td>DESCRIPCION</td>
+                                            <td>MONTO</td>
                                         </tr>
                                         <tr>
                                             <td>Cuota laboral igss (0.0483)</td>
-                                            <td class="title-body">Q. {{number_format(isset($d['igss']) ? $d['igss']:0,2)}}</td>
+                                            <td class="title-body">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td>ISR Laboral (0.05)</td>
-                                            <td class="title-body">Q. {{number_format(isset($d['ISR'])?$d['ISR']:0,2)}}</td>
+                                            <td>Isr</td>
+                                            <td class="title-body">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td>Otros Descuentos</td>
-                                            <td class="title-body">Q. {{number_format($d['otro_descuento'],2)}}</td>
+                                            <td>Prestamos</td>
+                                            <td class="title-body">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td>Seguros</td>
-                                            <td class="title-body">Q. 0.00</td>
+                                            <td>Alimentación</td>
+                                            <td class="title-body">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td>&nbsp;</td>
-                                            <td>&nbsp;</td>
+                                            <td>Otros</td>
+                                            <td class="title-body">0.00</td>
                                         </tr>
-                                        <tr>
-                                            <td>&nbsp;</td>
-                                            <td>&nbsp;</td>
-                                        </tr>
+                                        
                                         <tr style="background: #DDDCDF" class="title-body">
                                             <td>TOTAL DESCUENTOS</td>
-                                            <td>Q. {{number_format($d['otro_descuento']+ (isset( $d['ISR'] ) ? $d['ISR'] : 0 )+(isset($d['igss']) ? $d['igss'] : 0)+ $d['anticipo'],2)}}</td>
+                                            <td>0.00</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -254,7 +256,7 @@
                                   <tbody>
                                       <tr class="title-body">
                                           <td>Liquido a recibir</td>
-                                           <td>Q.{{number_format($d['liquido_a_recibir'],2)}}</td>
+                                           <td>{{number_format($d['total_liquido'],2)}}</td>
                                       </tr>
                                   </tbody>
                               </table>

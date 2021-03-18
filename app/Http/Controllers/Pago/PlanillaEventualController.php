@@ -198,25 +198,32 @@ class PlanillaEventualController extends ApiController
                                             ->with('asignacion_domos.carnet','asignacion_domos','asignacion_domos.asistencia_domo','asignacion_domos.cargo')->get()->pluck('asignacion_domos')->collapse()->values();
                                             #agrupar asignaciones por empleado y por cargo turno
         $asignaciones = $asignaciones->groupBy(['empleado_id','asignacion_domos.asistencia_domo.turno']);
-
+        
         foreach ($asignaciones as $key => $value) {
-            $pago = PagoEmpleadoDomo::create([
+            
+            $total = 0;
+            $conteo = 0;
+            foreach ($value as $key2 => $value2) {               
+                foreach ($value2 as $key3 => $value3) {
+                    $conteo = $conteo + count($value3->asistencia_domo);
+                    $total = $total + ($value3->cargo->salario * count($value3->asistencia_domo));
+                }               
+            }
+            if ($conteo > 0) {
+                $pago = PagoEmpleadoDomo::create([
                             'planilla_eventual_id' => $planilla_id,
                             'empleado_id' => $key,
                             'conteo_turno' => 0,
                             'total' => 0,
                         ]);
-            $total = 0;
-            $conteo = 0;
-            foreach ($value as $key2 => $value2) {
-                $conteo = $conteo + count($value2[0]->asistencia_domo);
-                $total = $total + ($value2[0]->cargo->salario * count($value2[0]->asistencia_domo));
-            }
-            $pago->total = $total;
-            $pago->conteo_turno = $conteo;
+                $pago->total = $total;
+                $pago->conteo_turno = $conteo;
+                $pago->confirmar_pago = true;
 
-            //dd($conteo);
-            $pago->save();
+                //dd($conteo);
+                $pago->save();
+            }
+            
         }
         $db->commit();
 

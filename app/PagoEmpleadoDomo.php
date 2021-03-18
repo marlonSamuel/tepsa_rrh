@@ -22,8 +22,8 @@ class PagoEmpleadoDomo extends Model
     public function empleado(){
         return $this->belongsTo(Empleado::class,'empleado_id','idEmpleado');
     }
-    public function detalle_pago(){
-        return $this->hasMany(DetallePagoEmpleadoFijo::class);
+    public function planilla_eventual(){
+        return $this->belongsTo(PlanillaEventual::class,'planilla_eventual_id','id');
     }
 
 }
