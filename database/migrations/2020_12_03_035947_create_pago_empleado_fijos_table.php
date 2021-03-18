@@ -24,6 +24,8 @@ class CreatePagoEmpleadoFijosTable extends Migration
             $table->decimal('otro_ingreso',11,2);
             $table->decimal('hora_extra_simple',11,2);
             $table->decimal('hora_extra_doble',11,2);
+            $table->decimal('monto_hora_extra_simple',11,2);
+            $table->decimal('monto_hora_extra_doble',11,2);
             $table->timestamps();
             $table->foreign('quincena_id')->references('id')->on('quincenas')->onDelete('cascade');
         });

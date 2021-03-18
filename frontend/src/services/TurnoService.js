@@ -40,6 +40,10 @@ class TurnoService {
         let self = this
         return self.axios.delete(`${self.baseUrl}/${data.id}`)
     }
+    startQuincena() {
+        let self = this
+        return self.axios.get(`${self.baseUrl}_start_quincena`)
+    }
 }
 
 export default TurnoService

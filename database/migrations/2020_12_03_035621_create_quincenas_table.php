@@ -22,6 +22,8 @@ class CreateQuincenasTable extends Migration
             $table->unsignedBigInteger('mes_id');
             $table->boolean('cerrada');
             $table->boolean('fin_mes');
+            $table->decimal('valor_hora_extra_simple',11,2);
+            $table->decimal('valor_hora_extra_doble',11,2);
             $table->timestamps();
             $table->foreign('anio_id')->references('id')->on('anios')->onDelete('cascade');
             $table->foreign('mes_id')->references('id')->on('meses')->onDelete('cascade');

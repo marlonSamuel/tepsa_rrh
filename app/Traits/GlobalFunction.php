@@ -233,6 +233,36 @@ trait GlobalFunction
 
         return [$data,$data2];
     }
+    public function pagoCuentasYchequesDomo($fecha,$pagos)
+    {
+
+        $data = collect();
+        $data2 = collect();
+        foreach ($pagos as $key => $value) {
+
+            if(!is_null($value->empleado->cuenta)){
+                $info = collect([
+                    'cuenta_origen'=>'902895911',
+                    'cuenta_destino'=>$value->empleado->cuenta,
+                    'fecha'=>date('d M Y', strtotime($fecha)),
+                    'monto'=>$value->total,
+                    'beneficiario'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
+                ]);
+                $data->push($info);
+            }else{
+                $info = collect([
+                    'fecha'=>date('d M Y', strtotime($fecha)),
+                    'monto'=>$value->total,
+                    'beneficiario'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
+                ]);
+
+                $data2->push($info);
+             
+            }
+        }
+
+        return [$data,$data2];
+    }
 
     public function pagoCuentasYchequesFijos($fecha,$pagos)
     {
@@ -275,7 +305,8 @@ trait GlobalFunction
 
         foreach ($pagos as $key => $value) {
                 //collection of dynamics columns to prestacions
-                $prestaciones_col = collect();
+                $prestaciones_col_cred = collect();
+                $prestaciones_col_deb = collect();
                 /*
                 $cargo = '';
                 $cargos = $value->detalle_pago->groupBy('cargo_turno.cargo.nombre');
@@ -295,42 +326,54 @@ trait GlobalFunction
                     'cuenta'=>$value->empleado->cuenta,
                     'puesto' => $value->empleado->cargo->nombre,
                     'salario'=>$value->empleado->cargo->salario,
-                    'anticipo'=>$value->anticipo,
-                    'otro_ingreso'=>$value->otro_ingreso,
-                    'hora_extra_simple'=>$value->hora_extra_simple,
-                    'hora_extra_doble'=>$value->hora_extra_doble,
-                    'otro_descuento'=>$value->otro_descuento,
-                    'total' => $value->total,
-                    'mes' => $value->quincena->mes_id,
-                    'quincena'=>$value->quincena->quincena
                 ]);
                
                 //merge info and turnos_cols to main data
 
                 //push data to prestaciones_col
+                $total_prestaciones = 0;
+                $descuento_prestaciones = 0;
                 foreach ($value->detalle_pago as $p) {
-                     $total_p = $p->total;
-                     $descripcion_p = str_replace(' ', '_', $p->prestacion->descripcion);
-                     $prestaciones_col[$descripcion_p] = $total_p;
+                    if (!$p->prestacion->debito_o_credito) {
+                        $total_p = $p->prestacion->descripcion == 'bonificacion incetivo' ? $p->prestacion->calculo : $p->total;
+                        $descripcion_p = str_replace(' ', '_', $p->prestacion->descripcion);
+                        $prestaciones_col_cred[$descripcion_p] = $total_p;
+                        $total_prestaciones += $total_p;
+                    }else{
+                       $total_p = $p->total;
+                        $descripcion_p = str_replace(' ', '_', $p->prestacion->descripcion);
+                        $prestaciones_col_deb[$descripcion_p] = $total_p;
+                        $descuento_prestaciones += $total_p; 
+                    }
+                }
+                if(!isset($prestaciones_col_cred['bonificacion_incetivo'])){
+                    $prestaciones_col_cred['bonificacion_incetivo'] = 0;
+                }
+                if(!isset($prestaciones_col_deb['igss'])){
+                    $prestaciones_col_deb['igss'] = 0;
+                }
+                if(!isset($prestaciones_col_deb['ISR'])){
+                    $prestaciones_col_deb['ISR'] = 0;
                 }
                  /*
                 */
                 //merge main data and prestaciones_col
-                $main_data = $info->merge($prestaciones_col);
-                /*
-                //total prestacions
-                $main_data['total_prestaciones'] = $value->total_prestaciones;
+                $info2 = $info->merge($prestaciones_col_cred);
+                $info2['otro_ingreso']=$value->otro_ingreso;
+                $info2['hora_extra_simple']=$value->hora_extra_simple;
+                $info2['monto_hora_extra_simple']=$value->monto_hora_extra_simple;
+                $info2['hora_extra_doble']=$value->hora_extra_doble;
+                $info2['monto_hora_extra_doble']=$value->monto_hora_extra_doble;
 
-                //dicounts
-                $main_data['descuento_prestaciones'] = $value->descuento_prestaciones;
-
-                $main_data['prestamos'] = $value->prestamos;
-                $main_data['alimentos'] = $value->alimentacion;
-                $main_data['otros_descuentos'] = $value->otros_descuentos;
-                //calculate total page
-                $main_data['liquido_a_recibir'] = $value->total_liquidado;
-                */
-                //push data to data collection
+                $total_ingresos = $value->empleado->cargo->salario +$total_prestaciones + $value->otro_ingreso + $value->monto_hora_extra_simple + $value->monto_hora_extra_doble ;
+                $info2['total_ingresos'] = $total_ingresos;
+                $info2['anticipo']= $value->quincena->fin_mes ? $value->anticipo : 0;
+                $main_data = $info2->merge($prestaciones_col_deb);
+                $main_data['otro_descuento'] = $value->otro_descuento;
+                 
+                $total_egresos = ($value->quincena->fin_mes ? $value->anticipo : 0) + $descuento_prestaciones + $value->otro_descuento;
+                $main_data['total_egresos'] = $total_egresos;
+                $main_data['liquido_a_recibir'] = $value->total; 
                 $data->push($main_data);
                 
         }

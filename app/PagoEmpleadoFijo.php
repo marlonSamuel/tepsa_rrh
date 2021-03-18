@@ -19,7 +19,9 @@ class PagoEmpleadoFijo extends Model{
         'anticipo',
         'otro_ingreso',
         'hora_extra_simple',
-        'hora_extra_doble'
+        'hora_extra_doble',       
+        'monto_hora_extra_simple',
+        'monto_hora_extra_doble',
     ];
 
     public function detalle_pago(){

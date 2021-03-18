@@ -31,7 +31,8 @@ class Empleado extends Model
         'cuenta',
         'tipo_empleado',
         'estado',
-        'igss'
+        'igss',
+        'fecha_ingreso'
     ];
 
     public function Cargo()
