@@ -72,7 +72,7 @@ class PlanillaFijoExport implements FromCollection, WithEvents, ShouldAutoSize, 
         return [
             AfterSheet::class    => function(AfterSheet $event) {
                 $event->sheet->mergeCells('C2:I4');
-                $event->sheet->setCellValue('C2', mb_strtoupper('TERMINAL ESTIBADORA DEL PACIFICO TEPSA S.A', 'UTF-8'));
+                $event->sheet->setCellValue('C2', mb_strtoupper('TERMINAL ESPECIALIZADAS DEL PACIFICO, S.A', 'UTF-8'));
 
                 $event->sheet->mergeCells('A5:B5');
             	$event->sheet->setCellValue('A5','DEPARTAMENTO DE OPERACIONES');
