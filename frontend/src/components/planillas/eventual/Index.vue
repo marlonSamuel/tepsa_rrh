@@ -161,8 +161,6 @@
                         
                         </v-layout>
                     </v-form>
-
-                      
                 </v-container>
 
                     
@@ -332,11 +330,21 @@ export default {
     setNumber(){
         let self = this
         let date = self.form.fecha !== "" ? moment(self.form.fecha) : moment() 
-        let planillas_year = self.items.filter(x=>moment(x.fecha).year() == date.year())
-        let numero = (planillas_year.length + 1) < 10 ? '0'+(planillas_year.length+1) : planillas_year.length+1
 
-        self.form.numero = 'PQ-'+numero+'-'+date.year()
-        console.log(self.form)
+        let planillas_year = self.items.filter(x=>moment(x.fecha).year() == date.year())
+
+        let _numero = planillas_year.length+1
+        let numero = (_numero) < 10 ? '0'+(_numero) : _numero
+      
+        let c_numero = 'PQ-'+numero+'-'+date.year()
+
+        while(self.items.some(x=>x.numero == c_numero)){
+          _numero++
+          numero = (_numero) < 10 ? '0'+(_numero) : _numero
+          c_numero = 'PQ-'+numero+'-'+date.year()
+        }
+        
+        self.form.numero = c_numero
     },
 
     //funcion para guardar registro

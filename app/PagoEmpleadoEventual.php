@@ -24,6 +24,7 @@ class PagoEmpleadoEventual extends Model
         'total_monto_turnos',
         'total_prestaciones',
         'descuento_prestaciones',
+        'bono_turnos',
         'total_devengado',
         'total_liquidado'
     ];

@@ -190,6 +190,7 @@
                                     label="Empleado"
                                     placeholder="seleccione empleado"
                                     :items="empleados"
+                                    @input="changeEmpleado"
                                     item-text="empleado"
                                     item-value="idEmpleado"
                                     v-validate="'required'"
@@ -202,7 +203,7 @@
                                   </v-autocomplete>
                                 </v-flex>
 
-                                <v-flex xs12 sm4 md4>
+                                <v-flex xs12 sm4 md4 v-if="empleado_carnet == null">
                                   <v-autocomplete
                                     v-model="form.carnet_id"
                                     label="Carnet"
@@ -218,6 +219,17 @@
                                   >
                                     >
                                   </v-autocomplete>
+                                </v-flex>
+
+                                <v-flex xs12 sm4 md4 v-else>
+                                  <v-text-field
+                                    v-model="empleado_carnet.carnet.codigo"
+                                    label="Carnet"
+                                    placeholder="seleccione carnet"
+                                    readonly
+                                  >
+                                    
+                                  </v-text-field>
                                 </v-flex>
 
                                 <v-flex xs6 sm2 md2>
@@ -451,6 +463,7 @@ export default {
       detalle_asignacion: [],
       turnos_print: [],
       planificacion: null,
+      empleado_carnet: null,
       headers: [
         { text: "Buque", value: "buque" },
         { text: "Fecha de atraque", value: "fecha_atraque" },
@@ -516,7 +529,7 @@ export default {
           if (self.$store.state.global.captureError(r)) {
             return;
           }
-          self.buques = r.data;
+          self.buques = r.data
         })
         .catch(r => {});
     },
@@ -623,6 +636,25 @@ export default {
         .catch(r => {});
     },
 
+        //obtener detalles
+    getByEmpleado(id, empleado_id) {
+      let self = this;
+      self.loading = true;
+      self.$store.state.services.asignacionService
+        .getByEmpleado(id, empleado_id)
+        .then(r => {
+          self.loading = false;
+          if (self.$store.state.global.captureError(r)) {
+            return;
+          }
+          self.empleado_carnet = r.data.data
+          if(self.empleado_carnet !== null){
+            self.form.carnet_id = self.empleado_carnet.carnet.id
+          }
+        })
+        .catch(r => {});
+    },
+
     //funcion para guardar registro
     create() {
       let self = this;
@@ -637,8 +669,9 @@ export default {
           }
           this.$toastr.success("registro agregado con éxito", "éxito");
           self.form.id = r.data.id;
-          self.getAll();
-          self.getDetailData(r.data.id, data.turno_id, data.fecha);
+          self.getAll()
+          self.getDetailData(r.data.id, data.turno_id, data.fecha)
+          self.getByEmpleado(r.data.id, data.empleado_id)
         })
         .catch(r => {});
     },
@@ -647,8 +680,8 @@ export default {
     update() {
       let self = this;
       let data = self.form;
-
-      if (self.detalle_asignacion.some(x => x.carnet_id == data.carnet_id)) {
+      console.log(data)
+      if (self.detalle_asignacion.some(x => x.carnet_id == data.carnet_id && x.empleado_id != data.empleado_id)) {
         self.$toastr.error("numero de carnet ya fue asignado", "error");
         return;
       }
@@ -669,6 +702,7 @@ export default {
             return;
           }
           self.getDetailData(data.id, data.turno_id, data.fecha);
+          self.getByEmpleado(r.data.id, data.empleado_id)
           //this.$toastr.success('registro actualizado con éxito', 'éxito')
         })
         .catch(r => {});
@@ -812,6 +846,12 @@ export default {
       if (data.id !== null && data.turno_id !== null && data.fecha !== null && data.fecha !== "" && data.fecha !== undefined) {
         self.getDetailData(data.id, data.turno_id, data.fecha);
       }
+    },
+
+    changeEmpleado(id){
+      let self = this
+      let data = self.form
+      self.getByEmpleado(data.id,id)
     },
 
     singlePrint(data) {

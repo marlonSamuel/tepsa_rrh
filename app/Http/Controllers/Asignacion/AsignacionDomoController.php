@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Asignacion;
 use App\AsignacionDomo;
 use App\Carnet;
 use App\AsignacionEmpleado;
+use App\DetalleAsignacionEmpleado;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\DB;
@@ -41,11 +42,17 @@ class AsignacionDomoController extends ApiController
 
             $data = $request->all();
 
+            $exits = DetalleAsignacionEmpleado::where([['empleado_id',$request->empleado_id],/*['turno_id',$request->turno_id],*/['fecha',$request->fecha]])
+                                                     ->first();
+
+            if(!is_null($exits)) return $this->errorResponse('empleado ya ha sido asignado a muelle en la fecha que trata de asignar',421);
+
             $asignacion = AsignacionDomo::create($data);
 
             $carnet = Carnet::find($request->carnet_id);
             $carnet->asignado = true;
             $carnet->save();
+
         $db->commit();
 
         return $this->showOne($asignacion,201,'insert');
@@ -75,11 +82,26 @@ class AsignacionDomoController extends ApiController
         return $asignacion;
     }
 
+     //obtener asignaciones por asignacion y empleado
+    public function getByEmpleadoAsignacion($id,$empleado_id){
+        $asignacion = AsignacionDomo::where([['empleado_id',$empleado_id],['asignacion_empleado_id',$id]])
+                                                     ->with('carnet')->first();
+
+        return $this->showQuery($asignacion);
+    }
+
     /**
      */
     public function destroy(AsignacionDomo $asignacion_domo)
     {
-        $asignacion_domo->delete();
+        DB::beginTransaction();
+        $carnet = Carnet::find($asignacion_domo->carnet_id);
+        $carnet->asignado = false;
+        $carnet->save();
+          $asignacion_domo->delete();
+        DB::commit();
+        
+      
         return $this->showOne($asignacion_domo,201,'delete');
     }
 

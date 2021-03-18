@@ -18,6 +18,7 @@ class CreatePagoEmpleadoEventualsTable extends Migration
             $table->unsignedBigInteger('planilla_eventual_id');
             $table->unsignedBigInteger('empleado_id');
             $table->decimal('septimo',11,2)->default(0);
+            $table->decimal('bono_turnos',11,2)->default(0);
             $table->integer('total_turnos');
             $table->decimal('total_monto_turnos',11,2);
             $table->decimal('total_prestaciones',11,2);

@@ -43,4 +43,5 @@ class AsistenciaAlmuerzoController extends ApiController
     {
         return $this->showOne($asistencia_almuerzo,200,'select');
     }
+
 }

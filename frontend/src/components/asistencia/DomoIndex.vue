@@ -276,7 +276,6 @@ export default {
                    
                 })
             })
-            console.log(self.all_items)
         }).catch(e=>{})
     },
 
@@ -298,8 +297,7 @@ export default {
     changeTurn(){
         let self = this
         self.items = self.form.turno !== 'todos' ? self.all_items.filter(x=>x.asistencia_domo.turno == self.form.turno 
-                                          && x.fecha_buque == self.form.fecha_buque) : self.all_items
-        console.log(self.items)
+                                          && x.fecha_buque == self.form.fecha_buque) : self.all_items.filter(x=>x.fecha_buque == self.form.fecha_buque)
     },
 
     validate(){

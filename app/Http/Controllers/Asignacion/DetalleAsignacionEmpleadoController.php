@@ -134,4 +134,13 @@ class DetalleAsignacionEmpleadoController extends ApiController
         DB::commit();
         return $this->showOne($detalle_asignacion_empleado,201,'delete');
     }
+
+
+        //obtener asistencias
+    public function getByEmpleado($asignacion_id,$empleado_id)
+    {
+        $asistencias = DetalleAsignacionEmpleado::where([['asignacion_empleado_id',$asignacion_id],['empleado_id',$empleado_id]])->with('asistencia_almuerzo')->get()->pluck('asistencia_almuerzo')->collapse()->values();
+
+        return $this->showAll($asistencias);
+    }
 }

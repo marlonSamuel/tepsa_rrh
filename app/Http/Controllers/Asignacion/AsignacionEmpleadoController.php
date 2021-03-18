@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Asignacion;
 
 use App\Carnet;
+use App\Turno;
 use App\PlanoEstiba;
 use Barryvdh\DomPDF\PDF;
 use App\AsignacionEmpleado;
 use Illuminate\Http\Request;
 use App\DetalleAsignacionEmpleado;
+use App\AsignacionDomo;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ApiController;
@@ -16,7 +18,7 @@ class AsignacionEmpleadoController extends ApiController
 {
     public function __construct()
     {
-        //parent::__construct(); //validacion de autenticacion
+        parent::__construct(); //validacion de autenticacion
     }
 
     public function index()
@@ -56,10 +58,32 @@ class AsignacionEmpleadoController extends ApiController
 
             $data = $request->all();
 
-            $exits = DetalleAsignacionEmpleado::where([['empleado_id',$request->empleado_id],['turno_id',$request->turno_id],['fecha',$request->fecha]])
+            $exits_domo = AsignacionDomo::where([['empleado_id',$request->empleado_id],['fecha',$request->fecha]])
                                                      ->first();
 
-            if(!is_null($exits)) return $this->errorResponse('empleado ya ha sido asignado a otro turno en la fecha que trata de asignar','421');
+            if($exits_domo) return $this->errorResponse('empleado ya tiene una asignacion a domo en esta fecha ',421);
+
+            $exits = DetalleAsignacionEmpleado::where([['empleado_id',$request->empleado_id],/*['turno_id',$request->turno_id],*/['fecha',$request->fecha]])
+                                                     ->get();
+
+            $turno_add = Turno::find($request->turno_id);  
+
+            foreach ($exits as $t) {
+                $turno = Turno::find($t->turno_id);
+
+                if($turno->numero == $turno_add->numero) return $this->errorResponse('empleado ya ha sido asignado a este turno en la fecha que trata de asignar','421');
+
+                if(($turno->numero == 1) && ($turno_add->numero == 4)) return $this->errorResponse('empleado ya ha sido asignado a el turno '.$turno->numero.' en la fecha que trata de asignar','421');
+
+                if(($turno->numero == 2) && ($turno_add->numero == 4 || $turno_add->numero == 5)) return $this->errorResponse('empleado ya ha sido asignado a el turno '.$turno->numero.' en la fecha que trata de asignar','421');
+
+                if(($turno->numero == 3) && ($turno_add->numero == 5)) return $this->errorResponse('empleado ya ha sido asignado a el turno '.$turno->numero.' en la fecha que trata de asignar','421');
+
+                if(($turno->numero == 4) && ($turno_add->numero == 1 || $turno_add->numero == 2)) return $this->errorResponse('empleado ya ha sido asignado a el turno '.$turno->numero.' en la fecha que trata de asignar','421');
+
+                if(($turno->numero == 5) && ($turno_add->numero == 2 || $turno_add->numero == 3)) return $this->errorResponse('empleado ya ha sido asignado a el turno '.$turno->numero.' en la fecha que trata de asignar','421');
+                
+            }
 
             $asignacion = AsignacionEmpleado::create($data);
 
@@ -126,6 +150,14 @@ class AsignacionEmpleadoController extends ApiController
         return $this->showall($detalle);
     }
 
+    //obtener asignaciones por asignacion y empleado
+    public function getByEmpleadoAsignacion($id,$empleado_id){
+        $asignacion = DetalleAsignacionEmpleado::where([['empleado_id',$empleado_id],['asignacion_empleado_id',$id]])
+                                                     ->with('carnet')->first();
+
+        return $this->showQuery($asignacion);
+    }
+
     /**
      */
     public function update(Request $request, AsignacionEmpleado $asignacion_empleado)
@@ -143,10 +175,32 @@ class AsignacionEmpleadoController extends ApiController
         $db->beginTransaction();
             $this->validate($request,$rules);
 
-            $exits = DetalleAsignacionEmpleado::where([['empleado_id',$request->empleado_id],['turno_id',$request->turno_id],['fecha',$request->fecha]])
+            $exits_domo = AsignacionDomo::where([['empleado_id',$request->empleado_id],['fecha',$request->fecha]])
                                                      ->first();
 
-            if(!is_null($exits)) return $this->errorResponse('empleado ya ha sido asignado a otro turno en la fecha que trata de asignar','421');
+            if($exits_domo) return $this->errorResponse('empleado ya tiene una asignacion a domo en esta fecha ',421);
+
+            $exits = DetalleAsignacionEmpleado::where([['empleado_id',$request->empleado_id],/*['turno_id',$request->turno_id],*/['fecha',$request->fecha]])
+                                                     ->get();
+
+            $turno_add = Turno::find($request->turno_id);  
+
+            foreach ($exits as $t) {
+                $turno = Turno::find($t->turno_id);
+
+                if($turno->numero == $turno_add->numero) return $this->errorResponse('empleado ya ha sido asignado a este turno en la fecha que trata de asignar','421');
+
+                if(($turno->numero == 1) && ($turno_add->numero == 4)) return $this->errorResponse('empleado ya ha sido asignado a el turno '.$turno->numero.' en la fecha que trata de asignar','421');
+
+                if(($turno->numero == 2) && ($turno_add->numero == 4 || $turno_add->numero == 5)) return $this->errorResponse('empleado ya ha sido asignado a el turno '.$turno->numero.' en la fecha que trata de asignar','421');
+
+                if(($turno->numero == 3) && ($turno_add->numero == 5)) return $this->errorResponse('empleado ya ha sido asignado a el turno '.$turno->numero.' en la fecha que trata de asignar','421');
+
+                if(($turno->numero == 4) && ($turno_add->numero == 1 || $turno_add->numero == 2)) return $this->errorResponse('empleado ya ha sido asignado a el turno '.$turno->numero.' en la fecha que trata de asignar','421');
+
+                if(($turno->numero == 5) && ($turno_add->numero == 2 || $turno_add->numero == 3)) return $this->errorResponse('empleado ya ha sido asignado a el turno '.$turno->numero.' en la fecha que trata de asignar','421');
+                
+            }
 
             $data_d = new DetalleAsignacionEmpleado;
             $data_d->turno_id = $request->turno_id;

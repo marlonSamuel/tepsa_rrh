@@ -12,7 +12,7 @@ class CargoTurnoController extends ApiController
 {
    public function __construct()
     {
-        #parent::__construct(); //validacion de autenticacion
+        parent::__construct(); //validacion de autenticacion
     }
 
     public function index(Cargo $cargo)
