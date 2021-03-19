@@ -6,9 +6,11 @@ use App\AsignacionEmpleado;
 use App\AsignacionDomo;
 use App\PagoEmpleadoEventual;
 use Illuminate\Database\Eloquent\Model;
-
-class PlanillaEventual extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class PlanillaEventual extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+
     protected $connection = 'rrh';
 
     protected $table = 'planilla_eventuals';

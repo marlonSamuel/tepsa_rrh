@@ -24,7 +24,7 @@ class PagoEmpleadoFijoController extends ApiController
     use GlobalFunction;
     public function __construct()
     {
-        parent::__construct(); //validacion de autenticacion
+        //parent::__construct(); //validacion de autenticacion
     }
 
 
@@ -117,8 +117,9 @@ class PagoEmpleadoFijoController extends ApiController
             if ($value->fecha_ingreso != "" || $value->fecha_ingreso != null) {
                 $fecha_actual = Carbon::parse($quincena->fecha_fin);
                 $fecha_ingreso = Carbon::parse($value->fecha_ingreso);
+                $ultimo_dia = Carbon::createFromFormat('m/Y', $quincena->mes->id . '/' . $quincena->anio->anio)->lastOfMonth();
                 if($fecha_ingreso < $fecha_actual){
-                    $dias_laborados = $fecha_ingreso->diffInDays($fecha_actual);
+                    $dias_laborados = $fecha_ingreso->diffInDays($ultimo_dia);
                 }               
             }
            
@@ -153,10 +154,11 @@ class PagoEmpleadoFijoController extends ApiController
                             $detalle_pago->save();
                         }
                     } else {
-                        $calculo_prestacion = $dias_laborados >= $dia_mes ? $value2->prestacion->calculo : $value2->prestacion->calculo * $dias_laborados / $dia_mes ;
+                        $calculo_prestacion = $dias_laborados >= $dia_mes ? $value2->prestacion->calculo : round(($value2->prestacion->calculo * $dias_laborados / $dia_mes),2) ;
                         $calculo_bonificacion = 0;
                         if($value2->prestacion->descripcion == 'bonificacion incetivo'){
-                            $calculo_bonificacion = $dias_laborados >= $dias_quincena ? $value2->prestacion->calculo / 2 : (($value2->prestacion->calculo/2) * $dias_laborados) / $dias_quincena;
+                            $calculo_bonificacion = $dias_laborados >= $dia_mes ? $value2->prestacion->calculo / 2 : ((($value2->prestacion->calculo) * $dias_laborados) / $dia_mes) / 2;
+                            $calculo_bonificacion = round($calculo_bonificacion,2);
                         }
                         
                         $monto_prestacion = $value2->prestacion->descripcion == 'bonificacion incetivo'? $calculo_bonificacion : $calculo_prestacion;
@@ -168,11 +170,11 @@ class PagoEmpleadoFijoController extends ApiController
                         $detalle_pago = DetallePagoEmpleadoFijo::create([
                             'pago_empleado_fijo_id' => $pago->id,
                             'prestacion_id' => $value2->prestacion_id,
-                            'total' => $value2->prestacion->fijo ? ($calculo_salario * ($value2->prestacion->descripcion == 'igss' ? 0.0483 : $value2->prestacion->calculo)) : $monto_prestacion
+                            'total' => $value2->prestacion->fijo ? round(($calculo_salario * ($value2->prestacion->descripcion == 'igss' ? 0.0483 : $value2->prestacion->calculo)),2) : $monto_prestacion
                         ]);
 
                         if($value2->prestacion->descripcion == 'bonificacion incetivo'){
-                            $monto_prestacion = $dias_laborados >= $dia_mes ? $value2->prestacion->calculo: (($value2->prestacion->calculo) * $dias_laborados) / $dia_mes == 31 ? 30 : $dia_mes;
+                            $monto_prestacion = $dias_laborados >= $dia_mes ? $value2->prestacion->calculo: (($value2->prestacion->calculo) * $dias_laborados) / $dia_mes;
                         }
 
                         if (!$value2->prestacion->debito_o_credito) {
@@ -185,7 +187,7 @@ class PagoEmpleadoFijoController extends ApiController
                             }
                         } else {
                             if ($value2->prestacion->fijo) {
-                                $prestacion_credito = $prestacion_credito + ($calculo_salario * ($value2->prestacion->descripcion == 'igss' ? 0.0483 : $value2->prestacion->calculo));
+                                $prestacion_credito = $prestacion_credito + round( ($calculo_salario * ($value2->prestacion->descripcion == 'igss' ? 0.0483 : $value2->prestacion->calculo)) , 2);
 
                             } else {
                                 
@@ -198,7 +200,8 @@ class PagoEmpleadoFijoController extends ApiController
             }else{               
               foreach ($value->empleado_prestacion as $key2 => $value2) {
                         if ($value2->prestacion->descripcion == 'bonificacion incetivo') {
-                            $calculo_bonificacion = $dias_laborados >= $dias_quincena ? $value2->prestacion->calculo / 2 : (($value2->prestacion->calculo/2) * $dias_laborados) / $dias_quincena;
+                            $calculo_bonificacion = $dias_laborados >= $dia_mes ? $value2->prestacion->calculo / 2 : ((($value2->prestacion->calculo) * $dias_laborados) / $dia_mes) / 2;
+                            $calculo_bonificacion = round($calculo_bonificacion,2);
                             $detalle_pago = DetallePagoEmpleadoFijo::create([
                                 'pago_empleado_fijo_id' => $pago->id,
                                 'prestacion_id' => $value2->prestacion_id,
@@ -241,15 +244,15 @@ class PagoEmpleadoFijoController extends ApiController
                 foreach ($pagoPrimerQuincena as $index => $itemPrimerQ) {
 
                     if ($value->idEmpleado == $itemPrimerQ->empleado_id) {
-                        $calculo_salario = $dias_laborados >= $dia_mes ? $value->Cargo->salario : $value->Cargo->salario * $dias_laborados / $dia_mes;
+                        $calculo_salario = $dias_laborados >= $dia_mes ? $value->Cargo->salario : ($value->Cargo->salario * $dias_laborados) / $dia_mes;
                         $calculo_salario = round($calculo_salario,2);
 
-                        $total = $calculo_salario - $itemPrimerQ->total + $prestacion_debito - $prestacion_credito;
-                        //dd($total .'----'. $calculo_salario.'----'. $itemPrimerQ->total.'----'. $prestacion_debito .'----'. $prestacion_credito);
+                        $total = $calculo_salario - $itemPrimerQ->anticipo + $prestacion_debito - $prestacion_credito;
+                        
                     }
                 }
             } else {
-                $calculo_salario = $dias_laborados >= $dias_quincena ? $value->Cargo->salario / 2 : ($value->Cargo->salario/2) * $dias_laborados / $dias_quincena;
+                $calculo_salario = $dias_laborados >= $dia_mes ? $value->Cargo->salario / 2 : (($value->Cargo->salario) * $dias_laborados / $dia_mes) / 2;
                         $calculo_salario = round($calculo_salario,2);
                 $pago->anticipo = ($calculo_salario) + $prestacion_debito;
                 $total = ($calculo_salario) + $prestacion_debito - $prestacion_credito;

@@ -6,9 +6,10 @@ use App\PlanoEstiba;
 use App\DetalleAsignacionEmpleado;
 use App\AsignacionDomo;
 use Illuminate\Database\Eloquent\Model;
-
-class AsignacionEmpleado extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class AsignacionEmpleado extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
     protected $table = 'asignacion_empleados';
 

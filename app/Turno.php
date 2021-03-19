@@ -4,9 +4,10 @@ namespace App;
 
 use App\CargoTurno;
 use Illuminate\Database\Eloquent\Model;
-
-class Turno extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class Turno extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $table = 'turnos';
 
     protected $fillable = [

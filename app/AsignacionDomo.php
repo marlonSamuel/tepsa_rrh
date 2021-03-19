@@ -7,9 +7,10 @@ use App\Cargo;
 use App\Carnet;
 use App\AsistenciaDomo;
 use Illuminate\Database\Eloquent\Model;
-
-class AsignacionDomo extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class AsignacionDomo extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     //
 
     protected $connection = 'rrh';

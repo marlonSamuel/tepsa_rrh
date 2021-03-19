@@ -3,9 +3,10 @@
 namespace App;
 use App\Carnet;
 use Illuminate\Database\Eloquent\Model;
-
-class CarnetEmpleado extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class CarnetEmpleado extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
 
     protected $table = 'carnet_empleados';

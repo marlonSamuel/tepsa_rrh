@@ -6,8 +6,10 @@ use App\Empleado;
 use App\Quincena;
 
 use Illuminate\Database\Eloquent\Model;
-
-class PagoEmpleadoFijo extends Model{
+use OwenIt\Auditing\Contracts\Auditable;
+class PagoEmpleadoFijo extends Model implements Auditable
+{
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
     protected $table = 'pago_empleado_fijos';
     protected $fillable=[

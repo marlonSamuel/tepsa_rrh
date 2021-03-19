@@ -5,9 +5,10 @@ namespace App;
 use App\Empleado;
 use App\DetallePagoEmpleadoFijo;
 use Illuminate\Database\Eloquent\Model;
-
-class PagoEmpleadoDomo extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class PagoEmpleadoDomo extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
 
     protected $table = 'pago_empleado_domos';

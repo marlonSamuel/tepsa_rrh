@@ -6,9 +6,10 @@ use App\CargoTurno;
 use App\Prestacion;
 use App\PagoEmpleadoEventual;
 use Illuminate\Database\Eloquent\Model;
-
-class DetallePagoEventual extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class DetallePagoEventual extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
     protected $table = 'detalle_pago_eventuals';
 

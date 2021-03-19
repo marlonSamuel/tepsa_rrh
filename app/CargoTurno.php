@@ -3,9 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
-class CargoTurno extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class CargoTurno extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
 
     protected $table = 'cargo_turnos';

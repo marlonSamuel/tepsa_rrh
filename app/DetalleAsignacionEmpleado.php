@@ -9,9 +9,10 @@ use Carbon\Carbon;
 use App\AsignacionEmpleado;
 use App\AsistenciaAlmuerzo;
 use Illuminate\Database\Eloquent\Model;
-
-class DetalleAsignacionEmpleado extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class DetalleAsignacionEmpleado extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
 
     protected $table = 'detalle_asignacion_empleados';

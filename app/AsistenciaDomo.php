@@ -4,9 +4,10 @@ namespace App;
 
 use App\AsistenciaDomo;
 use Illuminate\Database\Eloquent\Model;
-
-class AsistenciaDomo extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class AsistenciaDomo extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
 
     protected $table = 'asistencia_domos';

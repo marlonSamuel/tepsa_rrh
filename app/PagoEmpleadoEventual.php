@@ -6,7 +6,7 @@ use App\Empleado;
 use App\DetallePagoEventual;
 use App\DetallePagoPrestacion;
 use Illuminate\Database\Eloquent\Model;
-
+use OwenIt\Auditing\Contracts\Auditable;
 class PagoEmpleadoEventual extends Model
 {
     protected $connection = 'rrh';

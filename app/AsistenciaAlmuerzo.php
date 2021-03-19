@@ -3,9 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
-class AsistenciaAlmuerzo extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class AsistenciaAlmuerzo extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
 
     protected $table = 'asistencia_almuerzos';

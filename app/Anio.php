@@ -4,9 +4,10 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Quincena;
-
-class Anio extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class Anio extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
     protected $table = 'anios';
     protected $fillable = [

@@ -5,9 +5,10 @@ namespace App;
 use App\CargoTurno;
 use App\DetalleAsignacionEmpleado;
 use Illuminate\Database\Eloquent\Model;
-
-class AsistenciaTurnoBodega extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+class AsistenciaTurnoBodega extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     protected $connection = 'rrh';
 
     protected $table = 'asistencia_turno_bodegas';
