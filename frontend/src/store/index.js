@@ -18,8 +18,8 @@ const state = {
     is_login: false,
     token_expired: null,
     client_id: 2,
-    base_url: 'http://www.tepsa-rrh.com/',
-    //base_url: 'https://167.172.158.187/tepsa-rrh/',
+    //base_url: 'http://www.tepsa-rrh.com/',
+    base_url: 'https://167.172.158.187/tepsa-rrh/',
     client_secret: 'TGUf1wK1Une5YCMKxIsEWU0aQn0qH0Bvk8KO6xMz'
 }
 
