@@ -153,7 +153,7 @@
                 >
               </template>
               <span>Editar</span>
-            </v-tooltip>-->
+            </v-tooltip>
             <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <v-icon
@@ -167,7 +167,7 @@
                 >
               </template>
               <span>Eliminar</span>
-            </v-tooltip>
+            </v-tooltip>-->
           </td>
         </template>
         <template v-slot:no-data>
