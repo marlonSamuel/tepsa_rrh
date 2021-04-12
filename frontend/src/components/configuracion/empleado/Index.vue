@@ -574,7 +574,7 @@ export default {
     savePrestacion() {
       let self = this;
       let data = self.form2;
-      if (data.length > 0) {
+      if (data.prestaciones.length > 0) {
         self.loading = true;
         self.$store.state.services.empleadoPrestacionService
           .create(data)
@@ -587,6 +587,7 @@ export default {
             self.prestacion = false;
             self.asignacionPrestacion = [];
             self.getAll();
+            self.clearData();
           })
           .catch((r) => {});
       } else {
