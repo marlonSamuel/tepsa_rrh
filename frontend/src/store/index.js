@@ -20,7 +20,7 @@ const state = {
     client_id: 2,
     //base_url: 'http://www.tepsa-rrh.com/',
     base_url: 'https://167.172.158.187/tepsa-rrh/',
-    client_secret: 'TGUf1wK1Une5YCMKxIsEWU0aQn0qH0Bvk8KO6xMz'
+    client_secret: 'M2C6Tx21hJEswFJp2yb99DV8jBEhXKnCsifOc2TR'
 }
 
 const mutations = {

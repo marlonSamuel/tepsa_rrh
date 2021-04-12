@@ -15,11 +15,11 @@
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="800px" persistent>
 
-          <template v-slot:activator="{ on }">
+        <!--  <template v-slot:activator="{ on }">
             <v-btn color="primary" small dark class="mb-2" v-on="on"
               ><v-icon>add</v-icon> Nuevo</v-btn
             >
-          </template>
+          </template>-->
           <v-card>
             <v-card-title>
               <span class="headline">{{ setTitle }}</span>
@@ -140,7 +140,7 @@
               </template>
               <span>Configurar Salarios</span>
             </v-tooltip>
-            <v-tooltip top>
+          <!--  <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <v-icon
                   v-on="on"
@@ -167,7 +167,7 @@
                 >
               </template>
               <span>Eliminar</span>
-            </v-tooltip>
+            </v-tooltip>-->
           </td>
         </template>
         <template v-slot:no-data>

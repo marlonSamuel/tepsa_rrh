@@ -29,5 +29,17 @@ class TurnoSeeder extends Seeder
         $data->hora_fin = '07:00';
         $data->numero = 3;
         $data->save();
+
+        $data = new Turno;
+        $data->hora_inicio = '07:00';
+        $data->hora_fin = '19:00';
+        $data->numero = 4;
+        $data->save();
+
+        $data = new Turno;
+        $data->hora_inicio = '19:00';
+        $data->hora_fin = '07:00';
+        $data->numero = 5;
+        $data->save();
     }
 }
