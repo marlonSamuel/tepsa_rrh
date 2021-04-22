@@ -16,7 +16,7 @@ class EmpleadoPrestacionService {
         return self.axios.post(`${self.baseUrl}`, data)
     }
 
-    destroy(id) {
+    destroy(data) {
         let self = this
         return self.axios.delete(`${self.baseUrl}/${data.id}`)
     }
