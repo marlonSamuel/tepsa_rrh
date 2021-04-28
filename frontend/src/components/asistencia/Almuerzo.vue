@@ -216,23 +216,26 @@ export default {
 
     //obtener turno segun horario
     setCurrentTurn(turns) {
-      let self = this;
+      let self = this
       var currentTime = moment();
-      var extra = moment().format("YYYY-MM-DD") + " ";
+      var extra = moment().format("YYYY-MM-DD") + " "
 
       turns.forEach((t, i) => {
-        var start_time = moment(extra + t.hora_inicio);
-        var end_time = moment(extra + t.hora_fin);
-        if ((t.hora_fin < t.hora_inicio) & (self.turno == null)) {
-          var extra_e =
+        var start_time = moment(extra + t.hora_inicio)
+        var end_time = moment(extra + t.hora_fin)
+        if (t.hora_fin < t.hora_inicio) {
+
+         /* var extra_e =
             moment()
               .subtract(1, "d")
               .format("YYYY-MM-DD") + " ";
-          var start_time = moment(extra_e + t.hora_inicio);
+          var start_time = moment(extra_e + t.hora_inicio);*/
+
+          end_time = end_time.add(1,'d')
 
           if (
-            moment(start_time).format("YYYY-MM-DD") <
-            moment(end_time).format("YYYY-MM-DD")
+            moment(end_time).format("YYYY-MM-DD") ==
+            moment(currentTime).format("YYYY-MM-DD")
           ) {
             self.fecha = moment()
               .subtract(1, "d")
@@ -243,11 +246,15 @@ export default {
         if (moment(currentTime).isBetween(start_time, end_time)) {
           if(t.numero < 4){
             self.turno = t
+            self.turno._hora_inicio = start_time
+            self.turno._hora_fin = end_time
           }else{
             self.turno2 = t
+            self.turno2._hora_inicio = start_time
+            self.turno2._hora_fin = end_time
           }
         }
-      });
+      })
     },
 
     //funcion para guardar registro
