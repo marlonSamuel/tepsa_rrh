@@ -79,20 +79,14 @@ class DetalleAsignacionEmpleadoController extends ApiController
             $pdf_file = 'pdfs.print_asistencia_almuerzo';
             foreach ($detalle as $d) {
                 foreach ($d->asistencia_almuerzo as $a) {
-                    $extra = Carbon::parse($a->created_at)->format('Y-m-d');
-                    $desayuno = Carbon::create($extra.' 14:30:00');
-                    $almuerzo = Carbon::create($extra.' 21:30:00');
-                    $cena = Carbon::create($extra.' 07:00:00');//->add(1,'days');
-
-                    $hora = Carbon::parse($a->created_at);
-
-
-                    if($hora->between($desayuno,$cena)){
-                        $a->tipo_alimento = 'Desayuno';
-                    }else if($hora->between($desayuno,$almuerzo)){
-                        $a->tipo_alimento = 'Almuerzo';
+                    if($a->tipo_alimento == 'D'){
+                        $a->alimento = 'Desayuno';
+                    }else if($a->tipo_alimento == 'A'){
+                        $a->alimento == 'Almuerzo';
+                    }else if($a->tipo_alimento == 'C'){
+                        $a->alimento = 'Cena';
                     }else{
-                        $a->tipo_alimento = 'Cena';
+                        $a->alimento = 'Refacción';
                     }
                 };
                 
