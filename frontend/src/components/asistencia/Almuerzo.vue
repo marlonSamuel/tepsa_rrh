@@ -97,7 +97,7 @@
                   <br />
                   <strong>TURNO: </strong># {{ asignacion.turno.numero }}
                   <br />
-                  <strong>FECHA TURNO: </strong> {{ fecha }} de
+                  <strong>FECHA TURNO: </strong> {{ fecha | moment("DD/MM/YYYY")}} de
                   {{ asignacion.turno.hora_inicio }} a {{ asignacion.turno.hora_fin }}
                   <br />
                 </div>
@@ -224,26 +224,28 @@ export default {
         var start_time = moment(extra + t.hora_inicio)
         var end_time = moment(extra + t.hora_fin)
         if (t.hora_fin < t.hora_inicio) {
-
          /* var extra_e =
             moment()
               .subtract(1, "d")
               .format("YYYY-MM-DD") + " ";
           var start_time = moment(extra_e + t.hora_inicio);*/
 
-          end_time = end_time.add(1,'d')
+          //end_time = end_time.add(1,'d')
+          start_time = start_time.subtract(1, "days")
 
-          if (
+         /* if (
             moment(end_time).format("YYYY-MM-DD") ==
             moment(currentTime).format("YYYY-MM-DD")
           ) {
             self.fecha = moment()
               .subtract(1, "d")
               .format("YYYY-MM-DD");
-          }
+          }*/
         }
 
         if (moment(currentTime).isBetween(start_time, end_time)) {
+          
+          self.fecha = moment(start_time).format("YYYY-MM-DD")
           if(t.numero < 4){
             self.turno = t
             self.turno._hora_inicio = start_time
