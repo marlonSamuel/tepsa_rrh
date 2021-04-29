@@ -139,7 +139,7 @@ class PlanillaEventualController extends ApiController
                 }
 
                 $pago->total_devengado = $pago->total_monto_turnos + $pago->bono_turnos;
-                if($detalle_pago->conteo_turnos > 6){
+                if($detalle_pago->conteo_turnos >= 6){
                     $pago->septimo = $pago->total_monto_turnos/6;
                     $pago->total_devengado+=$pago->septimo;
                 }
