@@ -425,8 +425,8 @@ export default {
               .format("YYYY-MM-DD") + " ";
           var start_time = moment(extra_e + t.hora_inicio);*/
 
-          //end_time = end_time.add(1,'d')
-          start_time = start_time.subtract(1, "days")
+          end_time = end_time.add(1,'days')
+          //start_time = start_time.subtract(1, "days")
 
          /* if (
             moment(end_time).format("YYYY-MM-DD") ==
@@ -453,6 +453,8 @@ export default {
           }
         }
       })
+      console.log("turno "+self.turno.numero)
+      console.log("turno2",self.turno2.numero)
     },
 
     //setear bodegas en buque
