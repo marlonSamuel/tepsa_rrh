@@ -217,30 +217,27 @@ export default {
     //obtener turno segun horario
     setCurrentTurn(turns) {
       let self = this
-      var currentTime = moment();
+      var currentTime = moment()
       var extra = moment().format("YYYY-MM-DD") + " "
 
       turns.forEach((t, i) => {
         var start_time = moment(extra + t.hora_inicio)
         var end_time = moment(extra + t.hora_fin)
+
         if (t.hora_fin < t.hora_inicio) {
          /* var extra_e =
             moment()
               .subtract(1, "d")
               .format("YYYY-MM-DD") + " ";
           var start_time = moment(extra_e + t.hora_inicio);*/
+          let hct = moment(currentTime).format("HH:mm:ss")
+          let md = "00:00:00"
 
-          end_time = end_time.add(1,'days')
-          //start_time = start_time.subtract(1, "days")
-
-         /* if (
-            moment(end_time).format("YYYY-MM-DD") ==
-            moment(currentTime).format("YYYY-MM-DD")
-          ) {
-            self.fecha = moment()
-              .subtract(1, "d")
-              .format("YYYY-MM-DD");
-          }*/
+          if(hct >= md && hct <= t.hora_fin){
+            start_time = start_time.subtract(1,'days')
+          }else{
+            end_time = end_time.add(1,'days')
+          }
         }
 
         if (moment(currentTime).isBetween(start_time, end_time)) {

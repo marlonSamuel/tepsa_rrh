@@ -425,8 +425,14 @@ export default {
               .format("YYYY-MM-DD") + " ";
           var start_time = moment(extra_e + t.hora_inicio);*/
 
-          end_time = end_time.add(1,'days')
-          //start_time = start_time.subtract(1, "days")
+          let hct = moment(currentTime).format("HH:mm:ss")
+          let md = "00:00:00"
+
+          if(hct >= md && hct <= t.hora_fin){
+            start_time = start_time.subtract(1,'days')
+          }else{
+            end_time = end_time.add(1,'days')
+          }
 
          /* if (
             moment(end_time).format("YYYY-MM-DD") ==
