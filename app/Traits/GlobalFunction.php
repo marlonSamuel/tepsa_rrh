@@ -113,7 +113,11 @@ trait GlobalFunction
 
                     $turnos_col["turno_".$t->numero]=$conteo;
 
-                    $turnos_col["valor_turno_".$t->numero]=$valor_turno->salario;
+                    if(!is_null($valor_turno)){ 
+                        $turnos_col["valor_turno_".$t->numero]=$valor_turno->salario;
+                    }else{
+                        $turnos_col["valor_turno_".$t->numero]=0;
+                    }
 
                     $turnos_col["total_turno_".$t->numero]=$total_turno;
                     $total_turnos+= $conteo;
@@ -147,10 +151,12 @@ trait GlobalFunction
 
                 $main_data['bono_turno'] = $group->sum('bono_turno');
 
-                $main_data['septimo'] = $value->septimo / $count_group;
+                $main_data['septimo'] = ($main_data['total_turnos'] * $value->septimo) / $value->total_turnos;
 
 
                 $main_data['total_devengado'] = $main_data['monto_turnos'] + $main_data['septimo'] + $main_data['bono_turno'];
+
+                #dd($main_data['total_devengado']);
 
                 $total_prestaciones = 0;
                 $descuento_prestaciones = 0;
@@ -159,7 +165,7 @@ trait GlobalFunction
                 foreach ($prestaciones as $p) {
                      if(!$p->fijo){
                         if($p->descripcion == 'bono 14' || $p->descripcion == 'aguinaldo'){
-                            $calculo = ($main_data['total_devengado']*$main_data['total_turnos'])/(365 / $count_group);
+                            $calculo = ($main_data['total_devengado']*$value->total_turnos)/365;
                         }else{
                             $calculo = (($p->calculo/30)/24)*8*$main_data['total_turnos'];
                         }

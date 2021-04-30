@@ -103,6 +103,10 @@ class PlanillaEventualController extends ApiController
 
             $asignaciones = $asignaciones->where('asistencia_turno','!=',null)->values();
 
+            $asignaciones = $asignaciones->filter(function($item) {
+                return $item->asistencia_turno->bloqueado == 0 || ($item->asistencia_turno->bloqueado & $item->asistencia_turno->desbloqueado);
+            });
+
             $planilla = PlanillaEventual::create($data);
 
             #agrupar asignaciones por empleado y por cargo turno
@@ -122,7 +126,6 @@ class PlanillaEventualController extends ApiController
                             'bono_turnos' => 0
                         ]);
 
-
                 #crear detalle pago empleado
                 foreach ($value as $key2 => $value2) {
                     $detalle_pago = DetallePagoEventual::create([
@@ -133,13 +136,15 @@ class PlanillaEventualController extends ApiController
                                         'total' => $value2[0]->asistencia_turno->cargo_turno->salario * count($value2),
                                         'bono_turno' => count($value2) * $request->bono_turno
                                     ]);
+
                     $pago->total_turnos += $detalle_pago->conteo_turnos;
                     $pago->total_monto_turnos += $detalle_pago->total;
                     $pago->bono_turnos += $detalle_pago->bono_turno;
                 }
 
                 $pago->total_devengado = $pago->total_monto_turnos + $pago->bono_turnos;
-                if($detalle_pago->conteo_turnos >= 6){
+
+                if($pago->total_turnos >= 6){
                     $pago->septimo = $pago->total_monto_turnos/6;
                     $pago->total_devengado+=$pago->septimo;
                 }
@@ -170,7 +175,6 @@ class PlanillaEventualController extends ApiController
                         'prestacion_id'=>$value->prestacion_id,
                         'total'=>$calculo
                     ]);
-                   
 
                     #calculo de credito o debito de prestaciones
                     if($value->prestacion->debito_o_credito){
@@ -179,7 +183,6 @@ class PlanillaEventualController extends ApiController
                         $pago->total_prestaciones += $pago_prestacion->total;
                     }
                 }
-
 
                 #calculo de totales
                 $pago->total_liquidado = $pago->total_devengado + $pago->total_prestaciones - $pago->descuento_prestaciones;
@@ -339,7 +342,7 @@ class PlanillaEventualController extends ApiController
                     $data_sum3[$d] = "Pagos con cheque";
                 }
 
-                if(is_numeric($data[0][$d]) && $d != 'codigo' && $d != 'cuenta_origen' && $d != 'cuenta_destino' && $d != 'cuenta')
+                if(is_numeric($data[0][$d]) && $d != 'codigo' && $d != 'cuenta_origen' && $d != 'cuenta_destino' && $d != 'cuenta' && $d != 'dpi')
                 {
                     $data_sum[$d] = $data->sum($d);
 

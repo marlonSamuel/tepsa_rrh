@@ -138,7 +138,7 @@
             </span>
         </div>
 
-        <div style="margin-top: 25px; margin-left: -5px;">
+        <div style="margin-top: 20px; margin-left: -5px;">
             <table class="mytable">
                 <tbody>
                     <tr>
@@ -233,6 +233,10 @@
                                             <td class="title-body" style="text-align: center;">Q {{number_format($d['monto_turnos'],2)}}</td>
                                         </tr>
                                         <tr>
+                                            <td colspan="2">Bonificación por turnos:</td>
+                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['bono_turno'],2)}}</td>
+                                        </tr>
+                                        <tr>
                                             <td colspan="2">Séptimo:</td>
                                             <td class="title-body" style="text-align: center;">Q {{number_format($d['septimo'],2)}}</td>
                                         </tr>
@@ -272,7 +276,9 @@
                                         </tr>
                                         <tr>
                                             <td>Isr</td>
-                                            <td class="title-body" style="text-align: center;">Q {{number_format($d['isr'],2)}}</td>
+                                            <td class="title-body" style="text-align: center;">
+                                                Q {{isset($d['isr']) ? number_format($d['isr'],2) : number_format(0,2)}}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Prestamos</td>
@@ -285,6 +291,10 @@
                                         <tr>
                                             <td>Otros</td>
                                             <td class="title-body" style="text-align: center;">Q {{number_format($d['otros_descuentos'],2)}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>&nbsp;</td>
+                                            <td>&nbsp;</td>
                                         </tr>
                                         <tr>
                                             <td>&nbsp;</td>
