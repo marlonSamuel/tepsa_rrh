@@ -15,6 +15,7 @@ class PagoEmpleadoEventual extends Model
     protected $fillable = [
     	'planilla_eventual_id',
     	'empleado_id',
+        'cargo_id',
     	'alimentacion',
     	'prestamos',
     	'otros_descuentos',
@@ -39,5 +40,9 @@ class PagoEmpleadoEventual extends Model
 
     public function empleado(){
         return $this->belongsTo(Empleado::class,'empleado_id','idEmpleado');
+    }
+
+    public function cargo(){
+        return $this->belongsTo(Cargo::class,'cargo_id','idCargo');
     }
 }

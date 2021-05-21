@@ -97,7 +97,7 @@ class PlanillaEventualController extends ApiController
             $data = $request->all();
 
             $asignaciones = AsignacionEmpleado::where('id',$request->asignacion_empleado_id)
-                                            ->with('detalle_asignacion.carnet','detalle_asignacion.empleado','detalle_asignacion','detalle_asignacion.turno','detalle_asignacion.asistencia_turno.cargo_turno')->get()->pluck('detalle_asignacion')->collapse()->values();
+                                            ->with('detalle_asignacion.carnet','detalle_asignacion.empleado','detalle_asignacion','detalle_asignacion.turno','detalle_asignacion.asistencia_turno.cargo_turno.cargo')->get()->pluck('detalle_asignacion')->collapse()->values();
 
             $asignaciones = $asignaciones->where('empleado.tipo_empleado',0)->values();
 
@@ -109,85 +109,106 @@ class PlanillaEventualController extends ApiController
 
             $planilla = PlanillaEventual::create($data);
 
-            #agrupar asignaciones por empleado y por cargo turno
-            $asignaciones = $asignaciones->groupBy(['empleado_id','asistencia_turno.cargo_turno_id']);
+            #agrupar asignaciones por empleado y por cargo y cargo turno
+            $asignaciones = $asignaciones->groupBy(['empleado_id','asistencia_turno.cargo_turno.cargo_id','asistencia_turno.cargo_turno_id']);
+
 
             foreach ($asignaciones as $key => $value) {
-                #crear pago empleado
-                $pago = PagoEmpleadoEventual::create([
-                            'planilla_eventual_id' => $planilla->id,
-                            'empleado_id' => $key,
-                            'total_devengado' => 0,
-                            'total_turnos' => 0,
-                            'total_monto_turnos' => 0,
-                            'total_liquidado' => 0,
-                            'descuento_prestaciones' => 0,
-                            'total_prestaciones' => 0,
-                            'bono_turnos' => 0
+                foreach ($value as $key1 => $value1) {
+                    #crear pago empleado
+                    $pago = PagoEmpleadoEventual::create([
+                                'planilla_eventual_id' => $planilla->id,
+                                'empleado_id' => $key,
+                                'cargo_id' => $key1,
+                                'total_devengado' => 0,
+                                'total_turnos' => 0,
+                                'total_monto_turnos' => 0,
+                                'total_liquidado' => 0,
+                                'descuento_prestaciones' => 0,
+                                'total_prestaciones' => 0,
+                                'bono_turnos' => 0
+                            ]);
+
+                    #crear detalle pago empleado
+                    foreach ($value1 as $key2 => $value2) {
+                        $detalle_pago = DetallePagoEventual::create([
+                                            'pago_empleado_eventual_id' => $pago->id,
+                                            'cargo_turno_id' => $key2,
+                                            'conteo_turnos' => count($value2),
+                                            'valor_turno' => $value2[0]->asistencia_turno->cargo_turno->salario,
+                                            'total' => $value2[0]->asistencia_turno->cargo_turno->salario * count($value2),
+                                            'bono_turno' => count($value2) * $request->bono_turno
+                                        ]);
+
+                        $pago->total_turnos += $detalle_pago->conteo_turnos;
+                        $pago->total_monto_turnos += $detalle_pago->total;
+                        $pago->bono_turnos += $detalle_pago->bono_turno;
+                    }
+
+                    $pago->total_devengado = $pago->total_monto_turnos + $pago->bono_turnos;
+
+                    if($pago->total_turnos >= 6){
+                        $pago->septimo = $pago->total_monto_turnos/6;
+                        $pago->total_devengado+=$pago->septimo;
+                    }
+                    
+                    #crear detalle pago o descuento de prestaciones
+                    $prestaciones = Empleado::where('idEmpleado',$key)
+                                                ->with('empleado_prestacion.prestacion')
+                                                ->get()
+                                                ->pluck('empleado_prestacion')->collapse()->values();
+
+                    #calculo prestaciones
+                    foreach ($prestaciones as $value) {
+                        $calculo = 0;
+                        if(!$value->prestacion->fijo){
+                            if($value->prestacion->descripcion == 'bono 14' || $value->prestacion->descripcion == 'aguinaldo'){
+                                $calculo = ($pago->total_devengado*$pago->total_turnos)/365;
+                            }else if($value->prestacion->descripcion == 'igss')
+                            {
+                                $calculo = ($value->total_devengado * $value->prestacion->calculo); 
+                            }
+                            else{
+                                $calculo = (($value->prestacion->calculo/30)/24)*8*$pago->total_turnos;
+                            }
+                        }else{
+                            if(strtolower($value->prestacion->descripcion) != "isr"){
+                                $calculo = ($pago->total_devengado * $value->prestacion->calculo);
+                            }
+                        }
+
+                        $pago_prestacion = DetallePagoPrestacion::create([
+                            'pago_empleado_eventual_id'=>$pago->id,
+                            'prestacion_id'=>$value->prestacion_id,
+                            'total'=>$calculo
                         ]);
 
-                #crear detalle pago empleado
-                foreach ($value as $key2 => $value2) {
-                    $detalle_pago = DetallePagoEventual::create([
-                                        'pago_empleado_eventual_id' => $pago->id,
-                                        'cargo_turno_id' => $key2,
-                                        'conteo_turnos' => count($value2),
-                                        'valor_turno' => $value2[0]->asistencia_turno->cargo_turno->salario,
-                                        'total' => $value2[0]->asistencia_turno->cargo_turno->salario * count($value2),
-                                        'bono_turno' => count($value2) * $request->bono_turno
-                                    ]);
-
-                    $pago->total_turnos += $detalle_pago->conteo_turnos;
-                    $pago->total_monto_turnos += $detalle_pago->total;
-                    $pago->bono_turnos += $detalle_pago->bono_turno;
-                }
-
-                $pago->total_devengado = $pago->total_monto_turnos + $pago->bono_turnos;
-
-                if($pago->total_turnos >= 6){
-                    $pago->septimo = $pago->total_monto_turnos/6;
-                    $pago->total_devengado+=$pago->septimo;
-                }
-                
-                #crear detalle pago o descuento de prestaciones
-                $prestaciones = Empleado::where('idEmpleado',$key)
-                                            ->with('empleado_prestacion.prestacion')
-                                            ->get()
-                                            ->pluck('empleado_prestacion')->collapse()->values();
-
-                #calculo prestaciones
-                foreach ($prestaciones as $value) {
-                    $calculo = 0;
-                    if(!$value->prestacion->fijo){
-                        if($value->prestacion->descripcion == 'bono 14' || $value->prestacion->descripcion == 'aguinaldo'){
-                            $calculo = ($pago->total_devengado*$pago->total_turnos)/365;
+                        #calculo de credito o debito de prestaciones
+                        if($value->prestacion->debito_o_credito){
+                            $pago->descuento_prestaciones += $pago_prestacion->total;
                         }else{
-                            $calculo = (($value->prestacion->calculo/30)/24)*8*$pago->total_turnos;
-                        }
-                    }else{
-                        if(strtolower($value->prestacion->descripcion) != "isr"){
-                            $calculo = ($pago->total_devengado * $value->prestacion->calculo);
+                            $pago->total_prestaciones += $pago_prestacion->total;
                         }
                     }
 
-                    $pago_prestacion = DetallePagoPrestacion::create([
-                        'pago_empleado_eventual_id'=>$pago->id,
-                        'prestacion_id'=>$value->prestacion_id,
-                        'total'=>$calculo
-                    ]);
-
-                    #calculo de credito o debito de prestaciones
-                    if($value->prestacion->debito_o_credito){
-                        $pago->descuento_prestaciones += $pago_prestacion->total;
-                    }else{
-                        $pago->total_prestaciones += $pago_prestacion->total;
-                    }
+                    #calculo de totales
+                    $pago->total_liquidado = $pago->total_devengado + $pago->total_prestaciones - $pago->descuento_prestaciones;
+                    $pago->save();
                 }
 
-                #calculo de totales
-                $pago->total_liquidado = $pago->total_devengado + $pago->total_prestaciones - $pago->descuento_prestaciones;
-                $pago->save();
+
             }
+
+       /* $planilla_create = PlanillaEventual::where('id',$planilla->id)
+                          ->with('pago_eventual.empleado',
+                                 'pago_eventual.detalle_pago.cargo_turno.cargo',
+                                 'pago_eventual.detalle_pago.cargo_turno.turno',
+                                 'pago_eventual.prestaciones.prestacion')
+                                  ->firstOrFail();
+
+        $planilla_create->pago_eventual = $planilla_create->pago_eventual->where('total_turnos','>=',6);
+
+        $this->calculationMaster($planilla_create->pago_eventual,true);*/
 
         $this->pago_domo($request->asignacion_empleado_id,$planilla->id);
         $db->commit();
@@ -271,6 +292,7 @@ class PlanillaEventualController extends ApiController
     {
         $planilla = PlanillaEventual::where('id',$id)
                               ->with('pago_eventual.empleado',
+                                     'pago_eventual.cargo',
                                      'pago_eventual.detalle_pago.cargo_turno.cargo',
                                      'pago_eventual.detalle_pago.cargo_turno.turno',
                                      'pago_eventual.prestaciones.prestacion')

@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Prestacion;
 use App\Turno;
 use App\CargoTurno;
+use App\Empleado;
+use App\DetallePagoPrestacion;
 
 trait GlobalFunction
 {
@@ -79,7 +81,7 @@ trait GlobalFunction
     }
 
     //obtener array consolidado, reporte
-    public function calculationMaster($pagos){
+    public function calculationMaster($pagos,$create=false){
         //data collection to insert data
         $data = collect();
         //get turns
@@ -90,8 +92,89 @@ trait GlobalFunction
         $cargo_turnos = CargoTurno::with('cargo')->get();
 
         foreach ($pagos as $key => $value) {
+
+            #$total_septimo = 0;
+
+            $turnos_col = collect();
+
+            //collection of dynamics columns to prestacions
+            $prestaciones_col = collect();
+
+            //push data to turnos_col collection
+            foreach ($turnos as $t) {
+                $valor_turno = $cargo_turnos
+                                ->where('cargo_id',$value->cargo_id)
+                                ->where('turno_id',$t->id)->first();
+
+                $conteo = $value->detalle_pago->where('cargo_turno.turno_id',$t->id)->sum('conteo_turnos');
+                $total_turno = $value->detalle_pago->where('cargo_turno.turno_id',$t->id)->sum('total');
+
+                $turnos_col["turno_".$t->numero]=$conteo;
+
+                if(!is_null($valor_turno)){ 
+                    $turnos_col["valor_turno_".$t->numero]=$valor_turno->salario;
+                }else{
+                    $turnos_col["valor_turno_".$t->numero]=0;
+                }
+
+                $turnos_col["total_turno_".$t->numero]=$total_turno;
+            }
+
+            $turnos_col["total_turnos"]=$value->total_turnos;
+            $turnos_col["monto_turnos"]=$value->total_monto_turnos;
+
+            //push general info to collection
+            $info = collect([
+                'id'=>$value->id,
+                'codigo'=>$value->empleado_id,
+                'nombre'=>$value->empleado->primer_nombre.' '.$value->empleado->segundo_nombre.' '.$value->empleado->primer_apellido.' '.$value->empleado->segundo_apellido.' ',
+                'puesto' => $value->cargo->nombre,
+                'afilacion_igss'=>' '.$value->empleado->igss,
+                'dpi'=>' '.$value->empleado->dpi,
+                'cuenta'=>$value->empleado->cuenta
+            ]);
+
+            //merge info and turnos_cols to main data
+            $main_data = $info->merge($turnos_col);
+
+            $main_data['bono_turno'] = $value->bono_turnos;
+
+            $main_data['septimo'] = $value->septimo;
+
+            $main_data['total_devengado'] = $value->total_devengado;
+
+            //push data to prestaciones_col
+            foreach ($prestaciones as $p) {
+                 $total_p = $value->prestaciones->where('prestacion_id',$p->id)->sum('total');
+                 $p->descripcion = strtolower(str_replace(' ', '_', $p->descripcion));
+                 $prestaciones_col[$p->descripcion] = $total_p;
+            }
+
+
+            //merge main data and prestaciones_col
+            $main_data = $main_data->merge($prestaciones_col);
+
+            //total prestacions
+            $main_data['total_prestaciones'] = $value->total_prestaciones;
+
+            //dicounts
+            $main_data['descuento_prestaciones'] = $value->descuento_prestaciones;
+
+            $main_data['prestamos'] = $value->prestamos;
+            $main_data['alimentos'] = $value->alimentacion;
+            $main_data['otros_descuentos'] = $value->otros_descuentos;
+            //calculate total page
+            $main_data['liquido_a_recibir'] = $value->total_liquidado;
+
+            //push data to data collection
+            $data->push($main_data);
+
+
+
+
+
             //grouped data by cargo
-            $grouped = $value->detalle_pago->groupBy('cargo_turno.cargo.nombre');
+           /* $grouped = $value->detalle_pago->groupBy('cargo.nombre');
 
             foreach ($grouped as $key2 => $group) {
                 //collection of dynamic columns for turns
@@ -151,7 +234,15 @@ trait GlobalFunction
 
                 $main_data['bono_turno'] = $group->sum('bono_turno');
 
-                $main_data['septimo'] = ($main_data['total_turnos'] * $value->septimo) / $value->total_turnos;
+                $main_data['septimo'] = ($main_data['monto_turnos']) / 6;
+
+                if($main_data['total_turnos'] >= 6 && $main_data['codigo']==16){
+                    $main_data['septimo'] = ($main_data['monto_turnos']) / 6;
+
+                    if($create){
+                        $total_septimo+=$main_data['septimo'];
+                    }
+                }
 
 
                 $main_data['total_devengado'] = $main_data['monto_turnos'] + $main_data['septimo'] + $main_data['bono_turno'];
@@ -165,7 +256,7 @@ trait GlobalFunction
                 foreach ($prestaciones as $p) {
                      if(!$p->fijo){
                         if($p->descripcion == 'bono 14' || $p->descripcion == 'aguinaldo'){
-                            $calculo = ($main_data['total_devengado']*$value->total_turnos)/365;
+                            $calculo = ($value->total_devengado*$main_data['total_turnos'])/365;
                         }else{
                             $calculo = (($p->calculo/30)/24)*8*$main_data['total_turnos'];
                         }
@@ -205,6 +296,56 @@ trait GlobalFunction
                 //push data to data collection
                 $data->push($main_data);
             }
+
+            if($create && $total_septimo > 0){
+                $value->septimo= $total_septimo;
+
+                $value->total_devengado+= $total_septimo;
+
+                $descuento_prestaciones = 0;
+                $total_prestaciones = 0;
+
+                #crear detalle pago o descuento de prestaciones
+                $prestaciones = Empleado::where('idEmpleado',$value->empleado_id)
+                                            ->with('empleado_prestacion.prestacion')
+                                            ->get()
+                                            ->pluck('empleado_prestacion')->collapse()->values();
+
+                #calculo prestaciones
+                foreach ($prestaciones as $value_p) {
+                    $calculo = 0;
+                    if(!$value_p->prestacion->fijo){
+                        if($value_p->prestacion->descripcion == 'bono 14' || $value_p->prestacion->descripcion == 'aguinaldo'){
+                            $calculo = ($value->total_devengado*$value->total_turnos)/365;
+                        }else{
+                            $calculo = (($value_p->prestacion->calculo/30)/24)*8*$value->total_turnos;
+                        }
+                    }else{
+                        if(strtolower($value_p->prestacion->descripcion) != "isr"){
+                            $calculo = ($value->total_devengado * $value_p->prestacion->calculo);
+                        }
+                    }
+
+                    $pago_prestacion = DetallePagoPrestacion::where('pago_empleado_eventual_id',$value->id)->where('prestacion_id',$value_p->prestacion->id)->first();
+
+                    $pago_prestacion->total = $calculo;
+                    $pago_prestacion->save();
+
+                    #calculo de credito o debito de prestaciones
+                    if($value_p->prestacion->debito_o_credito){
+                        $descuento_prestaciones += $pago_prestacion->total;
+                    }else{
+                        $total_prestaciones += $pago_prestacion->total;
+                    }
+                }
+
+                $value->descuento_prestaciones = $descuento_prestaciones; 
+                $value->total_prestaciones = $total_prestaciones;
+
+
+                $value->total_liquidado = $value->total_devengado + $value->total_prestaciones - $value->descuento_prestaciones;
+                $value->save();
+            }*/
         }
         return $data;
     }
